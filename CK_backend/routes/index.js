@@ -1,14 +1,14 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const app = express();
 const path = require('path');
 
 
 // Require Controllers
-var home_controller = require('../controllers/home.js');
-var user_controller = require('../controllers/user.js');
-var sponser_controller = require('../controllers/sponser.js');
-var admin_controller = require('../controllers/admin.js');
+const home_controller = require('../controllers/home.js');
+const user_controller = require('../controllers/user.js');
+const sponser_controller = require('../controllers/sponser.js');
+const admin_controller = require('../controllers/admin.js');
 
 // ROUTES:
 

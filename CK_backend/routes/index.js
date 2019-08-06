@@ -1,17 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const app = express();
-const path = require('path');
-
 
 // Require Controllers
 const home_controller = require('../controllers/homeController');
-// const user_controller = require('../controllers/user.js');
-// const sponser_controller = require('../controllers/sponser.js');
-// const admin_controller = require('../controllers/admin.js');
+// const user_controller = require('../controllers/userController');
+// const sponser_controller = require('../controllers/sponserController');
+// const admin_controller = require('../controllers/adminController');
 
 // ROUTES:
 
+// GET sponsers events and show detail of events
+// router.get('/sponser/events',sponser_controller.sponser_events);
 // Home_Routes 
 // GET home page
 router.get('/', home_controller.index);

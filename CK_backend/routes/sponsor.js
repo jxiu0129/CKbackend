@@ -1,12 +1,14 @@
 const express = require('express');
-const router = express.router();
+const router = express.Router();
 
 const sponser_controller = require('../controllers/sponserController');
 
-
 //// Sponser_Routes: This is for sponser to manage their events.
-// GET sponser manage page
-router.get('/sponser',sponser_controller.sponser);
+ /*// GET sponser manage page
+ router.get('/sponser',sponser_controller.sponser); */
+ 
+// GET sponsers events and show detail of events
+router.get('/sponser/events',sponser_controller.sponser_events);
 
 // GET request for creating a event and input investments.
 router.get('/sponser/manage', sponser_controller.sponser_create_get);
@@ -25,9 +27,6 @@ router.get('/sponser/manage/update', sponser_controller.sponser_update_get);
 
 // POST request to update events.
 router.post('/sponser/manage/update', sponser_controller.sponser_update_post);
-
-// GET sponsers events and show detail of events
-router.get('/sponser/events',sponser_controller.sponser_events);
 
 // GET request for creating a check in or check out of users.
 router.get('/sponser/events/create', sponser_controller.check_create_get);

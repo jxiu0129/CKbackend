@@ -28,8 +28,8 @@ router.post('/admin/checks/update', admin_controller.check_update_post);
 // GET user information
 router.get('/admin/user',admin_controller.user_events);
 
-// GET sponser information
-router.get('/admin/sponser',admin_controller.sponser_events);
+// GET sponsor information
+router.get('/admin/sponsor',admin_controller.sponsor_events);
 
 // GET events information
 router.get('/admin/events',admin_controller.all_events);

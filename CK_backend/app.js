@@ -1,15 +1,23 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var sponserRouter = require('./routes/sponsor');
-var adminRouter = require('./routes/admin');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const sponsorRouter = require('./routes/sponsor');
+const adminRouter = require('./routes/admin');
 
-var app = express();
+// 设置 Mongoose 连接
+const mongoose = require('mongoose');
+const mongoDB = 'mongodb+srv://ckbackend:ckbackend@cluster0-sfo3z.mongodb.net/CKbackend_test1?retryWrites=true&w=majority';
+mongoose.connect(mongoDB,{ useNewUrlParser: true });
+mongoose.Promise = global.Promise;
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB 连接错误：'));
+
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -24,7 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(indexRouter);
 app.use(usersRouter);
-app.use(sponserRouter);
+app.use(sponsorRouter);
 app.use(adminRouter);
 
 // catch 404 and forward to error handler

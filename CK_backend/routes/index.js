@@ -2,23 +2,20 @@ const express = require('express');
 const router = express.Router();
 
 // Require Controllers
-const home_controller = require('../controllers/homeController');
-// const user_controller = require('../controllers/userController');
-// const sponser_controller = require('../controllers/sponserController');
-// const admin_controller = require('../controllers/adminController');
+const index_controller = require('../controllers/indexController');
 
 // ROUTES:
 
-// GET sponsers events and show detail of events
-// router.get('/sponser/events',sponser_controller.sponser_events);
+// GET sponsors events and show detail of events
+// router.get('/sponsor/events',sponsor_controller.sponsor_events);
 // Home_Routes 
 // GET home page
-router.get('/', home_controller.index);
+router.get('/', index_controller.index);
 
 // POST user login
-router.post('/user_login',home_controller.user_login_post);
+router.post('/user_login',index_controller.user_login_post);
 
-// POST sponser login
-router.post('/sponser_login',home_controller.sponser_login_post);
+// POST sponsor login
+router.post('/sponsor_login',index_controller.sponsor_login_post);
 
 module.exports = router;

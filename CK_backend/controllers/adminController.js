@@ -30,7 +30,7 @@ exports.user_events = function(req,res){
     res.render('index' , { title : "使用者資料"});
 };
 
-exports.sponser_events = function(req,res){
+exports.sponsor_events = function(req,res){
     res.render('index' , { title : "贊助商資料"});
 };
 

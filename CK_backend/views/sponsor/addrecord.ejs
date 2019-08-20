@@ -47,44 +47,44 @@
 			<section id="main" class="wrapper">
 				<div class="inner">
 					<header class="align-center">
-						<h1>出席表</h1>
+						<h1>手動新增報到或刷退紀錄</h1>
 					</header>
 
-					<form method="post" action="#">
-						<div class="row uniform">
-							<div class="9u 12u$(small)">
-								<input type="text" name="query" id="query" value="" placeholder="輸入參與者id" />
+					<!-- Form -->
+
+					<form method="post" action="SignOut_delete_post.js">
+						<!--<div class="row uniform">-->
+						<div align="center">
+							<div class="6u 12u$(xsmall)">
+								<input type="text" name="_id" id="name" value="" placeholder="參與者id" />
 							</div>
-							<div class="3u$ 12u$(small)">
-								<input type="submit" value="搜尋" class="fit" />
+							<br>
+
+
+							<!-- Break -->
+							<div class="12u$">
+								<ul class="actions">
+									<li><input type="submit" value="新增報到" onclick="a_post()"/></li>
+								</ul>
 							</div>
+                            <div class="12u$">
+								<ul class="actions">
+									<li><input type="submit" value="新增刷退" /></li>
+								</ul>
+							</div>
+                            <div class="12u$">
+								<ul class="actions">
+									<li><input type="submit" value="新增報到與刷退" /></li>
+								</ul>
+							</div>
+                            <div>
+                                <ul>
+                                    <li><input type="reset" value="重填資料" class="alt" /></li>
+                                </ul>
+                            </div>
 						</div>
 					</form>
-
-					<div class="table-wrapper">
-						<table>
-							<thead>
-							<tr>
-								<th>參與者id</th>
-								<th>刪除</th>
-							</tr>
-							</thead>
-							<tbody>
-                            <% for(let i = 0;i < list_attendance.Sign_in.length;i++){ %>
-							<tr>
-								<td><%= list_attendance.Sign_in[i]  %></td>
-								<td><a href="">修改</a>/<a href="">刪除</a></td>
-							</tr>
-							<% } %>
-							</tbody>
-						</table>
-					</div>
-
-					<!--button-->
-					<ul class="actions fit">
-						<li><a href="./create" class="button fit">手動新增報到或刷退紀錄</a></li>
-					</ul>
-					</div>
+				</div>
 			</section>
 
 		<!-- Footer -->
@@ -107,4 +107,5 @@
 			<script src="../assets/js/main.js"></script>
 
 	</body>
+	
 </html>

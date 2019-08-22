@@ -12,6 +12,6 @@ const AttendanceSchema = new Schema({
    income : Number
    });
 
-
+AttendanceSchema.set('collection', 'Attendance');
 // Export model.
 module.exports = mongoose.model('Attendance', AttendanceSchema);

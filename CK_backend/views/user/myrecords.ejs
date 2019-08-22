@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<!--
+	Intensify by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+	<head>
+		<title>Ｍy Records - NCCU Attendance</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="/stylesheets/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/stylesheets/assets/css/main.css" />
+		<link rel="stylesheet" href="/stylesheets/assets/css/edit.css">
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="../js/bootstrap.min.js"></script>
+	</head>
+	<body class="subpage">
+
+		<!-- Header -->
+		<header id="header">
+			<nav class="left">
+				<a href="#menu"><span>Menu</span></a>
+			</nav>
+			<a href="index_after_login.html" class="logo">NCCU Attendance</a>
+			<nav class="right">
+				<a href="../index.html" class="button alt">Log out</a>
+			</nav>
+		</header>
+
+		<!-- Menu -->
+		<nav id="menu">
+			<ul class="links">
+				<li><a href="index_after_login.html">首頁</a></li>
+				<li><a href="eventslist_after_login.html">活動列表</a></li>
+				<li><a href="couponlist_after_login.html">coupon排行榜</a></li>
+				<li><a href="myevents.html">我辦的活動</a></li>
+				<li><a href="myrecords.html">我參加的活動</a></li>
+				<li><a href="qrcodelist.html">QRCode</a></li>
+			</ul>
+			<!--<ul class="actions vertical">
+				<li><a href="#" class="button fit">Login</a></li>
+			</ul>-->
+		</nav>
+
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<header class="align-center">
+						<h1>我參加的活動</h1>
+					</header>
+					<div class="table-wrapper">
+						<table>
+							<thead>
+							<tr>
+								<th>活動名稱</th>
+								<th>報到時間</th>
+								<th>刷退時間</th>
+								<th>獲得點數</th>
+							</tr>
+							</thead>
+							<tbody>
+                            <%# =================從這邊開始dynamic================== %>
+                            <% for(let i = 0; i < event_info.length; i++){%>
+							<tr>
+								<td><a href="" data-toggle="modal" data-target="#exampleModal"><%= event_info[i].name %></a></td>
+
+								<!-- Modal -->
+								<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog" role="document">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h3 class="modal-title" id="exampleModalLabel">活動資訊</h3>
+												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+													<span aria-hidden="true">&times;</span>
+												</button>
+											</div>
+                                            <div class="modal-body">
+												<h3 class="inline">活動名稱：</h3><p class="inline"><%=event_info.name%></p>
+												<br>
+												<h3 class="inline">活動日期：</h3><p class="inline"><%=event_info.time%></p>
+												<br>
+												<h3 class="inline">主辦單位：</h3><p class="inline"><%=event_info.sponsor%></p>
+                                                <br>
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+											</div>
+										</div>
+									</div>
+								</div>
+
+
+								<td><%= event_info[i].sign_in %></td>
+								<td><%= event_info[i].sign_out%></td>
+								<td>
+									<img src="../images/piggy-bank.png" height="20" width="20"/>
+									<%=event_info[i].income%>
+								</td>
+                            </tr>
+                            <%}%>
+                            <%# =================結束dynamic區域================== %>
+							</tbody>
+						</table>
+					</div>
+
+					<!--button-->
+					<ul class="actions fit">
+						<li><a href="#" class="button fit">錢包查看餘額</a></li>
+					</ul>
+					</div>
+			</section>
+
+		<!-- Footer -->
+		<footer id="footer">
+			<div class="inner">
+				<h2>Contact Us</h2>
+				<ul class="actions">
+					<!-- <li><span class="icon fa-phone"></span> <a href="#">(000) 000-0000</a></li> -->
+					<!--<li><span class="icon fa-map-marker"></span> 123 Somewhere Road, Nashville, TN 00000</li>-->
+					<li><span class="icon fa-envelope"></span> <a href="#">ourmail@nccu.edu.tw</a></li>
+				</ul>
+			</div>
+		</footer>
+
+		<!-- Scripts -->
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/skel.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+	</body>
+</html>

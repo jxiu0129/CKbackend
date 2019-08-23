@@ -11,7 +11,7 @@ const adminRouter = require('./routes/admin');
 
 // 设置 Mongoose 连接
 const mongoose = require('mongoose');
-const mongoDB = 'mongodb+srv://ckbackend:ckbackend@cluster0-sfo3z.mongodb.net/CKbackend_test1?retryWrites=true&w=majority';
+const mongoDB = 'mongodb+srv://ckbackend:ckbackend@cluster0-sfo3z.mongodb.net/Jackk?retryWrites=true&w=majority';
 mongoose.connect(mongoDB,{ useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 const db = mongoose.connection;

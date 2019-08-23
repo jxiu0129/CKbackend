@@ -1,6 +1,6 @@
 const Event = require("../models/event");
 const Sponsor = require("../models/sponsor");
-const User = require("../models/user");
+//const User = require("../models/User");
 
 var async = require("async");
 

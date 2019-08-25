@@ -74,7 +74,7 @@ exports.sponsor_create_post = [
 
 
 exports.sponsor_delete_post= function(req,res,next){
-
+    console.log("HIHI")
     async.parallel({
         event: function (callback) {
             Event.findById(req.body.eventid).exec(callback)
@@ -86,10 +86,12 @@ exports.sponsor_delete_post= function(req,res,next){
         if (err) { return next(err); }
         // Success.
         else {
-            console.log(results.event);
-            console.log(results.sponsor_event);
+            // console.log(results.event);
+            // console.log(results.sponsor_event);
+
+            console.log(req.params.eventid);
             // Author has no books. Delete object and redirect to the list of authors.
-            Event.findByIdAndRemove(req.body.eventid, function deleteEvent(err) {
+            Event.findByIdAndRemove(req.params.eventid, function deleteEvent(err) {
                 if (err) { return next(err); }
                 // Success - go to author list.
                 console.log("Successfully Delete");
@@ -176,7 +178,7 @@ exports.SignIn_create_post= [
         // Extract the validation errors from a request.
         const errors = validationResult(req);
         // Create a Book object with escaped and trimmed data.
-
+        console.log(req.params.eventid);
         async.parallel({
         
             event: function(callback){
@@ -187,15 +189,16 @@ exports.SignIn_create_post= [
 
             function(err,results){
             if(err) {return next(err);}
-    
             let _sign_in = results.event.Sign_in;
             let _userid = req.body.userid;
             console.log(_sign_in);
+            console.log(_userid);
             if (_sign_in.indexOf(_userid) == -1){
                 _sign_in.push(_userid);
                 console.log('Successfully Create');
                 }
-            else {
+            else{
+                
                 console.log("This User Id has already Sign In");
                 res.redirect("../create/:eventid");
 
@@ -213,7 +216,7 @@ exports.SignIn_create_post= [
                 if (err) { return next(err); }
                 // Successful - redirect to genre detail page.
                 console.log('Successfully Update');
-                res.redirect("../attendancelist/:eventid");
+                res.redirect("../attendancelist");
 
             }
         )}
@@ -247,7 +250,7 @@ exports.SignOut_create_post= [
 
             function(err,results){
             if(err) {return next(err);}
-    
+            
             let _sign_out = results.event.Sign_out;
             let _userid = req.body.userid;
             console.log(_sign_out);
@@ -273,7 +276,7 @@ exports.SignOut_create_post= [
                 if (err) { return next(err); }
                 // Successful - redirect to genre detail page.
                 console.log('Successfully Update');
-                res.redirect("../attendancelist/:eventid");
+                res.redirect("../attendancelist");
             
             }
         )}

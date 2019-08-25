@@ -50,13 +50,21 @@
 						<h1>手動新增報到或刷退紀錄</h1>
 					</header>
 
-					<!-- Form -->
 
-					<form method="post" action="SignOut_delete_post.js">
+					<!-- Form -->
+					<%# <form method="post">
+					<div class="6u 12u$(xsmall)">
+						<input type="text" name="userid" id="name" value="" placeholder="參與者id" />
+					</div>
+
+					<input type="submit" onclick="req.body.userid=document.getElementById('name').value"></input>
+
+					</form> %>
+					<form method="post" action="create/Signin">
 						<!--<div class="row uniform">-->
 						<div align="center">
 							<div class="6u 12u$(xsmall)">
-								<input type="text" name="_id" id="name" value="" placeholder="參與者id" />
+								<input type="text" name="userid" id="name" value="" placeholder="參與者id" />
 							</div>
 							<br>
 
@@ -64,14 +72,31 @@
 							<!-- Break -->
 							<div class="12u$">
 								<ul class="actions">
-									<li><input type="submit" value="新增報到" onclick="a_post()"/></li>
+									<li><input type="submit" value="新增報到" /></li>
 								</ul>
 							</div>
+						</div>
+					</form>
+					<form method="post" action="create/Signout">
+					<div align="center">
+							<div class="6u 12u$(xsmall)">
+								<input type="text" name="userid" id="name" value="" placeholder="參與者id" />
+							</div>
+							<br>
                             <div class="12u$">
 								<ul class="actions">
-									<li><input type="submit" value="新增刷退" /></li>
+									<li><input type="submit" value="新增刷退"  /></li>
 								</ul>
 							</div>
+							</div>
+					</form>
+					<form method="post" action="create/Signboth">
+					<div align="center">
+							<div class="6u 12u$(xsmall)">
+								<input type="text" name="userid" id="name" value="" placeholder="參與者id" />
+							</div>
+							<br>
+					
                             <div class="12u$">
 								<ul class="actions">
 									<li><input type="submit" value="新增報到與刷退" /></li>
@@ -82,7 +107,7 @@
                                     <li><input type="reset" value="重填資料" class="alt" /></li>
                                 </ul>
                             </div>
-						</div>
+						<%# </div> %>
 					</form>
 				</div>
 			</section>

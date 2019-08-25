@@ -4,7 +4,7 @@ const router = express.Router();
 const sponsor_controller = require('../controllers/sponsorController');
 
 // GET sponsors events and show detail of events
-router.get('/sponsor/events',sponsor_controller.sponsor_events);
+router.get('/sponsor/events/',sponsor_controller.sponsor_events);
 
 // GET request for creating a event and input investments.
 router.get('/sponsor/events/createevent', sponsor_controller.sponsor_create_get);

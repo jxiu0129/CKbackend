@@ -12,6 +12,23 @@ const index_controller = require('../controllers/indexController');
 // GET home page
 router.get('/', index_controller.index);
 
+// session test
+router.get('/session', function(req, res, next) {
+    if (req.session.views) {
+      req.session.views++;
+      res.setHeader('Content-Type', 'text/html');
+      res.write('<p>views: ' + req.session.views + '</p>');
+      res.write('<p>expires in: ' + (req.session.cookie.maxAge / 1000) + 's</p>');
+      req.session.name = req.query.id;
+      res.write('<p>name: ' + req.session.name + '</p>');
+      res.end();
+    } else {
+      req.session.views = 1;
+      res.end('welcome to the session demo. refresh!');
+    }
+  });
+  
+
 // POST user login
 router.post('/user_login',index_controller.user_login_post);
 

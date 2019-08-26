@@ -1,5 +1,10 @@
 exports.index = function(req,res){
-    res.render('index' , { title : "政大辦活動"});
+    if(req.session.name == 'undefined'){
+        res.render('index');
+    }
+    else{
+        res.render('login_index');
+    }
 };
 
 exports.user_login_post = function(req,res){

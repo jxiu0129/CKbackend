@@ -16,46 +16,32 @@
 		<script src="/javascripts/bootstrap.min.js"></script>
 	</head>
 	<body>
+
 		<!-- Header -->
 			<header id="header">
 				<nav class="left">
 					<a href="#menu"><span>Menu</span></a>
 				</nav>
-				<a href="index.html" class="logo">NCCU Attendance</a>
+				<a href="index_after_login.html" class="logo">NCCU Attendance</a>
 				<nav class="right">
-					<a href="#" class="button alt " data-toggle="modal" data-target="#exampleModal">Log in</a>
-					<!-- Modal -->
-					<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-						<div class="modal-dialog" role="document">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h3 class="modal-title" id="exampleModalLabel">Log in</h3>
-									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-										<span aria-hidden="true">&times;</span>
-									</button>
-								</div>
-								<div class="modal-body">
-									<p>政大錢包logo</p>
-									<ul class="actions fit">
-										<li><a href="#" class="button special fit">以政大錢包身份登入</a></li>
-									</ul>
-								</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-								</div>
-							</div>
-						</div>
-					</div>
+					<a href="../index.html" class="button alt">Log out</a>
 				</nav>
 			</header>
 
 		<!-- Menu -->
 			<nav id="menu">
 				<ul class="links">
-					<li><a href="index.html">首頁</a></li>
-					<li><a href="eventslist.html">活動列表</a></li>
-					<li><a href="couponlist.html">coupon排行榜</a></li>
+					<li><a href="index_after_login.html">首頁</a></li>
+					<li><a href="eventslist_after_login.html">活動列表</a></li>
+					<li><a href="couponlist_after_login.html">coupon排行榜</a></li>
+					<li><a href="myevents.html">我辦的活動</a></li>
+					<li><a href="myrecords.html">我參加的活動</a></li>
+					<li><a href="qrcodelist.html">QRCode</a></li>
+
 				</ul>
+				<!--<ul class="actions vertical">
+					<li><a href="#" class="button fit">Login</a></li>
+				</ul>-->
 			</nav>
 
 		<!-- Banner -->
@@ -69,6 +55,36 @@
 				</div>
 			</section>
 
+		<!-- One 有圖片被h3文字跟p文字環繞
+			<section id="one" class="wrapper">
+				<div class="inner flex flex-3">
+					<div class="flex-item" style="text-align:left;">
+						<div>
+							<h3>Magna ultricies</h3>
+							<p>Morbi in sem quis dui plalorem ipsum<br /> euismod in, pharetra sed ultricies.</p>
+						</div>
+						<div>
+							<h3>Ipsum adipiscing lorem</h3>
+							<p>Tristique yonve cursus jam nulla quam<br /> loreipsu gravida adipiscing lorem</p>
+						</div>
+					</div>
+
+					<div class="flex-item image fit round">
+						<img src="images/pic01.jpg" alt="" />
+					</div>
+					<div class="flex-item right">
+						<div>
+							<h3>Tempus nullam</h3>
+							<p>Sed adipiscing ornare risus. Morbi estes<br /> blandit sit et amet, sagittis magna.</p>
+						</div>
+						<div>
+							<h3>Suscipit nibh dolore</h3>
+							<p>Pellentesque egestas sem. Suspendisse<br /> modo ullamcorper feugiat lorem.</p>
+						</div>
+					</div>
+				</div>
+			</section>
+			-->
 
 		<!-- Two -->
 			<section id="two" class="wrapper style1 special">
@@ -81,40 +97,41 @@
 				</div>
 			</section>
 
+
 		<!-- Three -->
-			<!--列出幾項活動
+		<!--
 			<section id="three" class="wrapper">
 				<div class="inner flex flex-3">
 					<div class="flex-item box">
 						<div class="image fit">
-							<img src="images/pic02.jpg" alt="" />
+							<img src="../images/pic02.jpg" alt="" />
 						</div>
 						<div class="content">
-							<a href="eventslist.html"><h3>活動名稱</h3></a>
+							<a href="eventslist_after_login.html"><h3>活動名稱</h3></a>
 							<p>活動時間：</p>
 						</div>
 					</div>
 					<div class="flex-item box">
 						<div class="image fit">
-							<img src="images/pic03.jpg" alt="" />
+							<img src="../images/pic03.jpg" alt="" />
 						</div>
 						<div class="content">
-							<a href="eventslist.html"><h3>活動名稱</h3></a>
+							<a href="eventslist_after_login.html"><h3>活動名稱</h3></a>
 							<p>活動時間：</p>
 						</div>
 					</div>
 					<div class="flex-item box">
 						<div class="image fit">
-							<img src="images/pic04.jpg" alt="" />
+							<img src="../images/pic04.jpg" alt="" />
 						</div>
 						<div class="content">
-							<a href="eventslist.html"><h3>活動名稱</h3></a>
+							<a href="eventslist_after_login.html"><h3>活動名稱</h3></a>
 							<p>活動時間：</p>
 						</div>
 					</div>
 				</div>
 			</section>
-			-->
+		-->
 
 		<!-- Footer -->
 			<footer id="footer">
@@ -134,5 +151,6 @@
 			<script src="/stylesheets/assets/js/skel.min.js"></script>
 			<script src="/stylesheets/assets/js/util.js"></script>
 			<script src="/stylesheets/assets/js/main.js"></script>
+
 	</body>
 </html>

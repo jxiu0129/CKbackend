@@ -3,6 +3,8 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const session = require('express-session'); 
+const MongoStore = require('connect-mongo')(session);
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -25,8 +27,22 @@ app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true })); //for read the form
 app.use(cookieParser());
+
+// session
+app.use(session({
+  secret: 'ckEventPromoter',
+  resave: false,  //強制保存session即使它並沒有變化
+  saveUninitialized: false, //強制將未初始化的session存儲。當新建了一個session且未設定屬性或值時，它就處於未初始化狀態。在設定一個cookie前，這對於登陸驗證，減輕服務端存儲壓力，權限控制是有幫助的。
+  cookie: {
+    maxAge: 12 * 3600 * 1000 // 保存半天
+  },
+  store: new MongoStore({
+    mongooseConnection: mongoose.connection,
+  })
+}));
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 

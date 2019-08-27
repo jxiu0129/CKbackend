@@ -15,24 +15,9 @@ const UserSchema = new Schema({
             default: false
         },
         holded_event:[{
-            event_ids:
-            {
-                type:Schema.Types.ObjectId,
-                ref: 'Event',
-                required : true
-            },
-            expense :
-            {
-                type: Schema.Types.Number,
-                ref : 'Event',
-                required : true
-            },
-            atnd_amount:
-            {
-                type: Schema.Types.Number,
-                ref : 'Event',
-                required : true
-            }
+            type:Schema.Types.ObjectId,
+            ref: 'Event',
+            required : true
         }]
     },
     attend: [{

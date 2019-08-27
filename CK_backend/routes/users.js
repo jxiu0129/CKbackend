@@ -56,6 +56,28 @@ router.post('/user/create_dick_event', (req, res) => {
     });
 })
 
+router.get('/user/find_event_id', (req, res) => {
+    Event.find({} ,'AttendanceList')
+
+
+    });
+})
+
+router.post('/user/create_dick_event_2', (req, res) => {
+    let new_event = new Event({
+        holder : 'dick',
+        name : 'hello1',
+        time : Date.now(),
+        expense : 314159,
+        location : 'toilet',
+    });
+
+    new_event.save((err) => {
+        if(err) throw err;
+        res.send('dick');
+    });
+})
+
 router.post('/user/create_dick_attend', (req, res) => {
     let new_attend_list = new Attendance({
         event_id : 'adfadsf',

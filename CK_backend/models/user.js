@@ -9,30 +9,12 @@ const UserSchema = new Schema({
         email: String, 
         tel: String
     },
-    holder : {
-        isHolder : { 
-            type:Boolean,
-            default: false
-        },
-        holded_event:[{
-            event_ids:
-            {
+    hold : {
+        isHolder : { type:Boolean, default: false },
+        holded_events:[{ //要看完整event資訊，在query用populate叫
                 type:Schema.Types.ObjectId,
                 ref: 'Event',
                 required : true
-            },
-            expense :
-            {
-                type: Schema.Types.Number,
-                ref : 'Event',
-                required : true
-            },
-            atnd_amount:
-            {
-                type: Schema.Types.Number,
-                ref : 'Event',
-                required : true
-            }
         }]
     },
     attend: [{

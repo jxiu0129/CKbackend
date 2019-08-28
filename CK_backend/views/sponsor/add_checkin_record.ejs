@@ -9,7 +9,11 @@
 		<title><%= title %></title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="/stylesheets/css/bootstrap.min.css">
 		<link rel="stylesheet" href="/stylesheets/assets/css/main.css" />
+		<link rel="stylesheet" href="/stylesheets/assets/css/edit.css">
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="../js/bootstrap.min.js"></script>
 	</head>
 	<body class="subpage">
 
@@ -18,18 +22,18 @@
 			<nav class="left">
 				<a href="#menu"><span>Menu</span></a>
 			</nav>
-			<a href="../../" class="logo">NCCU Attendance</a>
+			<a href="index_after_login.html" class="logo">NCCU Attendance</a>
 			<nav class="right">
-				<a href="../../" class="button alt">Log out</a>
+				<a href="../index.html" class="button alt">Log out</a>
 			</nav>
 		</header>
 
 		<!-- Menu -->
 		<nav id="menu">
 			<ul class="links">
-				<li><a href="../index.html">首頁</a></li>
-				<li><a href="../eventslist.html">活動列表</a></li>
-				<li><a href="../couponlist.html">coupon排行榜</a></li>
+				<li><a href="index_after_login.html">首頁</a></li>
+				<li><a href="eventslist_after_login.html">活動列表</a></li>
+				<li><a href="couponlist_after_login.html">coupon排行榜</a></li>
 				<li><a href="myevents.html">我辦的活動</a></li>
 				<li><a href="myrecords.html">我參加的活動</a></li>
                 <li><a href="qrcodelist.html">QRCode<img src="../images/fire.png" height="25" width="25"/></a></li>
@@ -43,44 +47,29 @@
 			<section id="main" class="wrapper">
 				<div class="inner">
 					<header class="align-center">
-						<h1>新增活動</h1>
+                        <h1>新增報到紀錄</h1>					
 					</header>
-
-					<!-- Form -->
 
 					<form method="post" action="#">
 						<!--<div class="row uniform">-->
 						<div align="center">
-							<h4>活動id(屆時將自動生成)</h4>
-
 							<div class="6u 12u$(xsmall)">
-                                <input type="text" name="name" id="event_name" value="" placeholder="活動名稱" />
+								<input type="text" name="userid" id="userID" value="" placeholder="參與者id" />
 							</div>
 							<br>
-							<div class="6u 12u$(xsmall)">
-								<input type="date" name="time" id="event_date" value="" placeholder="活動日期" />
-                            </div>
-                            <br>
-                            <div class="6u 12u$(xsmall)">
-                                <input type="text" name="location" id="event_location" value="" placeholder="活動地點" />
-							</div>
+							<h3 class="inline">報到時間：</h3>
+							<input class="inline" name="time" type="datetime-local" id="checkin-addDateTime" placeholder="2014-09-18">
 							<br>
-							<div class="6u$ 12u$(xsmall)">
-								<input type="number" name="expense" id="investment" value="" placeholder="投入資金" />
-							</div>
-							<br>
-                            <p>請注意！當你新增此活動後，該活動的投資金額不可再做更動。
-                                <br>
-                                若有需要更動，請刪除整筆活動再行新增。</p>
+							<br>							
+							<!-- Break -->
 							<div class="12u$">
 								<ul class="actions">
-									<li><input type="submit" value="新增活動" /></li>
-									<li><input type="reset" value="重填資料" class="alt" /></li>
+                                    <li><input type="submit" value="新增報到紀錄" /></li>
 								</ul>
 							</div>
 						</div>
 					</form>
-					</div>
+				</div>
 			</section>
 
 		<!-- Footer -->
@@ -103,4 +92,5 @@
 			<script src="../assets/js/main.js"></script>
 
 	</body>
+	
 </html>

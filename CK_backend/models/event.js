@@ -4,13 +4,13 @@ const Schema = mongoose.Schema;
 
 const EventSchema = new Schema({
    //  _id : _id,
-   holder : { type: String, required : true},
+   holder : { type: String, /*required : true*/},
    name : { type: String, required : true},
    time : { type : Date, required: true},
    location : String,
    expense : {type: Number, required : true },       //投資點數
-   /*Sign_in: [{ type: Schema.ObjectId, ref: 'user'}],       //簽到名單
-   Sign_out: [{ type: Schema.ObjectId, ref: 'user'}],*/      //簽退名單
+/*   Sign_in: [{ type: Schema.ObjectId, ref: 'user'}],       //簽到名單
+   Sign_out: [{ type: Schema.ObjectId, ref: 'user'}],   */   //簽退名單
    AttendanceList : [{ type: Schema.Types.ObjectId, ref: 'Attendance'}],  //有簽到and刷退 --> 出席名單
    Count_in: Number,      //簽到數
    Count_out: Number,     //簽退數

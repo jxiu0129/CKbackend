@@ -8,8 +8,8 @@ const AttendanceSchema = new Schema({
    list :
    [{
       student_id : { type : Number, required: true},
-      time_in : { type : Date, default : Date.now },
-      time_out : { type: Date, required: Date.now},
+      time_in : { type : Date, /*default : Date.now */},
+      time_out : { type: Date, /*default : Date.now */},
       reward : {type : Boolean, default: false}
    }]
 
@@ -23,5 +23,6 @@ const AttendanceSchema = new Schema({
    });
 
 AttendanceSchema.set('collection', 'Attendance');
+
 // Export model.
 module.exports = mongoose.model('Attendance', AttendanceSchema);

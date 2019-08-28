@@ -1,5 +1,4 @@
 const Event = require("../models/event");
-const Sponsor = require("../models/sponsor");
 const User = require("../models/user");
 const Attendance = require("../models/attendance");
 

@@ -30,9 +30,9 @@ router.get('/session', function(req, res, next) {
   
 
 // POST user login
-router.post('/user_login',index_controller.user_login_post);
+router.get('/login_index',index_controller.login_index);
 
 // POST sponsor login
-router.post('/sponsor_login',index_controller.sponsor_login_post);
+// router.post('/sponsor_login',index_controller.sponsor_login_post);
 
 module.exports = router;

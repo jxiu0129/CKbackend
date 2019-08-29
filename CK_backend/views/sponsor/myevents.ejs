@@ -38,7 +38,7 @@
 				<li><a href="couponlist_after_login.html">coupon排行榜</a></li>
 				<li><a href="myevents.html">我辦的活動</a></li>
 				<li><a href="myrecords.html">我參加的活動</a></li>
-				<li><a href="qrcodelist.html">QRCode</a></li>
+                <li><a href="qrcodelist.html">QRCode<img src="../images/fire.png" height="25" width="25"/></a></li>				
 			</ul>
 			<!--<ul class="actions vertical">
 				<li><a href="#" class="button fit">Login</a></li>
@@ -58,6 +58,7 @@
 								<th><img src="../images/code.jpeg" height="20" width="20"/>活動id</th>
 								<th>活動名稱</th>
 								<th>活動日期</th>
+                                <th>活動地點</th>
 								<th>投資點數</th>
 								<th>參加人數</th>
 								<th>修改/刪除</th>
@@ -97,66 +98,80 @@
 
 								<td><%= list_event[i].name %></td>
 								<td><%= list_event[i].time %></td>
+								<td><%= list_event[i].location %></td>
 								<td>
 									<img src="../images/piggy-bank.png" height="20" width="20"/>
 									<%= list_event[i].expense %>
 								</td>
-								<td><a href="/sponsor/events/attendancelist/list_event[i]._id">100</a></td> 
-								<td><a href="" data-toggle="modal" data-target="#event-edit1">修改</a>/<a href="" data-toggle="modal" data-target="#event-delete3">刪除</a></td>
+								<td><a href="/sponsor/events/<%= list_event[i]._id %>/attendancelist">100</a></td> 
+								<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
+									<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
+								<td><%=i%></td>
 
 								<!-- Modal -->
-								<div class="modal fade" id="event-edit1" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
-									<div class="modal-dialog" role="document">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h3 class="modal-title" id="event-editLabel">修改活動資訊</h3>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body" style="text-align: left">
-
-												<h3 class="inline">活動名稱：</h3><p class="inline">活動1</p>
-												<div class="6u 12u$(xsmall) inline">
-													<input type="text" name="name" id="event-editName" value="" placeholder="修改活動名稱" />
+								<form method="post" action="<%= list_event[i]._id %>/update">
+									<div class="modal fade" id="event-edit<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
+										<div class="modal-dialog" role="document">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h3 class="modal-title" id="event-editLabel">修改活動資訊</h3>
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
 												</div>
-												<br>
-												<h3 class="inline">活動日期：</h3><p class="inline">時間1</p>
-												<br>
-												<input type="datetime-local" id="event-editDateTime" placeholder="2014-09-18">
-												<br>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-												<input type="submit" class="btn btn-primary" value="Save"/>
+												<div class="modal-body" style="text-align: left">
 
+													<h3 class="inline">活動名稱：</h3>
+													<div class="6u 12u$(xsmall) inline">
+														<input type="text" name="name" id="event-editName" value="<%= list_event[i].name %>" placeholder="修改活動名稱" />
+													</div>
+													<br>
+													<h3 class="inline">活動日期：</h3>
+													<br>
+													<input type="datetime-local" name="time" id="event-editDateTime" placeholder="2014-09-18">
+													<br>
+													<h3 class="inline">活動地點：</h3>
+													<br>
+													<div class="6u 12u$(xsmall) inline">
+														<input type="text" name="location" id="event-editLocation" value="<%= list_event[i].location %>" placeholder="修改活動地點">
+													</div>
+													<br>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+													<input type="submit" class="btn btn-primary" value="Save"/>
+
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-
+								</form>
+							
 								<!-- Modal -->
-								<div class="modal fade" id="event-delete1" tabindex="-1" role="dialog" aria-labelledby="event-deleteLabel" aria-hidden="true">
-									<div class="modal-dialog" role="document">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h3 class="modal-title" id="event-deleteLabel">刪除活動</h3>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body">
-												<p>請注意！當你按下Delete，該活動將被刪除。</p>
-												<p>若有需要復原，請洽詢系統服務人員。</p>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-												<button type="button" class="btn btn-primary">Delete</button>
+								<form method="post" action="<%= list_event[i]._id %>/delete">
+									<div class="modal fade" id="event-delete<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-deleteLabel" aria-hidden="true">
+										<div class="modal-dialog" role="document">
+											<div class="modal-content">
+												<div class="modal-header">
+													<p> <%= list_event[i]._id %> </p>
+													<h3 class="modal-title" id="event-deleteLabel">刪除活動</h3>
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
+												</div>
+												<div class="modal-body">
+													<p>請注意！當你按下Delete，該活動將被刪除。</p>
+													<p>若有需要復原，請洽詢系統服務人員。</p>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary">Delete</button>
 
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
+								</form>
 							</tr>
 
 							<% } %>

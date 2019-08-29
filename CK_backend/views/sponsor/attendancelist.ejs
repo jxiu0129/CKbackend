@@ -36,7 +36,7 @@
 				<li><a href="couponlist_after_login.html">coupon排行榜</a></li>
 				<li><a href="myevents.html">我辦的活動</a></li>
 				<li><a href="myrecords.html">我參加的活動</a></li>
-				<li><a href="qrcodelist.html">QRCode</a></li>
+                <li><a href="qrcodelist.html">QRCode<img src="../images/fire.png" height="25" width="25"/></a></li>
 			</ul>
 			<!--<ul class="actions vertical">
 				<li><a href="#" class="button fit">Login</a></li>
@@ -66,15 +66,21 @@
 							<thead>
 							<tr>
 								<th>參與者id</th>
-								<th>刪除</th>
+								<th>報到時間</th>
+								<th>刷退時間</th>
 							</tr>
 							</thead>
 							<tbody>
-                            <% for(let i = 0;i < list_attendance.Sign_in.length;i++){ %>
-							<tr>
-								<td><%= list_attendance.Sign_in[i]  %></td>
-								<td><a href="">修改</a>/<a href="">刪除</a></td>
-							</tr>
+                            <%if(thisattnd == null){ %>
+								<h1>此活動尚未有任何簽到/刷退紀錄</h1>
+							<% }else{ %>
+								<% for(let i = 0;i < thisattnd.list.length; i++){ %>
+								<tr>
+									<td><%= thisattnd.list[i].student_id  %></td>
+									<td><%= thisattnd.list[i].time_in  %></td>
+									<td><%= thisattnd.list[i].time_out  %></td>
+								</tr>
+								<% } %>
 							<% } %>
 							</tbody>
 						</table>
@@ -82,8 +88,10 @@
 
 					<!--button-->
 					<ul class="actions fit">
-						<li><a href="./create" class="button fit">手動新增報到或刷退紀錄</a></li>
-					</ul>
+                        <li><a href="./SigninCreate" class="button special fit">新增報到紀錄</a></li>
+                        <li><a href="./SignoutCreate" class="button fit">新增刷退紀錄</a></li>
+                        <li><a href="./SignbothCreate" class="button alt fit">新增報到與刷退紀錄</a></li>					
+						</ul>
 					</div>
 			</section>
 

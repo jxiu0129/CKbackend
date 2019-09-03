@@ -33,10 +33,10 @@
     
                       
 			<ul class="links">
-				<li><a href="index_after_login.html">首頁</a></li>
-				<li><a href="eventslist_after_login.html">活動列表</a></li>
-				<li><a href="couponlist_after_login.html">電子禮券排行榜</a></li>
-				<li><a href="myevents.html">我辦的活動</a></li>
+				<li><a href="../../login_index">首頁</a></li>
+				<li><a href="../../eventslist">活動列表</a></li>
+				<li><a href="../../couponlist">電子禮券排行榜</a></li>
+				<li><a href="./events">我辦的活動</a></li>
 				<li><a href="myrecords.html">我參加的活動</a></li>
                 <li><a href="qrcodelist.html">QRCode<img src="../images/fire.png" height="25" width="25"/></a></li>				
 			</ul>
@@ -97,7 +97,7 @@
 
 
 								<td><%= list_event[i].name %></td>
-								<td><%= list_event[i].time %></td>
+								<td><%= list_event[i].time.toLocaleString() %></td>
 								<td><%= list_event[i].location %></td>
 								<td>
 									<img src="../images/piggy-bank.png" height="20" width="20"/>
@@ -106,7 +106,6 @@
 								<td><a href="/sponsor/events/<%= list_event[i]._id %>/attendancelist">100</a></td> 
 								<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
 									<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
-								<td><%=i%></td>
 
 								<!-- Modal -->
 								<form method="post" action="./<%= list_event[i]._id %>/update">

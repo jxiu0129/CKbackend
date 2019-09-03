@@ -6,14 +6,14 @@
 -->
 <html>
 	<head>
-		<title><%= title %></title>
+		<title>Coupon - NCCU Attendance</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="/stylesheets/css/bootstrap.min.css">
 		<link rel="stylesheet" href="/stylesheets/assets/css/main.css" />
 		<link rel="stylesheet" href="/stylesheets/assets/css/edit.css">
 		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-		<script src="../js/bootstrap.min.js"></script>
+		<script src="/javascripts/bootstrap.min.js"></script>
 	</head>
 	<body class="subpage">
 
@@ -31,12 +31,13 @@
 		<!-- Menu -->
 		<nav id="menu">
 			<ul class="links">
-				<li><a href="../../../../login_index">首頁</a></li>
-				<li><a href="../../../../eventslist">活動列表</a></li>
-				<li><a href="../../../../couponlist">電子禮券排行榜</a></li>
-				<li><a href="../../">我辦的活動</a></li>
+                <li><a href="./login_index">首頁</a></li>
+                <li><a href="./eventslist">活動列表</a></li>
+                <li><a href="./couponlist">電子禮券排行榜</a></li>
 				<li><a href="myrecords.html">我參加的活動</a></li>
+                <li><a href="./sponsor/events">我辦的活動</a></li>
 				<li><a href="qrcodelist.html">QRCode<img src="../images/fire.png" height="25" width="25"/></a></li>
+
 			</ul>
 			<!--<ul class="actions vertical">
 				<li><a href="#" class="button fit">Login</a></li>
@@ -47,28 +48,55 @@
 			<section id="main" class="wrapper">
 				<div class="inner">
 					<header class="align-center">
-						<h1>新增刷退紀錄</h1>
+						<h1>電子禮券排行榜</h1>
+						<p>以下為暢銷電子禮券組前三名！</p>
 					</header>
-					<form method="post" action="#">
-						<!--<div class="row uniform">-->
-						<div align="center">
-							<div class="6u 12u$(xsmall)">
-								<input type="text" name="userid" id="userID" value="" placeholder="參與者id" />
-							</div>
-							<br>
-							<h3 class="inline">刷退時間：</h3>
-							<input class="inline" name="time" type="datetime-local" id="checkout-addDateTime" placeholder="2014-09-18">
-							<br>
-							<br>							
-							<!-- Break -->
-							<div class="12u$">
-								<ul class="actions">
-                                    <li><input type="submit" value="新增刷退紀錄" /></li>
-								</ul>
-							</div>
-						</div>
-					</form>
-				</div>
+					<div class="table-wrapper">
+						<table>
+							<thead>
+							<tr>
+								<th>排名</th>
+								<th>票券組合</th>
+								<th>價錢（點數）</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr>
+								<td>Top 1</td>
+								<td>Haagen-dazs百元現金兌換券</td>
+								<td>
+									<img src="../images/piggy-bank.png" height="20" width="20"/>
+									10
+								</td>
+							</tr>
+							<tr>
+								<td>Top 2</td>
+								<td>威秀影城電影票即享券</td>
+								<td>
+									<img src="../images/piggy-bank.png" height="20" width="20"/>
+									27
+								</td>
+							</tr>
+							<tr>
+								<td>Top 3</td>
+								<td>Cold Stone百元商品兌換券</td>
+								<td>
+									<img src="../images/piggy-bank.png" height="20" width="20"/>
+									10
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+					<header class="align-center">
+						<p>若要購買或兌換電子禮券，請前往政大錢包！</p>
+					</header>
+
+					<!--button-->
+					<ul class="actions fit">
+						<li><a href="addevent.html" class="button fit">前往政大錢包</a></li>
+					</ul>
+					</div>
 			</section>
 
 		<!-- Footer -->

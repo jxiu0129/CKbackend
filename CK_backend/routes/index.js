@@ -35,4 +35,18 @@ router.get('/login_index',index_controller.login_index);
 // POST sponsor login
 // router.post('/sponsor_login',index_controller.sponsor_login_post);
 
+
+// GET event list
+router.get('/eventslist',function(req,res,next){
+  res.render('eventlist' , { title : "Event List | NCCU Attendance"});
+});
+
+// GET coupon list
+router.get('/couponlist',function(req,res,next){
+  res.render('couponlist' , { title : "Event List | NCCU Attendance"});
+});
+
+router.get('/user_profile', function(req, res, next) {
+  res.render('./user/user_profile');
+});
 module.exports = router;

@@ -7,8 +7,8 @@ const AttendanceSchema = new Schema({
    list :
    [{
       student_id : { type : Number, required: true},
-      time_in : { type : Date, default : Date.now },
-      time_out : { type: Date, required: Date.now},
+      time_in : { type : Date, /*default : Date.now*/ },  // 註解for test 
+      time_out : { type: Date, /*default: Date.now*/  },  // 註解for test (required:date.now?)
       reward : {type : Boolean, default: false}
    }]
 });

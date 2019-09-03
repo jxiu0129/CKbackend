@@ -35,7 +35,7 @@
 			<ul class="links">
 				<li><a href="index_after_login.html">首頁</a></li>
 				<li><a href="eventslist_after_login.html">活動列表</a></li>
-				<li><a href="couponlist_after_login.html">coupon排行榜</a></li>
+				<li><a href="couponlist_after_login.html">電子禮券排行榜</a></li>
 				<li><a href="myevents.html">我辦的活動</a></li>
 				<li><a href="myrecords.html">我參加的活動</a></li>
                 <li><a href="qrcodelist.html">QRCode<img src="../images/fire.png" height="25" width="25"/></a></li>				
@@ -109,7 +109,7 @@
 								<td><%=i%></td>
 
 								<!-- Modal -->
-								<form method="post" action="<%= list_event[i]._id %>/update">
+								<form method="post" action="./<%= list_event[i]._id %>/update">
 									<div class="modal fade" id="event-edit<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
 										<div class="modal-dialog" role="document">
 											<div class="modal-content">
@@ -128,7 +128,7 @@
 													<br>
 													<h3 class="inline">活動日期：</h3>
 													<br>
-													<input type="datetime-local" name="time" id="event-editDateTime" placeholder="2014-09-18">
+													<input type="datetime-local" name="time" id="event-editDateTime" value="<%= list_event[i].time %>" placeholder="2014-09-18">
 													<br>
 													<h3 class="inline">活動地點：</h3>
 													<br>
@@ -148,7 +148,7 @@
 								</form>
 							
 								<!-- Modal -->
-								<form method="post" action="<%= list_event[i]._id %>/delete">
+								<form method="post" action="./<%= list_event[i]._id %>/delete">
 									<div class="modal fade" id="event-delete<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-deleteLabel" aria-hidden="true">
 										<div class="modal-dialog" role="document">
 											<div class="modal-content">

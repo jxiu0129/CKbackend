@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const EventSchema = new Schema({
    // _id : Number,
-   holder : { type: String, required : true},
+   holder : { type: String, /*required : true*/},  //註解For test
    name : { type: String, required : true},
    time : { type : Date, required: true},
    location : String,

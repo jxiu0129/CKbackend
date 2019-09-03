@@ -281,6 +281,7 @@ exports.SignIn_create_post= [
                         else if (_stdId == _atndList[i].student_id){                    //如果輸入的使用者id已經存在於紀錄中
                             if (_atndList[i].time_in == undefined){                          //則檢查timein有沒有輸入過
                                 _atndList[i].time_in = _timein;
+                                _atndList[i].reward = true;
                                 _SignIn = {
                                     event_id : req.params.eventid,
                                     list : _atndList,
@@ -436,6 +437,7 @@ exports.SignOut_create_post= [
                         else if (_stdId == _atndList[i].student_id){                    //如果輸入的使用者id已經存在於紀錄中
                             if (_atndList[i].time_out == undefined){                          //則檢查timein有沒有輸入過
                                 _atndList[i].time_out = _timeout;
+                                _atndList[i].reward = true;
                                 _SignOut = {
                                     event_id : req.params.eventid,
                                     list : _atndList,
@@ -476,71 +478,154 @@ exports.SignBoth_create_post= [
     sanitizeBody('*').escape(),
 
     // Process request after validation and sanitization.
-    (req, res, next) => {
-        
+    (req,res,next) =>{
+        console.log("????"),
 
-        // Extract the validation errors from a request.
-        const errors = validationResult(req);
-        // Create a Book object with escaped and trimmed data.
 
         async.parallel({
-        
             event: function(callback){
                 Event.findById(req.params.eventid)
-                .exec(callback)      
+                .exec(callback)
+            },
 
-            }},
+            attendance: function(callback){
+                Attendance.findOne({event_id:req.params.eventid})
+                .exec(callback)
 
-            function(err,results){
-            if(err) {return next(err);}
-    
-            let _sign_in = results.event.Sign_in;
-            let _sign_out = results.event.Sign_out;
-            let _userid = req.body.userid;
+            },
 
-            console.log(_sign_in);
-            if (_sign_in.indexOf(_userid) == -1){
-                _sign_in.push(_userid);
-                console.log('Successfully Create');
+            list : function(callback){
+                Attendance.findOne({event_id:req.params.eventid},'list')
+                .exec(callback)
+
+            }
+        },
+        
+        function(err,results){
+
+            let _stdId = req.body.userid;
+            let _timein = req.body.timein;
+            let _timeout = req.body.timeout;
+            let _atnd = results.attendance;
+            let _Sign;
+
+
+            if(err){return next(err);}
+
+            else if (_atnd == null){
+
+                let _newSign = new Attendance({
+                    event_id : req.params.eventid,
+                    list : [{
+                        student_id : _stdId,
+                        time_in : _timein,
+                        time_out : _timeout,
+                        reward : true
+                    }]
+                });
+
+                _Sign = _newSign;
+
+                _newSign.save(function(err){
+
+                    if(err) {return next(err);}
+                    console.log("Successfully Create SignIn and SignOut");
+
+                });
+                
+                let thisevent = new Event({
+                    name : results.event.name,
+                    time : results.event.time,
+                    expense : results.event.expense,
+                    location : results.event.location,
+                    AttendanceList : _newSign,
+                    _id : results.event._id
+                })
+                // results.event.AttendanceList._id = _newSignOut._id
+
+                Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
+                    if(err) { return next(err);}
+                    res.redirect("./attendancelist");
+
+                });
+                
+            }
+        
+            else{
+                let _atndList = results.list.list;
+                if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
+                    _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+                        student_id : _stdId,
+                        time_in : _timein,
+                        time_out : _timeout,
+                        reward : true
+                    });
+                    _Sign = {
+                        event_id : req.params.eventid,
+                        list : _atndList,
+                    };
+
+                    Attendance.findByIdAndUpdate(_atnd._id,_Sign,{},function(err){
+                        console.log("Successfully Create SignIn and SignOut");
+                    })
                 }
-            else {
-                console.log("This User Id has already Sign In");
-                res.redirect("./");
 
-                return;
-            }
-            
-            console.log(_sign_out);
-            if (_sign_out.indexOf(_userid) == -1){
-                _sign_out.push(_userid);
-                console.log('Successfully Create');
+
+                else{
+
+                    for(let i = 0; i < _atndList.length; i++){
+                        console.log("i:  "+i);
+                        console.log(_atndList[i].student_id);
+
+
+                        if(_stdId != _atndList[i].student_id){              //輸入的userid不等於目前檢查的studentId
+                            if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
+                            else{
+                                _atndList.push({
+                                    student_id : _stdId,
+                                    time_in : _timein,
+                                    time_out : _timeout,
+                                    reward : true
+                                });
+                                _Sign = {
+                                    event_id : req.params.eventid,
+                                    list : _atndList,
+                                };
+                                break;
+                            }
+                        }
+                        
+                        
+                        
+                        else if (_stdId == _atndList[i].student_id){                    //如果輸入的使用者id已經存在於紀錄中
+                            if (_atndList[i].time_out != undefined && _atndList[i].time_in != undefined){                          //如果in跟out都已經輸入了
+                                console.log("This user has already SignIn and SignOut");
+                                res.redirect('./attendancelist');
+                                return;
+                            }else if (_atndList[i].time_in != undefined){     //如果in已經輸入過
+                                console.log("This user has already SignIn ");
+                                res.redirect('./attendancelist');
+                                return;
+                            }else if(_atndList[i].time_out != undefined){     //如果out已經輸入過
+                                console.log("This user has already SignOut");
+                                res.redirect('./attendancelist');
+                                return;
+                            }
+                        }else{
+                            console.log("?");
+                            break;
+                        }
+                    }
+                    console.log(_Sign);
+                    Attendance.findByIdAndUpdate(results.attendance._id,_Sign,{},function(err,theAtd){
+                        if(err){return next(err);}
+                        console.log("Successfully Create SingIn and SignOut");
+                        res.redirect("./attendancelist");
+                    })
                 }
-            else {
-                console.log("This User Id has already Sign Out");
-                res.redirect("./");
-
-                return;
             }
-
-            let new_event = {
-                name : results.event.name,
-                time : results.event.time,
-                expense : results.event.expense,
-                Sign_in : _sign_in,
-                Sign_out : _sign_out
-            }
-            console.log(_sign_in);
-            console.log(_sign_out);
-
-            Event.findByIdAndUpdate(req.params.eventid, new_event, {}, function (err, theevent) {
-                if (err) { return next(err); }
-                // Successful - redirect to genre detail page.
-                console.log('Successfully Update');
-                res.redirect("./attendancelist");
-            
-            }
-        )}
-    )}       
+        })
+    }       
 ];
 
 

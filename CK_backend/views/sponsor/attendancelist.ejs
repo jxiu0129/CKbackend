@@ -77,8 +77,17 @@
 								<% for(let i = 0;i < thisattnd.list.length; i++){ %>
 								<tr>
 									<td><%= thisattnd.list[i].student_id  %></td>
-									<td><%= thisattnd.list[i].time_in  %></td>
-									<td><%= thisattnd.list[i].time_out  %></td>
+									<% if(thisattnd.list[i].time_in == undefined) {%>
+										<td><%= thisattnd.list[i].time_in  %></td>
+									<% } else { %>
+										<td><%= thisattnd.list[i].time_in.toLocaleString()  %></td>
+									<% } %>
+
+									<% if(thisattnd.list[i].time_out == undefined) {%>
+										<td><%= thisattnd.list[i].time_out  %></td>
+									<% } else { %>
+										<td><%= thisattnd.list[i].time_out.toLocaleString()  %></td>
+									<% } %>
 								</tr>
 								<% } %>
 							<% } %>

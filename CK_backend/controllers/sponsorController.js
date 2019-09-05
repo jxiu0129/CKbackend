@@ -2,7 +2,10 @@ const Event = require("../models/event");
 const User = require("../models/user");
 const Attendance = require("../models/attendance");
 
-var async = require("async");
+const async = require("async");
+const request = require('request');
+const QRCode = require('qrcode');
+
 
 const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
@@ -63,13 +66,40 @@ exports.sponsor_create_post = [
         return;
         }
         else {
-            // Data from form is valid, Save
+ 
+            // First, Create QR code jpg                           
+            let event_id = event._id;          //find的條件理應是找目前正在舉辦的event，因為正常來說這個其實是一個array
+            
+            const opts = {                                    //容錯率包含QRcode圖片的大小，若把太大的圖片硬縮成小圖就會增加讀取錯誤率
+                errorCorrectionLevel: 'H',                    //version越高，圖片能包含的data也就越多   
+                version: 10                                    //但別太高
+            };
+            
+            const qr_urlIN = 'http://localhost:3000/testsignin/'+event_id+'?userid=77777777';       //data的部分，此處的req.query先寫死
+            const qr_pathIN = './public/images/QRcode/qrcode_'+event_id+"_in.jpg";
+        
+            QRCode.toFile(qr_pathIN, qr_urlIN, opts, (err) => {
+                if (err) throw err;
+                console.log('savedIN.');
+            });
+            
+            const qr_urlOUT = 'http://localhost:3000/testsignout/'+event_id+'?userid=77777777';           //data的部分
+            const qr_pathOUT = './public/images/QRcode/qrcode_'+event_id+"_out.jpg";
+        
+    
+            QRCode.toFile(qr_pathOUT, qr_urlOUT, opts, (err) => {
+                if (err) throw err;
+                console.log('savedOUT.');
+            });
+
+            // Second,Data from form is valid, Save
             event.save(function (err) {
                 if (err) { return next(err); }
-                // Successful - redirect to new author record.
+                // Successful 
                 res.redirect('./');
                 console.log('Successfully Create');
-            })
+            });
+
         }
     }
 ];

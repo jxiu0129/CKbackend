@@ -3,7 +3,7 @@ var router = express.Router();
 var request = require('request');
 
 const QRCode = require('qrcode');
-var async = require("async");
+const async = require("async");
 
 const Attendance = require("../models/attendance");
 const Event = require("../models/event");
@@ -360,7 +360,7 @@ router.post('/createuser',(req,res,next)=>{
     let user = new User({
         name : req.body.name,
         hold:{
-            isHolder : true,
+            isHolder : req.body.isholder,
             holded_events : req.body.eventid
         }
     });
@@ -412,6 +412,56 @@ router.get('/QRtest', function(req, res, next) {
     });
 });
 
+//TIME TEST
+const schedule = require('node-schedule');
+
+router.get('/qrcodelist/:userid', (req,res,next)=>{
+
+    User.findById(req.params.userid,'hold')
+    .exec(async (err,thisuser)=>{
+       
+        if (err) { return next(err); };
+
+        if (thisuser.hold.isHolder == false){
+            res.render('qrcode/alertmessage',{title:'No Event',msg:'這個使用者沒有舉辦過任何活動哦！'});
+        }else{
+            
+            let event_array = thisuser.hold.holded_events;
+            let timesup_event = [];
+            let _now = Date.now();
+            let timespan = 3600000;                         //時間差，目前是設定為一個小時
+            
+            for (let i =0 ; i < event_array.length ; i++) {                       //檢查此user舉辦的所有活動，如果有一小時後開始的活動就把他push進timesup_event
+                const evt = await Event.findById(event_array[i]);
+                if ((evt.time - _now) <= timespan){
+                    timesup_event.push(event_array[i]);
+                }
+            };
+
+            console.log(timesup_event);
+
+            if( timesup_event[0] == null ){
+                res.render('qrcode/alertmessage',{title:'Not Yet',msg:'目前沒有即將進行的活動哦！\n (活動前一小時才會產生QRcode)'});
+            }else{
+                res.render('qrcode/qrcodelist',{timesup_event : timesup_event});
+            }
+        } 
+    });
+});
+
+
+router.get('/timeTest',(req,res,next)=>{
+    let _date = new Date(Date.now());
+    console.log(_date);
+    let A = [];
+    let B = [0,1,2,3,4]
+    for (b of B){
+        A.push(b);
+        console.log(A);
+    }
+    console.log(A);
+
+});
 
 
 

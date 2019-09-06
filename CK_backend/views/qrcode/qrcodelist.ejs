@@ -43,13 +43,15 @@
         </ul>-->
 	</nav>
 
+	<% for(ev of timesup_event){ %>
+
 	<!-- QRcode List -->
+	<h3 style="text-align: center">活動ID： <%=ev%></h3>
 	<section id="three" class="wrapper">
 		<div class="inner flex flex-3">
 			<div class="flex-item box">
 				<div class="image fit">
-                    <img src="<%= qr_pathIN %>" />
-                    <!-- <img src="./images/QRcode/fire.png"> -->
+                    <img src="../images/QRcode/qrcode_<%= ev._id %>_in.jpg" />
 				</div>
 				<div class="content">
 					<h3>簽到條碼</h3>
@@ -57,10 +59,7 @@
 			</div>
 			<div class="flex-item box">
 				<div class="image fit">
-                    <!-- WHY?????????????????? -->
-                    <img src="<%= qr_pathIN %>" />
-                   
-					<img src="<%= qr_pathOUT %>" />
+                    <img src="../images/QRcode/qrcode_<%= ev._id %>_out.jpg" />
 				</div>
 				<div class="content">
 					<h3>刷退條碼</h3>
@@ -68,6 +67,8 @@
 			</div>
 		</div>
 	</section>
+
+	<%}%>
 
 	<p style="text-align: center">若有需要查詢其他活動的QRCode，請按照以下步驟進行。</p>
     <p style="text-align: center">點選左上角menu -> 點選我辦的活動 -> 點選活動id</p>

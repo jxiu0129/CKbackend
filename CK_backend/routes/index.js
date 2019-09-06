@@ -46,7 +46,6 @@ router.get('/couponlist',function(req,res,next){
   res.render('couponlist' , { title : "Event List | NCCU Attendance"});
 });
 
-router.get('/user_profile', function(req, res, next) {
-  res.render('./user/user_profile');
-});
+router.get('/user_profile', index_controller.profile_user);
+
 module.exports = router;

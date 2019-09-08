@@ -30,16 +30,14 @@ exports.login_index = function(req, res){
     .catch(() => {
         console.log('wrong');
         console.log(API_Access);
-        console.log(API_Access.access_token);
-        console.log(API_Access.refresh_token);
         rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
             'auth': {
                 'bearer': API_Access.access_token
             }
         })
         .then((message) => {
-            console.log(message);
-            API_User = message;
+            API_User = JSON.parse(message);
+            console.log(API_User);
         })
         .catch(() =>{
             console.log('fail');
@@ -52,7 +50,7 @@ exports.login_index = function(req, res){
 
 exports.profile_user = async function(req, res){
     res.render('profile');
-} 
+};
 
 // exports.user_login_post = function(req,res){
 //     res.redirect('../user');  //Test

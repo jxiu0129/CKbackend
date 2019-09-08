@@ -136,7 +136,7 @@
 									<img src="../images/piggy-bank.png" height="20" width="20"/>
 									<%= list_event[i].expense %>
 								</td>
-								<td><a href="/sponsor/events/<%= list_event[i]._id %>/attendancelist"></a></td> 
+								<td><a href="/sponsor/events/<%= list_event[i]._id %>/attendancelist"><%=list_event[i].amount%></a></td> 
 								<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
 									<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
 								<td><%=i%></td>

@@ -18,7 +18,6 @@ exports.sponsor_events= function(req,res,next){
       .exec(function (err, list_event){
          if (err) { return next(err); }
          // Successful, so render.
-         console.log(list_event.amount);
          res.render('sponsor/myevents', { title: 'My Events | NCCU Attendance', list_event:  list_event});
     });
     
@@ -30,31 +29,37 @@ exports.sponsor_create_get= function(req, res,){
 
 
 exports.sponsor_create_post = [
-
+    
     //Validate
+    
     body('name', 'Name is required').isLength({ min: 1 }).trim(),
     body('time',  'Invalid date').optional({ checkFalsy: true}).isISO8601(),
     body('location', 'Name is required').isLength({ min: 1 }).trim(),
     body('expense','Expense is required').isInt({ min : 0 ,allow_leading_zeroes: false}),
-
+    
     // Sanitize (trim) the name field.
     sanitizeBody('name').escape(),
     sanitizeBody('time').escape().toDate(),
     sanitizeBody('location').escape(),
     sanitizeBody('expense').escape(),
- 
+    
     // Process request after validation and sanitization.
     (req, res, next) => {
         // Extract the validation errors from a request.
+        
         const errors = validationResult(req);
-
+        
+        // if (req.session.user_info.user_info.sponsor_point < req.body.expense ){
+        //     console.log("餘額不足");   
+        // };
         // Create a genre object with escaped and trimmed data.
         let event = new Event({
             // _id : req.body._id, 
             name : req.body.name,
             time : req.body.time,
             location : req.body.location,
-            expense : req.body.expense      //投資點數
+            expense : req.body.expense,      //投資點數
+            amount : 0
         });
 
 
@@ -109,7 +114,7 @@ exports.sponsor_create_post = [
 exports.sponsor_delete_post= function(req,res,next){
     /*async.parallel({
         event: function (callback) {
-            Event.findById(req.body.eventid).exec(callback)
+            Event.findById(req.body.eventid).exec(call back)
         }
     }, function (err, results) {
         if (err) { return next(err); }
@@ -248,9 +253,6 @@ exports.SignIn_create_post= [
 
                 });
                 
-                for(let i =0;i < _atnd.length;i++){
-                    if(_atndList)
-                }
                 
                 let thisevent = new Event({
                     name : results.event.name,
@@ -258,9 +260,9 @@ exports.SignIn_create_post= [
                     expense : results.event.expense,
                     location : results.event.location,
                     AttendanceList : _newSignIn,
-                    // amount :  ,
+                    amount : results.event.amount,
                     _id : results.event._id
-                })
+                });
                 // results.event.AttendanceList._id = _newSignIn._id
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
@@ -332,12 +334,35 @@ exports.SignIn_create_post= [
                             break;
                         }
                     }
+                    
                     console.log(_SignIn);
                     Attendance.findByIdAndUpdate(results.attendance._id,_SignIn,{},function(err,theAtd){
                         if(err){return next(err);}
                         console.log("Successfully Create SignIn");
                         res.redirect("./attendancelist");
-                    })
+                    });
+                    
+                    let _rwd = 0;
+                    for (let j = 0; j < _atnd.length;j++){
+                        if(_atnd.list[j].reward == true){
+                            _rwd ++;
+                        }
+                    };
+                    
+                    let theevent = {
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSignOut,
+                        _id : results.event._id,
+                        reward : _rwd
+                    };
+                    
+                    Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
+                        if(err) { return next(err);}
+                        res.redirect("./attendancelist");
+                     });
                 }
             }
         })
@@ -415,7 +440,8 @@ exports.SignOut_create_post= [
                     expense : results.event.expense,
                     location : results.event.location,
                     AttendanceList : _newSignOut,
-                    _id : results.event._id
+                    _id : results.event._id,
+                    amount : results.event.amount,
                 })
                 // results.event.AttendanceList._id = _newSignOut._id
 
@@ -492,8 +518,29 @@ exports.SignOut_create_post= [
                     Attendance.findByIdAndUpdate(results.attendance._id,_SignOut,{},function(err,theAtd){
                         if(err){return next(err);}
                         console.log("Successfully Create SignOut");
-                        res.redirect("./attendancelist");
-                    })
+                    });
+                    
+                    let _rwd = 0;
+                    for (let j = 0; j < _atnd.length;j++){
+                        if(_atnd.list[j].reward == true){
+                            _rwd ++;
+                        }
+                    };
+                    
+                    let theevent = {
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSignOut,
+                        _id : results.event._id,
+                        reward : _rwd
+                    }
+                    
+                    Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
+                        if(err) { return next(err);}
+                        res.redirect("./attendancelist");    
+                    });                
                 }
             }
         })
@@ -574,7 +621,8 @@ exports.SignBoth_create_post= [
                     expense : results.event.expense,
                     location : results.event.location,
                     AttendanceList : _newSign,
-                    _id : results.event._id
+                    _id : results.event._id,
+                    amount : results.event.amount
                 })
                 // results.event.AttendanceList._id = _newSignOut._id
 
@@ -657,6 +705,29 @@ exports.SignBoth_create_post= [
                         console.log("Successfully Create SingIn and SignOut");
                         res.redirect("./attendancelist");
                     })
+                   
+                    let _rwd = 0;
+                    for (let j = 0; j < _atnd.length;j++){
+                        console.log(_atnd.list[j].reward)
+                        if(_atnd.list[j].reward == true){
+                            _rwd ++;
+                        }
+                    };
+                    
+                    let theevent = {
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSignOut,
+                        _id : results.event._id,
+                        reward : _rwd
+                    };
+                    
+                    Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
+                        if(err) { return next(err);}
+                        res.redirect("./attendancelist");
+                     });
                 }
             }
         })
@@ -751,3 +822,185 @@ exports.SignOut_delete_post= function(req,res){
         )}
     )
     }};
+
+
+
+    
+// exports.sponsor_delete_get= function(req,res,next){
+//     async.parallel({
+//         event: function (callback) {
+//             Event.findById(req.params.eventid).exec(callback)
+//         },
+//     }, function (err, results) {
+//         if (err) { return next(err); }
+//         // No Need this function
+//         if (results.event == null) { // No results.
+//             console.log('Results.event is null');
+//             // res.redirect('../');
+//         }
+//         console.log(results.event);
+//         // Successful, so render.
+//         // res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books });
+//     });
+
+//     res.render('index' , { title : "刪除活動"});
+// };
+
+
+// exports.sponsor_update_get= function(req,res,next){
+//     // console.log(req.params.eventid);
+//     Event.findById(req.params.eventid, function (err, event) {
+//         if (err) { return next(err); }
+//         if (event == null) { // No results.
+//             let err = new Error('Event not found');
+//             err.status = 404;
+//             return next(err);
+//         }
+//         // Success.
+//         console.log("GET");
+//         // res.render('author_form', { title: 'Update Author', author: author });
+
+//     });
+// };
+
+// exports.SignInCreatetest = [
+//     (req,res,next) =>{
+//         console.log("????"),
+
+
+//         async.parallel({
+//             event: function(callback){
+//                 Event.findById(req.params.eventid)
+//                 .exec(callback)
+//             },
+
+//             attendance: function(callback){
+//                 Attendance.findOne({event_id:req.params.eventid})
+//                 .exec(callback)
+
+//             },
+
+//             list : function(callback){
+//                 Attendance.findOne({event_id:req.params.eventid},'list')
+//                 .exec(callback)
+
+//             }
+//         },
+        
+//         function(err,results){
+
+//             let _stdId = req.body.userid;
+//             let _timein = req.body.time;
+//             let _atnd = results.attendance;
+//             let _SignIn;
+
+
+//             if(err){return next(err);}
+
+//             else if (_atnd == null){
+
+//                 let _newSignIn = new Attendance({
+//                     event_id : req.params.eventid,
+//                     list : [{
+//                         student_id : _stdId,
+//                         time_in : _timein
+//                     }]
+//                 });
+
+//                 _SignIn = _newSignIn;
+
+//                 _newSignIn.save(function(err){
+
+//                     if(err) {return next(err);}
+//                     console.log("Successfully Create SignIn");
+
+//                 });
+                
+//                 let thisevent = new Event({
+//                     name : results.event.name,
+//                     time : results.event.time,
+//                     expense : results.event.expense,
+//                     location : results.event.location,
+//                     AttendanceList : _newSignIn,
+//                     _id : results.event._id
+//                 })
+//                 // results.event.AttendanceList._id = _newSignIn._id
+
+//                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
+//                     if(err) { return next(err);}
+//                     res.redirect("./attendancelist");
+
+//                 });
+                
+//             }
+        
+//             else{
+//                 let _atndList = results.list.list;
+//                 if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
+//                     _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+//                         student_id : _stdId,
+//                         time_in : _timein
+//                     });
+//                     _SignIn = {
+//                         event_id : req.params.eventid,
+//                         list : _atndList,
+//                     };
+
+//                     Attendance.findByIdAndUpdate(_atnd._id,_SignIn,{},function(err){
+//                         console.log("Successfully Create SignIn 671");
+//                     })
+//                 }
+
+
+//                 else{
+
+//                     for(let i = 0; i < _atndList.length; i++){
+//                         console.log("i:  "+i);
+//                         console.log(_atndList[i].student_id);
+
+
+//                         if(_stdId != _atndList[i].student_id){              //輸入的userid不等於目前檢查的studentId
+//                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
+//                             else{
+//                                 _atndList.push({
+//                                     student_id : _stdId,
+//                                     time_in : _timein
+//                                 });
+//                                 _SignIn = {
+//                                     event_id : req.params.eventid,
+//                                     list : _atndList,
+//                                 };
+//                                 break;
+//                             }
+//                         }
+                        
+                        
+                        
+//                         else if (_stdId == _atndList[i].student_id){                    //如果輸入的使用者id已經存在於紀錄中
+//                             if (_atndList[i].time_in == undefined){                          //則檢查timein有沒有輸入過
+//                                 _atndList[i].time_in = _timein;
+//                                 _SignIn = {
+//                                     event_id : req.params.eventid,
+//                                     list : _atndList,
+//                                 };
+//                                 break;
+//                             }else{
+//                                 console.log("This User Has Already Signed In");
+//                                 res.redirect('./SigninCreate');
+//                                 return;
+//                             }
+//                         }else{
+//                             console.log("?");
+//                             break;
+//                         }
+//                     }
+//                     console.log(_SignIn);
+//                     Attendance.findByIdAndUpdate(results.attendance._id,_SignIn,{},function(err,theAtd){
+//                         if(err){return next(err);}
+//                         console.log("Successfully Create SignIn");
+//                         res.redirect("./attendancelist");
+//                     })
+//                 }
+//             }
+//         })
+//     }]

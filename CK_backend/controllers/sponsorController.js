@@ -13,12 +13,12 @@ const { sanitizeBody } = require('express-validator/filter');
 
 exports.sponsor_events= function(req,res,next){
 
-    Event.find({},'_id name time location expense')
+    Event.find({},'_id name time location expense amount')
       .sort([['time','descending']])
       .exec(function (err, list_event){
          if (err) { return next(err); }
          // Successful, so render.
-         console.log(list_event);
+         console.log(list_event.amount);
          res.render('sponsor/myevents', { title: 'My Events | NCCU Attendance', list_event:  list_event});
     });
     
@@ -248,12 +248,17 @@ exports.SignIn_create_post= [
 
                 });
                 
+                for(let i =0;i < _atnd.length;i++){
+                    if(_atndList)
+                }
+                
                 let thisevent = new Event({
                     name : results.event.name,
                     time : results.event.time,
                     expense : results.event.expense,
                     location : results.event.location,
                     AttendanceList : _newSignIn,
+                    // amount :  ,
                     _id : results.event._id
                 })
                 // results.event.AttendanceList._id = _newSignIn._id

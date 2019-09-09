@@ -19,7 +19,11 @@ exports.login_index = function(req, res){
     console.log('location.code : ' + req.query.code);
     API_LoginCode = req.query.code;
     req.session.API_LoginCode = req.query.code;
-
+    if(!req.session.API_LoginCode){
+        console.log('wrong dude');
+        res.redirect("http://localhost:3000/");
+    }
+    
     rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
         API_Access = JSON.parse(body);
     })

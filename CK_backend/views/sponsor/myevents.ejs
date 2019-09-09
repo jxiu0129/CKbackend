@@ -99,7 +99,7 @@
 								<!-- Here is Test -->
 
 								<%if((list_event[i].time - Date.now()) <= 3600000){%>
-									<td><a href="" data-toggle="modal" data-target="#event<%=i%>-qrModal"><%= list_event[i]._id %></a></td>
+									<td><a href="" data-toggle="modal" data-target="#event<%=i%>-qrModal"><%= list_event[i].shortid %></a></td>
 
 									<div class="modal fade" id="event<%=i%>-qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
 									
@@ -125,7 +125,7 @@
 	
 									</div>
 								<%}else{%>
-									<td><%= list_event[i]._id %></td>
+									<td><%= list_event[i].shortid %></td>
 								<%}%>
 
 

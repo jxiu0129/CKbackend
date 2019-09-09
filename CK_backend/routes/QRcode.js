@@ -73,7 +73,7 @@ router.get('/testSignIn/:eventid',(req,res,next)=>{
         
         function(err,results){
 
-            let _stdId = req.query.userid;
+            let _stdId = req.session.user_info.user_info.student_id;
             let _timein = Date.now();
             let _atnd = results.attendance;
             let _SignIn;
@@ -416,7 +416,7 @@ router.get('/QRtest', function(req, res, next) {
 const schedule = require('node-schedule');
 
 router.get('/qrcodelist/:userid', (req,res,next)=>{
-
+    console.log(req.session.user_info);
     User.findById(req.params.userid,'hold')
     .exec(async (err,thisuser)=>{
        

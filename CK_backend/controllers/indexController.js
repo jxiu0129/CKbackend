@@ -36,6 +36,7 @@ exports.login_index = function(req, res){
             }
         })
         .then((message) => {
+            console
             API_User = JSON.parse(message);
             console.log(API_User);
         })

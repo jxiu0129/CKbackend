@@ -13,7 +13,7 @@ const { sanitizeBody } = require('express-validator/filter');
 
 exports.sponsor_events= function(req,res,next){
 
-    Event.find({},'_id name time location expense amount')
+    Event.find({},'_id shortid name time location expense amount')
       .sort([['time','descending']])
       .exec(function (err, list_event){
          if (err) { return next(err); }
@@ -25,6 +25,10 @@ exports.sponsor_events= function(req,res,next){
 
 exports.sponsor_create_get= function(req, res,){
     res.render('sponsor/addevents' , { title : "Add Events | NCCU Attendance"});
+    Event.findById('_EuOHrj')
+    .exec((err,thisevent) =>{
+        console.log(thisevent);
+    });
 };
 
 
@@ -224,7 +228,7 @@ exports.SignIn_create_post= [
             }
         },
         
-        function(err,results){
+        async (err,results) => {
 
             let _stdId = req.body.userid;
             let _timein = req.body.time;
@@ -280,6 +284,7 @@ exports.SignIn_create_post= [
                         student_id : _stdId,
                         time_in : _timein
                     });
+
                     _SignIn = {
                         event_id : req.params.eventid,
                         list : _atndList,
@@ -287,7 +292,7 @@ exports.SignIn_create_post= [
 
                     Attendance.findByIdAndUpdate(_atnd._id,_SignIn,{},function(err){
                         console.log("Successfully Create SignIn 671");
-                    })
+                    });
                 }
 
 
@@ -336,36 +341,41 @@ exports.SignIn_create_post= [
                     }
                     
                     console.log(_SignIn);
-                    Attendance.findByIdAndUpdate(results.attendance._id,_SignIn,{},function(err,theAtd){
+
+                    await Attendance.findByIdAndUpdate(results.attendance._id,_SignIn,{},function(err,theAtd){
                         if(err){return next(err);}
                         console.log("Successfully Create SignIn");
-                        res.redirect("./attendancelist");
                     });
-                    
+
+                    const theAtd = await Attendance.findOne({event_id:req.params.eventid});
+
                     let _rwd = 0;
-                    for (let j = 0; j < _atnd.length;j++){
-                        if(_atnd.list[j].reward == true){
-                            _rwd ++;
+                    for ( let j = 0; j < theAtd.list.length;j++){
+                        if(theAtd.list[j].reward == true){
+                             _rwd ++;
                         }
-                    };
-                    
+                    }
+
+                    console.log(_rwd);
+
                     let theevent = {
                         name : results.event.name,
                         time : results.event.time,
                         expense : results.event.expense,
                         location : results.event.location,
-                        AttendanceList : _newSignOut,
+                        AttendanceList : _atnd._id,
                         _id : results.event._id,
-                        reward : _rwd
+                        amount : _rwd
                     };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
                         if(err) { return next(err);}
                         res.redirect("./attendancelist");
                      });
+
                 }
             }
-        })
+        });        
     }       
 ];
 
@@ -405,7 +415,7 @@ exports.SignOut_create_post= [
             }
         },
         
-        function(err,results){
+        async (err,results) => {
 
             let _stdId = req.body.userid;
             let _timeout = req.body.time;
@@ -440,8 +450,8 @@ exports.SignOut_create_post= [
                     expense : results.event.expense,
                     location : results.event.location,
                     AttendanceList : _newSignOut,
-                    _id : results.event._id,
                     amount : results.event.amount,
+                    _id : results.event._id,
                 })
                 // results.event.AttendanceList._id = _newSignOut._id
 
@@ -514,27 +524,33 @@ exports.SignOut_create_post= [
                             break;
                         }
                     }
+                    
                     console.log(_SignOut);
-                    Attendance.findByIdAndUpdate(results.attendance._id,_SignOut,{},function(err,theAtd){
+                    
+                    await Attendance.findByIdAndUpdate(results.attendance._id,_SignOut,{},function(err,theAtd){
                         if(err){return next(err);}
                         console.log("Successfully Create SignOut");
                     });
-                    
+
+                    const theAtd = await Attendance.findOne({event_id:req.params.eventid});
+
                     let _rwd = 0;
-                    for (let j = 0; j < _atnd.length;j++){
-                        if(_atnd.list[j].reward == true){
+                    for (let j = 0; j < theAtd.list.length;j++){
+                        if(theAtd.list[j].reward == true){
                             _rwd ++;
                         }
                     };
                     
+                    console.log(_rwd);
+
                     let theevent = {
                         name : results.event.name,
                         time : results.event.time,
                         expense : results.event.expense,
                         location : results.event.location,
-                        AttendanceList : _newSignOut,
+                        AttendanceList : _atnd._id,
                         _id : results.event._id,
-                        reward : _rwd
+                        amount : _rwd
                     }
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
@@ -583,7 +599,7 @@ exports.SignBoth_create_post= [
             }
         },
         
-        function(err,results){
+        async(err,results) => {
 
             let _stdId = req.body.userid;
             let _timein = req.body.timein;
@@ -622,7 +638,7 @@ exports.SignBoth_create_post= [
                     location : results.event.location,
                     AttendanceList : _newSign,
                     _id : results.event._id,
-                    amount : results.event.amount
+                    amount : 1
                 })
                 // results.event.AttendanceList._id = _newSignOut._id
 
@@ -650,7 +666,23 @@ exports.SignBoth_create_post= [
 
                     Attendance.findByIdAndUpdate(_atnd._id,_Sign,{},function(err){
                         console.log("Successfully Create SignIn and SignOut");
+                    });
+                    let thisevent = new Event({
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSign,
+                        _id : results.event._id,
+                        amount : 1
                     })
+                    // results.event.AttendanceList._id = _newSignOut._id
+    
+                    Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
+                        if(err) { return next(err);}
+                        res.redirect("./attendancelist");
+    
+                    });
                 }
 
 
@@ -700,28 +732,31 @@ exports.SignBoth_create_post= [
                         }
                     }
                     console.log(_Sign);
-                    Attendance.findByIdAndUpdate(results.attendance._id,_Sign,{},function(err,theAtd){
+
+                    await Attendance.findByIdAndUpdate(results.attendance._id,_Sign,{},function(err,theAtd){
                         if(err){return next(err);}
                         console.log("Successfully Create SingIn and SignOut");
-                        res.redirect("./attendancelist");
-                    })
+                    });
                    
+                    const theAtd = await Attendance.findOne({event_id:req.params.eventid});
+
                     let _rwd = 0;
-                    for (let j = 0; j < _atnd.length;j++){
-                        console.log(_atnd.list[j].reward)
-                        if(_atnd.list[j].reward == true){
+                    for (let j = 0; j < theAtd.list.length;j++){
+                        if(theAtd.list[j].reward == true){
                             _rwd ++;
                         }
                     };
+
+                    console.log(_rwd);
                     
                     let theevent = {
                         name : results.event.name,
                         time : results.event.time,
                         expense : results.event.expense,
                         location : results.event.location,
-                        AttendanceList : _newSignOut,
+                        AttendanceList : _atnd._id,
                         _id : results.event._id,
-                        reward : _rwd
+                        amount : _rwd
                     };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){

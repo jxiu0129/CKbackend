@@ -69,11 +69,12 @@
 							<tbody>
 							
 							<% for(let i = 0;i < list_event.length;i++){ %>
-								<tr>
-								<td><a href="" data-toggle="modal" data-target="#event1-qrModal"><%= list_event[i]._id %></a></td>
+							<tr>
+								<!-- <td><a href="" data-toggle="modal" data-target="#event<%=i%>-qrModal"><%= list_event[i]._id %></a></td> -->
 
-								<!-- Modal -->
-								<div class="modal fade" id="event1-qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
+								<!-- Modal Below is Correct-->
+								<!-- <div class="modal fade" id="event<%=i%>-qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
+									
 									<div class="modal-dialog" role="document">
 										<div class="modal-content">
 											<div class="modal-header">
@@ -89,11 +90,43 @@
 												<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
 											</div>
 											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close<%=i%></button>
 											</div>
 										</div>
 									</div>
-								</div>
+
+								</div> -->
+								<!-- Here is Test -->
+
+								<%if((list_event[i].time - Date.now()) <= 3600000){%>
+									<td><a href="" data-toggle="modal" data-target="#event<%=i%>-qrModal"><%= list_event[i]._id %></a></td>
+
+									<div class="modal fade" id="event<%=i%>-qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
+									
+										<div class="modal-dialog" role="document">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h3 class="modal-title" id="qrModalLabel">QR Code<%=i%></h3>
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
+												</div>
+												<div class="modal-body">
+													<h3>簽到條碼</h3>
+													<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_in.jpg" /></span>
+													<h3>刷退條碼</h3>
+													<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close<%=i%></button>
+												</div>
+											</div>
+										</div>
+	
+									</div>
+								<%}else{%>
+									<td><%= list_event[i]._id %></td>
+								<%}%>
 
 
 								<td><%= list_event[i].name %></td>
@@ -106,6 +139,7 @@
 								<td><a href="/sponsor/events/<%= list_event[i]._id %>/attendancelist">100</a></td> 
 								<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
 									<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
+								<td><%=i%></td>
 
 								<!-- Modal -->
 								<form method="post" action="./<%= list_event[i]._id %>/update">

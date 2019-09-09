@@ -4,7 +4,7 @@ const shortid = require('shortid');
 const Schema = mongoose.Schema;
 
 const EventSchema = new Schema({
-   _id : { type : String,default : shortid.generate},
+   _id : { type : ObjectId, default : shortid.generate},
    holder : { type: String, /*required : true*/},  //註解For test
    name : { type: String, required : true},
    time : { type : Date, required: true},

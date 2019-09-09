@@ -18,7 +18,30 @@ exports.index = function(req,res){
 exports.login_index = function(req, res){
     console.log('location.code : ' + req.query.code);
     API_LoginCode = req.query.code;
-    rp.get('http://wm.nccu.edu.tw:3001/')
+    // req.session.API_LoginCode = req.query.code;
+
+    rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
+        API_Access = JSON.parse(body);
+        // req.session.API_Access = API_Access;
+    })
+    .catch(() => {
+        console.log('wrong');
+        console.log(API_Access.access_token);
+        console.log(API_Access.refresh_token);
+        rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+            'auth': {
+                'bearer': API_Access.access_token
+            }
+        })
+        .then((message) => {
+            console.log(message);
+            // req.session.user_info = message;
+        })
+        .catch(() =>{
+            console.log('fail');
+        });
+
+    });
     res.render('login_index');
 };
 
@@ -49,26 +72,6 @@ exports.login_index = function(req, res){
 
 
 exports.profile_user = async function(req, res){
-    rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
-        API_Access = JSON.parse(body);
-    })
-    .catch(() => {
-        console.log('wrong');
-        console.log(API_Access.access_token);
-        console.log(API_Access.refresh_token);
-        rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
-            'auth': {
-                'bearer': API_Access.access_token
-            }
-        })
-        .then((message) => {
-            console.log(message);
-        })
-        .catch((message) =>{
-            console.log('fail');
-        });
-
-    });
     res.render('profile');
 } 
 

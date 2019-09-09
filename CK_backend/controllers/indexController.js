@@ -37,7 +37,9 @@ exports.login_index = function(req, res){
         })
         .then((message) => {
             API_User = JSON.parse(message);
+            console.log(message);
             console.log(API_User);
+            console.log(API_User.user_info.sponsor_point);
         })
         .catch(() =>{
             console.log('fail');

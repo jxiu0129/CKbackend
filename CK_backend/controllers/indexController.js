@@ -23,7 +23,7 @@ exports.login_index = function(req, res){
         console.log('wrong dude');
         res.redirect("http://localhost:3000/");
     }
-    
+    else {}
     rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
         API_Access = JSON.parse(body);
     })
@@ -38,13 +38,14 @@ exports.login_index = function(req, res){
         .then((message) => {
             console
             API_User = JSON.parse(message);
-            console.log(API_User);
+            console.log(message);
+            console.log(API_User.user_info.sponsor_point);
+            req.session.user_info = API_User;
+            req.session.API_Access = API_Access;
         })
         .catch(() =>{
             console.log('fail');
         });
-        req.session.user_info = API_User;
-        req.session.API_Access = API_Access;
     });
     res.render('login_index');
 };

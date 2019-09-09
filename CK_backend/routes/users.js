@@ -29,16 +29,6 @@ router.get('/user/test', (req,res) => {
 });
 
 const User = require('../models/user');
-router.post('/user/create_dick_account', (req, res) => {
-    let new_user = new User();
-    new_user.name = "dick";
-    new_user.contact_info = { email: "dafddasds@dadfasdf", tel: "092342341341"};
-    
-    new_user.save((err) => {
-        if(err) throw err;
-        res.send('dick');
-    });
-});
 
 const Event = require("../models/event");
 router.post('/user/create_dick_event', (req, res) => {

@@ -69,7 +69,7 @@ exports.sponsor_create_post = [
 
         if (!errors.isEmpty()) {
             // There are errors. Render the form again with sanitized values/error messages.
-            res.render('sponsor/addevents', { title: 'Add Events | NCCU Attendance', errors: errors.array()});
+            res.render('sponsor/addevents', { title: 'Add Events | NCCU Attendance', balance : 'defined your mother' , errors: errors.array()});
             // Test
             console.log("Error : "+errors);
         return;

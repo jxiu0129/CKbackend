@@ -36,12 +36,12 @@ exports.login_index = function(req, res){
             }
         })
         .then((message) => {
-            console
             API_User = JSON.parse(message);
             console.log(message);
             console.log(API_User.user_info.sponsor_point);
             req.session.user_info = API_User;
             req.session.API_Access = API_Access;
+            req.session.save();
         })
         .catch(() =>{
             console.log('fail');

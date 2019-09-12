@@ -54,12 +54,26 @@ exports.sponsor_create_get= function(req, res,){
 exports.sponsor_create_post = [
     
     //Validate
-    
+    // req.session.reload();
     body('name', 'Name is required').isLength({ min: 1 }).trim(),
-    body('time',  'Invalid date').optional({ checkFalsy: true}).isISO8601(),
+    body('time',  'Invalid date').custom((value, {req}) => {
+        if (!isISO8601(value)){
+            throw new Error('Wrong Date Mate!');
+        } else if (value < Date.now()){
+            throw new Error('Cannot hold event in past!');
+        }
+    }),
     body('location', 'Name is required').isLength({ min: 1 }).trim(),
-    body('expense','Expense is required').isInt({ min : 0 ,allow_leading_zeroes: false}),
-    
+    body('expense','Expense is required').custom((value ,{ req}) => {
+        req.session.reload();
+        if(!isInt(value)){
+            throw new Error('Expense must be an integer');
+        }else if(value < 0){
+            throw new Error('Expense must be Positive');
+        }else if(value > req.session.user_info.user_info.sponsor){
+            throw new Error("You don't have enough money");
+        }
+    }),    
     // Sanitize (trim) the name field.
     sanitizeBody('name').escape(),
     sanitizeBody('time').escape().toDate(),

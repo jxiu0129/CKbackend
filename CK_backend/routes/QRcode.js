@@ -50,7 +50,7 @@ router.get('/qrlist/:sponsorid', function(req, res, next) {
 });
 
 // 掃描qrcode 並 簽到
-router.get('/testSignIn/:eventid',(req,res,next)=>{
+router.get('/testSignIn/:eventid',async (req,res,next)=>{
 
         async.parallel({
             event: function(callback){
@@ -71,8 +71,9 @@ router.get('/testSignIn/:eventid',(req,res,next)=>{
             }
         },
         
-        function(err,results){
+        async (err,results)=>{
 
+            req.session.reload();
             let _stdId = req.session.user_info.user_info.student_id;
             let _timein = Date.now();
             let _atnd = results.attendance;
@@ -106,8 +107,9 @@ router.get('/testSignIn/:eventid',(req,res,next)=>{
                     expense : results.event.expense,
                     location : results.event.location,
                     AttendanceList : _newSignIn,
+                    amount : results.event.amount,
                     _id : results.event._id
-                })
+                });
                 // results.event.AttendanceList._id = _newSignIn._id
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
@@ -185,22 +187,51 @@ router.get('/testSignIn/:eventid',(req,res,next)=>{
                             break;
                         }
                     }
+
                     console.log(_SignIn);
-                    Attendance.findByIdAndUpdate(results.attendance._id,_SignIn,{},function(err,theAtd){
+                    await Attendance.findByIdAndUpdate(results.attendance._id,_SignIn,{},function(err,theAtd){
                         if(err){return next(err);}
                         console.log("Successfully Create SignIn");
                         res.render('qrcode/alertmessage',
                         {title: 'Successfully Sign In | NCCU Attendance',
-                        msg:'簽到成功'})
-                    })
+                        msg:'簽到成功'});
+                    });
+
+                    
+                    const theAtd = await Attendance.findOne({event_id:req.params.eventid});
+
+                    console.log("theAtd"+theAtd);
+                    let _rwd = 0;
+                    for ( let j = 0; j < theAtd.list.length ; j++){
+                        if(theAtd.list[j].reward == true){
+                             _rwd ++;
+                        }
+                    }
+
+                    console.log("the_rwd"+_rwd);
+
+                    let theevent = {
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _atnd._id,
+                        _id : results.event._id,
+                        amount : _rwd
+                    };
+                    
+                    Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
+                        if(err) { return next(err);}
+                        console.log("reward successfully update");
+                     });
                 }
             }
-        }) 
+        });
 });
 
 
 // 掃描qrcode 並 刷退
-router.get('/testSignOut/:eventid',(req,res,next)=>{
+router.get('/testSignOut/:eventid',async (req,res,next)=>{
     async.parallel({
         event: function(callback){
             Event.findById(req.params.eventid)
@@ -220,9 +251,10 @@ router.get('/testSignOut/:eventid',(req,res,next)=>{
         }
     },
     
-    function(err,results){
+    async (err,results) =>{
 
-        let _stdId = req.query.userid;
+        req.session.reload();
+        let _stdId = req.session.user_info.user_info.student_id;
         let _timeout = Date.now();
         let _atnd = results.attendance;
         let _SignOut;
@@ -255,6 +287,7 @@ router.get('/testSignOut/:eventid',(req,res,next)=>{
                 expense : results.event.expense,
                 location : results.event.location,
                 AttendanceList : _newSignOut,
+                amount : results.event.amount,
                 _id : results.event._id
             })
             // results.event.AttendanceList._id = _newSignOut._id
@@ -336,13 +369,40 @@ router.get('/testSignOut/:eventid',(req,res,next)=>{
                     }
                 }
                 console.log(_SignOut);
-                Attendance.findByIdAndUpdate(results.attendance._id,_SignOut,{},function(err,theAtd){
+                await Attendance.findByIdAndUpdate(results.attendance._id,_SignOut,{},function(err,theAtd){
                     if(err){return next(err);}
                     console.log("Successfully Create SignOut");
                     res.render('qrcode/alertmessage',
                     {title: 'Successfully Sign Out | NCCU Attendance',
                     msg:'刷退成功'});
+                    
                 });
+                
+                const theAtd = await Attendance.findOne({event_id:req.params.eventid});
+
+                let _rwd = 0;
+                for ( let j = 0; j < theAtd.list.length;j++){
+                    if(theAtd.list[j].reward == true){
+                         _rwd ++;
+                    }
+                }
+
+                console.log(_rwd);
+
+                let theevent = {
+                    name : results.event.name,
+                    time : results.event.time,
+                    expense : results.event.expense,
+                    location : results.event.location,
+                    AttendanceList : _atnd._id,
+                    _id : results.event._id,
+                    amount : _rwd
+                };
+                
+                Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
+                    if(err) { return next(err);}
+                    console.log("reward successfully update");
+                 });
             }
         }
     });
@@ -416,6 +476,8 @@ router.get('/QRtest', function(req, res, next) {
 const schedule = require('node-schedule');
 
 router.get('/qrcodelist/:userid', (req,res,next)=>{
+    req.session.reload();
+
     console.log(req.session.user_info);
     User.findById(req.params.userid,'hold')
     .exec(async (err,thisuser)=>{

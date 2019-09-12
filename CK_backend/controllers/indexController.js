@@ -42,6 +42,7 @@ exports.login_index = function(req, res){
             console.log(API_User.user_info.sponsor_point);
             req.session.user_info = API_User;
             req.session.API_Access = API_Access;
+            req.session.save();
         })
         .catch(() =>{
             console.log('fail');

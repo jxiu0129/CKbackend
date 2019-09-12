@@ -12,30 +12,32 @@ const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 
 
-exports.sponsor_events= function(req,res,next){
+exports.sponsor_events= async(req,res,next) =>{
 
-    Event.find({},'_id shortid name time location expense amount status')
-      .sort([['time','descending']])
-      .exec(function (err, list_event){
-         if (err) { return next(err); }
-         console.log(list_event);
+    let list_event = await Event.find({},'_id shortid name time location expense amount status')
+      .sort([['time','descending']]);
+    //   .exec(function (err, list_event){
+    //      if (err) { return next(err); }
+    console.log(list_event);
 
-         //顯示狀態： 活動開始前都是willhold，活動開始時就是holding並會顯示活動結束按鈕，直到隔天凌晨1:00會統一把前一天的名單傳給錢包並顯示finish
-         for(let i =0; i<list_event.length;i++){
-            if (Date.now() < list_event[i].time){continue;}
-            else if(Date.now() >= list_event[i].time){
-                console.log(i+' : b : '+list_event[i].status);
-                Event.findByIdAndUpdate(list_event[i]._id, list_event[i].status = 'holding',{});
-                console.log(i+' : a : '+list_event[i].status);
-            }
-         };
-
-         console.log(list_event);
+    // 顯示狀態： 活動開始前都是willhold，活動開始時就是holding並會顯示活動結束按鈕，直到隔天凌晨1:00會統一把前一天的名單傳給錢包並顯示finish
+    
+    for(let i =0; i < list_event.length;i++){
+       if (Date.now() < list_event[i].time || list_event[i].status == 'holding'){continue;}
+       else if(Date.now() >= list_event[i].time){
+           console.log(i+' : b : '+list_event[i].status);
            
-         // Successful, so render.
-         res.render('sponsor/myevents', { title: 'My Events | NCCU Attendance', list_event:  list_event});
-    });
+           await Event.findByIdAndUpdate(list_event[i]._id,list_event[i].status ='holding',{});
+           console.log(i+' : a : '+list_event[i].status);
+       }
+    };
 
+           
+    // Successful, so render.
+    res.render('sponsor/myevents', { title: 'My Events | NCCU Attendance', list_event:  list_event});
+    // });
+
+    console.log(list_event);
 
     
 };
@@ -101,7 +103,7 @@ exports.sponsor_create_post = [
                 version: 10                                    //但別太高
             };
             
-            const qr_urlIN = 'http://localhost:3000/testsignin/'+event_id+'?userid=77777777';       //data的部分，此處的req.query先寫死
+            const qr_urlIN = 'http://localhost:3000/testsignin/'+event_id ;       //data的部分，此處的req.query先寫死
             const qr_pathIN = './public/images/QRcode/qrcode_'+event_id+"_in.jpg";
         
             QRCode.toFile(qr_pathIN, qr_urlIN, opts, (err) => {
@@ -109,7 +111,7 @@ exports.sponsor_create_post = [
                 console.log('savedIN.');
             });
             
-            const qr_urlOUT = 'http://localhost:3000/testsignout/'+event_id+'?userid=77777777';           //data的部分
+            const qr_urlOUT = 'http://localhost:3000/testsignout/'+event_id;           //data的部分
             const qr_pathOUT = './public/images/QRcode/qrcode_'+event_id+"_out.jpg";
         
     

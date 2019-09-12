@@ -54,11 +54,22 @@ exports.profile_user = async function(req, res){
     res.render('profile');
 };
 
-// exports.user_login_post = function(req,res){
-//     res.redirect('../user');  //Test
-// };
+let multipoint = {
+    method: 'POST',
+    uri: 'http://wm.nccu.edu.tw:3001/openapi/send_point',
+    body: {
+        list: []
+    },
+    json: true // Automatically stringifies the body to JSON
+};
 
-// exports.sponsor_login_post = function(req,res){
-//     res.redirect('../sponsor');   //Test
-// };
-
+exports.Send_Multi_Point = (list) => {
+    multipoint.body.push(list);
+    rp(multipoint)
+    .then((message) =>{
+        console.log(message);
+    })
+    .catch((err) =>{
+        console.log(err);
+    });
+};

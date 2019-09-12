@@ -56,22 +56,22 @@ exports.sponsor_create_post = [
     //Validate
     // req.session.reload();
     body('name', 'Name is required').isLength({ min: 1 }).trim(),
-    body('time',  'Invalid date').custom((value, {req}) => {
-        if (!isISO8601(value)){
-            throw new Error('Wrong Date Mate!');
-        } else if (value < Date.now()){
+    body('time',  'Invalid date').isISO8601().custom((value) => {
+        if (value < Date.now()){
             throw new Error('Cannot hold event in past!');
         }
+        return true;
     }),
     body('location', 'Name is required').isLength({ min: 1 }).trim(),
-    body('expense','Expense is required').custom((value ,{ req}) => {
-        if(!isInt(value)){
-            throw new Error('Expense must be an integer');
-        }else if(value < 0){
+    body('expense','Expense is required').isInt().custom((value, {req}) => {
+        if(value < 0){
+            console.log("Problem3");
             throw new Error('Expense must be Positive');
-        }else if(value > req.session.user_info.user_info.sponsor){
+        }else if(value > req.session.user_info.user_info.sponsor_point){
+            console.log("Problem4");
             throw new Error("You don't have enough money");
         }
+        return true;
     }),    
     // Sanitize (trim) the name field.
     sanitizeBody('name').escape(),
@@ -82,7 +82,7 @@ exports.sponsor_create_post = [
     // Process request after validation and sanitization.
     (req, res, next) => {
         // Extract the validation errors from a request.
-        
+        console.log(req.session.user_info.user_info.sponsor_point);
         const errors = validationResult(req);
         
         // if (req.session.user_info.user_info.sponsor_point < req.body.expense ){

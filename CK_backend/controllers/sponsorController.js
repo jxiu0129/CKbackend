@@ -65,7 +65,6 @@ exports.sponsor_create_post = [
     }),
     body('location', 'Name is required').isLength({ min: 1 }).trim(),
     body('expense','Expense is required').custom((value ,{ req}) => {
-        req.session.reload();
         if(!isInt(value)){
             throw new Error('Expense must be an integer');
         }else if(value < 0){

@@ -525,6 +525,18 @@ router.get('/timeTest',(req,res,next)=>{
 
 });
 
+router.get('/tttest',(req,res)=>{
+    req.session.reload();
+    
+    User.findOne({email:req.session.user_info.user_info.email})
+    .exec((err,_user)=>{
+        console.log(_user);
+        Event.findById(_user.hold.holded_events)
+        .exec((err,_event)=>{
+            res.send(_event);            
+        })
+    });
+})
 
 
 module.exports = router;

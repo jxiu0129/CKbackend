@@ -97,3 +97,7 @@
 .show > .btn-primary.dropdown-toggle:focus {
     box-shadow: 0 0 0 0.2rem rgba(36, 117, 149, 1);
 }
+
+.hidden {
+    display:none;
+}

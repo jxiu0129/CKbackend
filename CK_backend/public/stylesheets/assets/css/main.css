@@ -1848,10 +1848,10 @@
 		margin: 0 0 1em 0;
 	}
 
+
 	input[type="text"],
-	input[type="password"],
-	input[type="email"],
-	input[type="tel"],
+	input[type="number"],
+	input[type="datetime-local"],
 	select,
 	textarea {
 		-moz-appearance: none;
@@ -1871,8 +1871,8 @@
 	}
 
 		input[type="text"]:invalid,
-		input[type="password"]:invalid,
-		input[type="email"]:invalid,
+		input[type="number"]:invalid,
+		input[type="datetime-local"]:invalid,
 		input[type="tel"]:invalid,
 		select:invalid,
 		textarea:invalid {
@@ -1880,8 +1880,8 @@
 		}
 
 		input[type="text"]:focus,
-		input[type="password"]:focus,
-		input[type="email"]:focus,
+		input[type="number"]:focus,
+		input[type="datetime-local"]:focus,
 		input[type="tel"]:focus,
 		select:focus,
 		textarea:focus {
@@ -1923,8 +1923,8 @@
 		}
 
 	input[type="text"],
-	input[type="password"],
-	input[type="email"],
+	input[type="number"],
+	input[type="datetime-local"],
 	select {
 		height: 3.5em;
 		line-height: 3.5em;
@@ -2920,7 +2920,7 @@
 
 	#banner {
 		padding: 14em 0 12em 0;
-		background-image: url(../../../images/banner.jpg);
+		background-image: url(../../images/banner.jpg);
 		background-size: cover;
 		background-position: center top;
 		background-repeat: no-repeat;

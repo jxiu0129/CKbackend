@@ -2,6 +2,7 @@ const Event = require("../models/event");
 const User = require("../models/user");
 const Attendance = require("../models/attendance");
 
+const fs = require("fs");
 const async = require("async");
 const request = require('request');
 const QRCode = require('qrcode');
@@ -13,13 +14,29 @@ const { sanitizeBody } = require('express-validator/filter');
 
 exports.sponsor_events= function(req,res,next){
 
-    Event.find({},'_id shortid name time location expense amount')
+    Event.find({},'_id shortid name time location expense amount status')
       .sort([['time','descending']])
       .exec(function (err, list_event){
          if (err) { return next(err); }
+         console.log(list_event);
+
+         //顯示狀態： 活動開始前都是willhold，活動開始時就是holding並會顯示活動結束按鈕，直到隔天凌晨1:00會統一把前一天的名單傳給錢包並顯示finish
+         for(let i =0; i<list_event.length;i++){
+            if (Date.now() < list_event[i].time){continue;}
+            else if(Date.now() >= list_event[i].time){
+                console.log(i+' : b : '+list_event[i].status);
+                Event.findByIdAndUpdate(list_event[i]._id, list_event[i].status = 'holding',{});
+                console.log(i+' : a : '+list_event[i].status);
+            }
+         };
+
+         console.log(list_event);
+           
          // Successful, so render.
          res.render('sponsor/myevents', { title: 'My Events | NCCU Attendance', list_event:  list_event});
     });
+
+
     
 };
 
@@ -115,28 +132,30 @@ exports.sponsor_create_post = [
 
 
 
-exports.sponsor_delete_post= function(req,res,next){
-    /*async.parallel({
-        event: function (callback) {
-            Event.findById(req.body.eventid).exec(call back)
-        }
-    }, function (err, results) {
-        if (err) { return next(err); }
-        // Success.
-        else {
-            // console.log(results.event);
-            // console.log(results.sponsor_event);
+exports.sponsor_delete_post= async (req,res,next) => {
 
-            console.log(req.params.eventid);*/
-            // Author has no books. Delete object and redirect to the list of authors.
-            Event.findByIdAndRemove(req.params.eventid, function deleteEvent(err) {
-                console.log(req.params.eventid);
-
+            await Event.findByIdAndRemove(req.params.eventid, function deleteEvent(err,theevt) {
                 if (err) { return next(err); }
-                // Success - go to author list.
-                console.log("Successfully Delete");
+                console.log("Successfully Delete Event");
+
+    //沒有寫檢查的機制，照理來說應該是先檢查attendancelist存不存在才能刪，但莫名的無論存不存在他都會刪所以都可以跑，先這樣寫好了
+                Attendance.findOneAndRemove({event_id:req.params.eventid},(err,theAtd)=>{
+                    if(err){console.log(err)}
+                    else{console.log("Successfully Delete Attendance")}
+                });
+
                 res.redirect('../');
             });
+
+            fs.unlink('./public/images/QRcode/qrcode_' +req.params.eventid+'_in.jpg',(err)=>{
+                if(err){console.log(err)}
+                else{console.log("Successfully Delete QRcode_in.jpg")}
+            });
+
+            fs.unlink('./public/images/QRcode/qrcode_' +req.params.eventid+'_out.jpg',(err)=>{
+                if(err){console.log(err)}
+                else{console.log("Successfully Delete QRcode_out.jpg")}
+            } );
 
         };
 

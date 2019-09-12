@@ -15,6 +15,8 @@ const EventSchema = new Schema({
    Count_in: Number,      //簽到數
    Count_out: Number,     //簽退數
    amount : Number,       //參加人數
+   //活動狀態依序分為：尚未開始，正在進行，活動結束(名單送出)
+   status : {type: String, required : true , enum :['willhold','holding','finish'], default: 'willhold'},     
    });
 
 EventSchema.set('collection', 'Event'); // .set(配置選項,collection名稱) （若沒有此行配置，預設會透過下一行所設定的model名稱產生collection名稱）

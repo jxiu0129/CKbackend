@@ -261,10 +261,10 @@ exports.SignIn_create_get= function(req,res){
 exports.SignIn_create_post= [
 
     // Validate fields.
-    body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim(),
+    // body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim(),
 
     // Sanitize fields.
-    sanitizeBody('*').escape(),
+    // sanitizeBody('*').escape(),
 
     // Process request after validation and sanitization.
     (req,res,next) =>{
@@ -292,7 +292,7 @@ exports.SignIn_create_post= [
         
         async (err,results) => {
 
-            let _stdId = req.body.userid;
+            let _stdId = req.body.email;
             let _timein = req.body.time;
             let _atnd = results.attendance;
             let _SignIn;
@@ -305,7 +305,7 @@ exports.SignIn_create_post= [
                 let _newSignIn = new Attendance({
                     event_id : req.params.eventid,
                     list : [{
-                        student_id : _stdId,
+                        email : _stdId,
                         time_in : _timein
                     }]
                 });
@@ -343,7 +343,7 @@ exports.SignIn_create_post= [
                 let _atndList = results.list.list;
                 if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
                     _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
-                        student_id : _stdId,
+                        email : _stdId,
                         time_in : _timein
                     });
 
@@ -362,14 +362,14 @@ exports.SignIn_create_post= [
 
                     for(let i = 0; i < _atndList.length; i++){
                         console.log("i:  "+i);
-                        console.log(_atndList[i].student_id);
+                        console.log(_atndList[i].email);
 
 
-                        if(_stdId != _atndList[i].student_id){              //輸入的userid不等於目前檢查的studentId
+                        if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
                             else{
                                 _atndList.push({
-                                    student_id : _stdId,
+                                    email : _stdId,
                                     time_in : _timein
                                 });
                                 _SignIn = {
@@ -382,7 +382,7 @@ exports.SignIn_create_post= [
                         
                         
                         
-                        else if (_stdId == _atndList[i].student_id){                    //如果輸入的使用者id已經存在於紀錄中
+                        else if (_stdId == _atndList[i].email){                    //如果輸入的使用者id已經存在於紀錄中
                             if (_atndList[i].time_in == undefined){                          //則檢查timein有沒有輸入過
                                 _atndList[i].time_in = _timein;
                                 _atndList[i].reward = true;
@@ -448,10 +448,10 @@ exports.SignOut_create_get= function(req,res){
 exports.SignOut_create_post= [
 
     // Validate fields.
-    body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim(),
+    // body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim(),
 
     // Sanitize fields.
-    sanitizeBody('*').escape(),
+    // sanitizeBody('*').escape(),
 
     // Process request after validation and sanitization.
     (req,res,next) =>{
@@ -479,7 +479,7 @@ exports.SignOut_create_post= [
         
         async (err,results) => {
 
-            let _stdId = req.body.userid;
+            let _stdId = req.body.email;
             let _timeout = req.body.time;
             let _atnd = results.attendance;
             let _SignOut;
@@ -492,7 +492,7 @@ exports.SignOut_create_post= [
                 let _newSignOut = new Attendance({
                     event_id : req.params.eventid,
                     list : [{
-                        student_id : _stdId,
+                        email : _stdId,
                         time_out : _timeout
                     }]
                 });
@@ -529,7 +529,7 @@ exports.SignOut_create_post= [
                 let _atndList = results.list.list;
                 if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
                     _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
-                        student_id : _stdId,
+                        email : _stdId,
                         time_out : _timeout
                     });
                     _SignOut = {
@@ -547,14 +547,14 @@ exports.SignOut_create_post= [
 
                     for(let i = 0; i < _atndList.length; i++){
                         console.log("i:  "+i);
-                        console.log(_atndList[i].student_id);
+                        console.log(_atndList[i].email);
 
 
-                        if(_stdId != _atndList[i].student_id){              //輸入的userid不等於目前檢查的studentId
+                        if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
                             else{
                                 _atndList.push({
-                                    student_id : _stdId,
+                                    email : _stdId,
                                     time_out : _timeout
                                 });
                                 _SignOut = {
@@ -567,7 +567,7 @@ exports.SignOut_create_post= [
                         
                         
                         
-                        else if (_stdId == _atndList[i].student_id){                    //如果輸入的使用者id已經存在於紀錄中
+                        else if (_stdId == _atndList[i].email){                    //如果輸入的使用者id已經存在於紀錄中
                             if (_atndList[i].time_out == undefined){                          //則檢查timein有沒有輸入過
                                 _atndList[i].time_out = _timeout;
                                 _atndList[i].reward = true;
@@ -613,7 +613,7 @@ exports.SignOut_create_post= [
                         AttendanceList : _atnd._id,
                         _id : results.event._id,
                         amount : _rwd
-                    }
+                    };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
                         if(err) { return next(err);}
@@ -632,10 +632,10 @@ exports.SignBoth_create_get= function(req,res){
 exports.SignBoth_create_post= [
 
     // Validate fields.
-    body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim(),
+    // body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim(),
 
     // Sanitize fields.
-    sanitizeBody('*').escape(),
+    // sanitizeBody('*').escape(),
 
     // Process request after validation and sanitization.
     (req,res,next) =>{
@@ -663,7 +663,7 @@ exports.SignBoth_create_post= [
         
         async(err,results) => {
 
-            let _stdId = req.body.userid;
+            let _stdId = req.body.email;
             let _timein = req.body.timein;
             let _timeout = req.body.timeout;
             let _atnd = results.attendance;
@@ -677,7 +677,7 @@ exports.SignBoth_create_post= [
                 let _newSign = new Attendance({
                     event_id : req.params.eventid,
                     list : [{
-                        student_id : _stdId,
+                        email : _stdId,
                         time_in : _timein,
                         time_out : _timeout,
                         reward : true
@@ -716,7 +716,7 @@ exports.SignBoth_create_post= [
                 let _atndList = results.list.list;
                 if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
                     _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
-                        student_id : _stdId,
+                        email : _stdId,
                         time_in : _timein,
                         time_out : _timeout,
                         reward : true
@@ -752,14 +752,14 @@ exports.SignBoth_create_post= [
 
                     for(let i = 0; i < _atndList.length; i++){
                         console.log("i:  "+i);
-                        console.log(_atndList[i].student_id);
+                        console.log(_atndList[i].email);
 
 
-                        if(_stdId != _atndList[i].student_id){              //輸入的userid不等於目前檢查的studentId
+                        if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
                             else{
                                 _atndList.push({
-                                    student_id : _stdId,
+                                    email : _stdId,
                                     time_in : _timein,
                                     time_out : _timeout,
                                     reward : true
@@ -774,7 +774,7 @@ exports.SignBoth_create_post= [
                         
                         
                         
-                        else if (_stdId == _atndList[i].student_id){                    //如果輸入的使用者id已經存在於紀錄中
+                        else if (_stdId == _atndList[i].email){                    //如果輸入的使用者id已經存在於紀錄中
                             if (_atndList[i].time_out != undefined && _atndList[i].time_in != undefined){                          //如果in跟out都已經輸入了
                                 console.log("This user has already SignIn and SignOut");
                                 res.redirect('./attendancelist');

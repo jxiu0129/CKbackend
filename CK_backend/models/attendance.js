@@ -6,7 +6,8 @@ const AttendanceSchema = new Schema({
    event_id: { type: String, required: true},
    list :
    [{
-      student_id : { type : Number, required: true},
+      student_id : { type : Number, /*required: true*/},
+      email : {type : String, required: true},
       time_in : { type : Date, /*default : Date.now*/ },  // 註解for test 
       time_out : { type: Date, /*default: Date.now*/  },  // 註解for test (required:date.now?)
       reward : {type : Boolean, default: false}

@@ -1,44 +1,4 @@
-<!DOCTYPE HTML>
-<!--
-	Intensify by TEMPLATED
-	templated.co @templatedco
-	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
--->
-<html>
-	<head>
-		<title><%= title %></title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="stylesheet" href="/stylesheets/css/main.css" />
-	</head>
-	<body class="subpage">
-
-		<!-- Header -->
-		<header id="header">
-			<nav class="left">
-				<a href="#menu"><span>Menu</span></a>
-			</nav>
-			<a href="../../" class="logo">NCCU Attendance</a>
-			<nav class="right">
-				<a href="../../" class="button alt">Log out</a>
-			</nav>
-		</header>
-
-		<!-- Menu -->
-		<nav id="menu">
-			<ul class="links">
-				<li><a href="../index.html">首頁</a></li>
-				<li><a href="../eventslist.html">活動列表</a></li>
-				<li><a href="../couponlist.html">電子禮券排行榜</a></li>
-				<li><a href="myevents.html">我辦的活動</a></li>
-				<li><a href="myrecords.html">我參加的活動</a></li>
-				<li><a href="qrcodelist.html">QRCode</a></li>
-			</ul>
-			<!--<ul class="actions vertical">
-				<li><a href="#" class="button fit">Login</a></li>
-			</ul>-->
-		</nav>
-
+<%-include('../root/header')-%>
 		<!-- Main -->
 			<section id="main" class="wrapper">
 				<div class="inner">
@@ -125,25 +85,4 @@
 					</ul>
 					</div>
 			</section>
-
-		<!-- Footer -->
-		<footer id="footer">
-			<div class="inner">
-				<h2>Contact Us</h2>
-				<ul class="actions">
-					<!-- <li><span class="icon fa-phone"></span> <a href="#">(000) 000-0000</a></li> -->
-					<!--<li><span class="icon fa-map-marker"></span> 123 Somewhere Road, Nashville, TN 00000</li>-->
-					<li><span class="icon fa-envelope"></span> <a href="#">ourmail@nccu.edu.tw</a></li>
-				</ul>
-			</div>
-		</footer>
-
-		<!-- Scripts -->
-			<script src="../assets/js/jquery.min.js"></script>
-			<script src="../assets/js/jquery.scrolly.min.js"></script>
-			<script src="../assets/js/skel.min.js"></script>
-			<script src="../assets/js/util.js"></script>
-			<script src="../assets/js/main.js"></script>
-
-	</body>
-</html>
+<%-include('../root/footer')-%>

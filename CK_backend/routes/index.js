@@ -37,9 +37,7 @@ router.get('/login_index',index_controller.login_index);
 
 
 // GET event list
-router.get('/eventslist',function(req,res,next){
-  res.render('eventlist' , { title : "Event List | NCCU Attendance"});
-});
+router.get('/eventslist',index_controller.event_list);
 
 // GET coupon list
 router.get('/couponlist',function(req,res,next){

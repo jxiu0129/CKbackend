@@ -89,13 +89,16 @@ exports.sponsor_create_post = [
         // Extract the validation errors from a request.
         console.log(req.session.user_info.user_info.sponsor_point);
         const errors = validationResult(req);
-        
         // if (req.session.user_info.user_info.sponsor_point < req.body.expense ){
         //     console.log("餘額不足");   
         // };
         // Create a genre object with escaped and trimmed data.
+
+        let _user = await User.findOne({email:req.session.user_info.user_info.email});
+
         let event = new Event({
             // _id : req.body._id, 
+            holder : _user._id,
             name : req.body.name,
             time : req.body.time,
             location : req.body.location,

@@ -6,7 +6,7 @@
 -->
 <html>
 	<head>
-		<title>Events |  NCCU Attendance</title>
+		<title><%=title%></title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="/stylesheets/css/bootstrap.min.css">
@@ -74,12 +74,17 @@
 							</tr>
 							</thead>
 							<tbody>
-							<tr>
-								<td title="T2019082301">活動1</td>
-								<td>時間1</td>
-								<td>地點1</td>
-								<td><a href="" data-toggle="modal" data-target="#sponsorInfo1">處室1</a></td>
+							<% for(let i = 0 ; i < _event.length; i++){ %>
 
+							<tr>
+								<td title="T2019082301"><%=_event[i].name%></td>
+								<td><%=_event[i].time.toLocaleString()%></td>
+								<td><%=_event[i].location%></td>
+								<%if (_event[i].holder != undefined){%>
+									<td><a href="" data-toggle="modal" data-target="#sponsorInfo1"><%=_event[i].holder.name%></a></td>
+								<%}else{%>
+									<td></td>
+								<%}%>
 								<!-- Modal -->
 								<div class="modal fade" id="sponsorInfo1" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
 									<div class="modal-dialog" role="document">
@@ -104,136 +109,10 @@
 										</div>
 									</div>
 								</div>
-								<td><a href="" style="font-weight: bold">我要報名</a></td>
-							</tr>
-							<tr>
-								<td title="T2019082302">活動2</td>
-								<td>時間2</td>
-								<td>地點2</td>
-								<td><a href="" data-toggle="modal" data-target="#sponsorInfo2">公司2</a></td>
 
-								<!-- Modal -->
-								<div class="modal fade" id="sponsorInfo2" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
-									<div class="modal-dialog" role="document">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h3 class="modal-title" id="infoLabel">承辦單位聯絡資訊</h3>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body">
-												<h3 class="inline">承辦單位名稱：</h3><p class="inline">處室2</p>
-												<br>
-												<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline">(02)23104468</p>
-												<br>
-												<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><a href="emailsample002@gmial.com">emailsample002@gmial.com</a></p>
-												<br>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-											</div>
-										</div>
-									</div>
-								</div>
 								<td><a href="" style="font-weight: bold">我要報名</a></td>
 							</tr>
-							<tr>
-								<td title="T2019082303">活動3</td>
-								<td>時間3</td>
-								<td>地點3</td>
-								<td><a href="" data-toggle="modal" data-target="#sponsorInfo3">處室3</a></td>
-
-								<!-- Modal -->
-								<div class="modal fade" id="sponsorInfo3" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
-									<div class="modal-dialog" role="document">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h3 class="modal-title" id="infoLabel">承辦單位聯絡資訊</h3>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body">
-												<h3 class="inline">承辦單位名稱：</h3><p class="inline">處室3</p>
-												<br>
-												<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline">(02)23105732</p>
-												<br>
-												<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><a href="emailsample003@gmial.com">emailsample003@gmial.com</a></p>
-												<br>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-											</div>
-										</div>
-									</div>
-								</div>
-								<td><a href="" style="font-weight: bold">我要報名</a></td>
-							</tr>
-							<tr>
-								<td title="T2019082304">活動4</td>
-								<td>時間4</td>
-								<td>地點4</td>
-								<td><a href="" data-toggle="modal" data-target="#sponsorInfo4">處室4</a></td>
-
-								<!-- Modal -->
-								<div class="modal fade" id="sponsorInfo4" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
-									<div class="modal-dialog" role="document">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h3 class="modal-title" id="infoLabel">承辦單位聯絡資訊</h3>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body">
-												<h3 class="inline">承辦單位名稱：</h3><p class="inline">處室4</p>
-												<br>
-												<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline">(02)22305732</p>
-												<br>
-												<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><a href="emailsample004@gmial.com">emailsample004@gmial.com</a></p>
-												<br>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-											</div>
-										</div>
-									</div>
-								</div>
-								<td><a href="" style="font-weight: bold">我要報名</a></td>
-							</tr>
-							<tr>
-								<td title="T2019082305">活動5</td>
-								<td>時間5</td>
-								<td>地點5</td>
-								<td><a href="" data-toggle="modal" data-target="#sponsorInfo5">公司5</a></td>
-
-								<!-- Modal -->
-								<div class="modal fade" id="sponsorInfo5" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
-									<div class="modal-dialog" role="document">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h3 class="modal-title" id="infoLabel">承辦單位聯絡資訊</h3>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body">
-												<h3 class="inline">承辦單位名稱：</h3><p class="inline">處室5</p>
-												<br>
-												<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline">(02)22304769</p>
-												<br>
-												<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><a href="emailsample005@gmial.com">emailsample005@gmial.com</a></p>
-												<br>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-											</div>
-										</div>
-									</div>
-								</div>
-								<td><a href="" style="font-weight: bold">我要報名</a></td>
-							</tr>
+							<%}%>
 							</tbody>
 
 							<!--表格換頁

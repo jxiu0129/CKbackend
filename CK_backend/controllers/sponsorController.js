@@ -14,40 +14,45 @@ const { sanitizeBody } = require('express-validator/filter');
 
 exports.sponsor_events= async(req,res,next) =>{
 
-    let list_event = await Event.find({},'_id shortid name time location expense amount status')
-      .sort([['time','descending']]);
-    //   .exec(function (err, list_event){
-    //      if (err) { return next(err); }
-    console.log(list_event);
-
-    // 顯示狀態： 活動開始前都是willhold，活動開始時就是holding並會顯示活動結束按鈕，直到隔天凌晨1:00會統一把前一天的名單傳給錢包並顯示finish
+    req.session.reload();
     
-    for(let i =0; i < list_event.length;i++){
-       if (Date.now() < list_event[i].time || list_event[i].status == 'holding'){continue;}
-       else if(Date.now() >= list_event[i].time){
-           console.log(i+' : b : '+list_event[i].status);
-           
-           await Event.findByIdAndUpdate(list_event[i]._id,list_event[i].status ='holding',{});
-           console.log(i+' : a : '+list_event[i].status);
-       }
-    };
+    User.findOne({email:req.session.user_info.user_info.email})
+    .exec(async (err,_user)=>{
+        if (err) { return next(err); }
 
-           
-    // Successful, so render.
-    res.render('sponsor/myevents', { title: 'My Events | NCCU Attendance', list_event:  list_event});
-    // });
+        console.log(_user);
+        
+        Event.findById(_user.hold.holded_events,'_id shortid name time location expense amount status')
+        .sort([['time','descending']])
+        .exec(async (err,list_event)=>{
+            if (err) { return next(err); }
 
-    console.log(list_event);
+            console.log(list_event);
 
-    
+        // 顯示狀態： 活動開始前都是willhold，活動開始時就是holding並會顯示活動結束按鈕，直到隔天凌晨1:00會統一把前一天的名單傳給錢包並顯示finish
+        
+            for(let i =0; i < list_event.length;i++){
+
+            if (Date.now() < list_event[i].time){continue;}
+            else if(Date.now() >= list_event[i].time){
+                console.log(i+' : b : '+list_event[i].status);
+                
+                await Event.findbyIddAndUpdate(list_event[i]._id,{ status :'holding'});
+                console.log(i+' : a : '+list_event[i].status);
+                }
+            }
+            console.log(list_event);
+
+            // Successful, so render.
+            res.render('sponsor/myevents', { title: 'My Events | NCCU Attendance', list_event:  list_event});
+
+                    
+        });
+    });    
 };
 
 exports.sponsor_create_get= function(req, res,){
     res.render('sponsor/addevents' , { title : "Add Events | NCCU Attendance"});
-    Event.findById('_EuOHrj')
-    .exec((err,thisevent) =>{
-        console.log(thisevent);
-    });
 };
 
 
@@ -141,6 +146,20 @@ exports.sponsor_create_post = [
                 console.log('Successfully Create');
             });
 
+            User.findOne({email:req.session.user_info.user_info.email})
+            .exec((err,theuser)=>{
+                theuser.hold.holded_events.push(event._id);
+                let _holdedEvents = theuser.hold.holded_events;
+                User.findByIdAndUpdate(theuser._id,{hold:{holded_events : _holdedEvents}});
+                console.log(theuser.hold.holded_events);
+            });
+            // .exec((err,_user)=>{
+            //     console.log("eventid:  "+event._id);
+            //     _user.hold.holded_events.push(event._id);
+            //     User.findByIdAndUpdate(_user._id,{holdholded_events : holded_events.push(event._id)});
+            //     console.log("push:  "+_user.hold.holded_events.push(event._id));
+
+            // });
         }
     }
 ];

@@ -63,8 +63,11 @@ let multipoint = {
     json: true // Automatically stringifies the body to JSON
 };
 
-exports.Send_Multi_Point = (list) => {
-    multipoint.body.push(list);
+exports.Send_Multi_Point = (list, from, point, des) => {
+    multipoint.list.email = from;
+    multipoint.list.to_account.push(list);
+    multipoint.list.point = point;
+    multipoint.list.description = des;
     rp(multipoint)
     .then((message) =>{
         console.log(message);
@@ -72,4 +75,5 @@ exports.Send_Multi_Point = (list) => {
     .catch((err) =>{
         console.log(err);
     });
+
 };

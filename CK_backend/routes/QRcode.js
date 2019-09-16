@@ -527,15 +527,21 @@ router.get('/timeTest',(req,res,next)=>{
 
 router.get('/tttest',(req,res)=>{
     req.session.reload();
-    
-    User.findOne({email:req.session.user_info.user_info.email})
+    User.findOneAndUpdate({email : req.session.user_info.user_info.email},{name : "馬如龍"})
     .exec((err,_user)=>{
-        console.log(_user);
+        if(err){console.log(err)}
+        else{
+            res.send(_user);
+        }
+    })
+    User.findOne({email : req.session.user_info.user_info.email})
+    .exec((err,_user)=>{
+        console.log(_user.hold.holded_events);
         Event.findById(_user.hold.holded_events)
-        .exec((err,_event)=>{
-            res.send(_event);            
-        })
-    });
+        .exec((err,_events)=>{
+            console.log(_events);
+        }) 
+    })
 })
 
 

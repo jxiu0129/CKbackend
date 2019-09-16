@@ -82,6 +82,9 @@ let multipoint = {
 exports.Send_Multi_Point = async function(req, res){    
     let attndid;
     let list = [];
+    let event_name;
+    let point;
+    let count=0;
     await Event.findById(req.params.eventid)
     .exec((err, data) => {
         if (err) { 
@@ -89,33 +92,40 @@ exports.Send_Multi_Point = async function(req, res){
         }else{
             console.log(data.AttendanceList[0]);
             attndid = data.AttendanceList[0];
+            event_name = data.name;
+            point = data.expense;
             Attendance.findById(attndid)
             .exec((err, data) => {
                 if (err){
                     console.log(err);
                 }else{
-                    console.log(data.list);
                     for(let i = 0; i < data.list.length;i++)
                     {
-                        list.push(data.list[i].email);
+                        if(data.list[i].reward == true){
+                            list.push(data.list[i].email);
+                            count++;
+                        }
                     }
                 }
+                console.log(list);
+                point = point / count;
+                let sendpoint = multipoint;
+                sendpoint.body.email = req.session.user_info.user_info.email;
+                sendpoint.auth.bearer = req.session.API_Access.access_token;
+                sendpoint.body.to_accounts = list;
+                sendpoint.body.point = point;
+                sendpoint.body.description = event_name;
+                console.log(sendpoint);
+                rp(sendpoint)
+                .then((message) =>{
+                    console.log(message);
+                })
+                .catch((err) =>{
+                    console.log(err);
+                });
             });
         }
     });
-    // let sendpoint = multipoint;
-    // sendpoint.body.email = req.session.user_info.user_info.email;
-    // sendpoint.auth.bearer = req.session.API_Access.access_token;
-    // sendpoint.body.to_account.push(list);
-    // sendpoint.body.point = point;
-    // sendpoint.body.description = des;
-    // rp(sendpoint)
-    // .then((message) =>{
-    //     console.log(message);
-    // })
-    // .catch((err) =>{
-    //     console.log(err);
-    // });
     res.render('dick');
 };
 

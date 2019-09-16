@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
+const index_controller = require('../controllers/indexController');
 const sponsor_controller = require('../controllers/sponsorController');
 
 // GET sponsors events and show detail of events
@@ -33,6 +34,8 @@ router.post('/sponsor/events/:eventid/SignbothCreate', sponsor_controller.SignBo
 
 // POST request to delete users.
 router.post('/sponsor/events/:eventid/deleteuser', sponsor_controller.SignIn_delete_post);
+
+router.get('/sponsor/events/:eventid/SendMultiPoint', index_controller.Send_Multi_Point);
 
 // POST request to delete checks.
 // router.post('/sponsor/events/SignInDelete/:eventid', sponsor_controller.SignIn_delete_post);

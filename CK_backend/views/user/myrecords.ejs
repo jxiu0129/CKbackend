@@ -1,134 +1,72 @@
-<!DOCTYPE HTML>
-<!--
-	Intensify by TEMPLATED
-	templated.co @templatedco
-	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
--->
-<html>
-	<head>
-		<title>Ｍy Records - NCCU Attendance</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="stylesheet" href="/stylesheets/css/bootstrap.min.css">
-		<link rel="stylesheet" href="/stylesheets/assets/css/main.css" />
-		<link rel="stylesheet" href="/stylesheets/assets/css/edit.css">
-		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-		<script src="/javascripts/bootstrap.min.js"></script>
-	</head>
-	<body class="subpage">
-
-		<!-- Header -->
-		<header id="header">
-			<nav class="left">
-				<a href="#menu"><span>Menu</span></a>
-			</nav>
-			<a href="../login_index.ejs" class="logo">NCCU Attendance</a>
-			<nav class="right">
-				<a href="../index.ejs" class="button alt">Log out</a>
-			</nav>
+<%- include('../root/header')-%>
+<!-- Main -->
+<section id="main" class="wrapper">
+	<div class="inner">
+		<header class="align-center">
+			<h1>我參加的活動</h1>
 		</header>
+		<div class="table-wrapper">
+			<table>
+				<thead>
+				<tr>
+					<th>活動名稱/ID</th>
+					<th>活動日期</th>
+					<th>活動地點</th>
+					<th>主辦單位投資金額</th>
+					<th>參與人數</th>
+					<th>獲得點數</th>
+					<th>出席狀況</th>
+				</tr>
+				</thead>
+				<tbody>
+				<% for(let i = 0; i < event_info.length; i++) {%>
+				<tr>
+					<td title="T2019082301"><%= event_info[i].event_id.name%></td>
+					<td><%= event_info[i].event_id.time.toLocaleString()%></td>
+					<td><%= event_info[i].event_id.location%></td>
+					<td>
+						<img src="../images/piggy-bank.png" height="20" width="20"/>
+						<%= event_info[i].event_id.expense%>
+					</td>
+					<td><%= event_info[i].income%></td>
+					<td>
+						<img src="../images/piggy-bank.png" height="20" width="20"/>
+						5
+					</td>
+					<td><a href="" data-toggle="modal" data-target="#record1">報到與刷退紀錄</a></td>
 
-		<!-- Menu -->
-		<nav id="menu">
-			<ul class="links">
-					<li><a href="../../login_index">首頁</a></li>
-					<li><a href="../../eventslist">活動列表</a></li>
-					<li><a href="../../couponlist">電子禮券排行榜</a></li>
-					<li><a href="../eventlist">我辦的活動</a></li>
-					<li><a href="../../myrecords">我參加的活動</a></li>
-					<li><a href="qrcodelist.html">QRCode<img src="../images/fire.png" height="25" width="25"/></a></li>
-			</ul>
-		</nav>
-
-		<!-- Main -->
-			<section id="main" class="wrapper">
-				<div class="inner">
-					<header class="align-center">
-						<h1>我參加的活動</h1>
-					</header>
-					<div class="table-wrapper">
-						<table>
-							<thead>
-							<tr>
-								<th>活動名稱/ID</th>
-								<th>活動日期</th>
-								<th>活動地點</th>
-								<th>主辦單位投資金額</th>
-								<th>參與人數</th>
-								<th>獲得點數</th>
-								<th>出席狀況</th>
-							</tr>
-							</thead>
-							<tbody>
-							<% for(let i = 0; i < event_info.length; i++) {%>
-							<tr>
-								<td title="T2019082301"><%= event_info[i].event_id.name%></td>
-								<td><%= event_info[i].event_id.time.toLocaleString()%></td>
-								<td><%= event_info[i].event_id.location%></td>
-								<td>
-									<img src="../images/piggy-bank.png" height="20" width="20"/>
-									<%= event_info[i].event_id.expense%>
-								</td>
-								<td><%= event_info[i].income%></td>
-								<td>
-									<img src="../images/piggy-bank.png" height="20" width="20"/>
-									5
-								</td>
-								<td><a href="" data-toggle="modal" data-target="#record1">報到與刷退紀錄</a></td>
-
-								<!-- Modal -->
-								<div class="modal fade" id="record1" tabindex="-1" role="dialog" aria-labelledby="recordLabel" aria-hidden="true">
-									<div class="modal-dialog" role="document">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h3 class="modal-title" id="recordLabel">報到與刷退紀錄</h3>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body">
-												<h3 class="inline">報到時間：</h3><p class="inline"><%=event_info[i].signin.toLocaleString()%></p>
-												<br>
-												<h3 class="inline">刷退時間：</h3><p class="inline"><%=event_info[i].signout.toLocaleString()%></p>
-												<br>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-											</div>
-										</div>
-									</div>
+					<!-- Modal -->
+					<div class="modal fade" id="record1" tabindex="-1" role="dialog" aria-labelledby="recordLabel" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h3 class="modal-title" id="recordLabel">報到與刷退紀錄</h3>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
 								</div>
-							</tr>
-							<%};%>
-							</tbody>
-						</table>
+								<div class="modal-body">
+									<h3 class="inline">報到時間：</h3><p class="inline"><%=event_info[i].signin.toLocaleString()%></p>
+									<br>
+									<h3 class="inline">刷退時間：</h3><p class="inline"><%=event_info[i].signout.toLocaleString()%></p>
+									<br>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								</div>
+							</div>
+						</div>
 					</div>
+				</tr>
+				<%};%>
+				</tbody>
+			</table>
+		</div>
 
-					<!--button-->
-					<ul class="actions fit">
-						<li><a href="#" class="button fit">錢包查看餘額</a></li>
-					</ul>
-					</div>
-			</section>
-
-		<!-- Footer -->
-		<footer id="footer">
-			<div class="inner">
-				<h2>Contact Us</h2>
-				<ul class="actions">
-					<!-- <li><span class="icon fa-phone"></span> <a href="#">(000) 000-0000</a></li> -->
-					<!--<li><span class="icon fa-map-marker"></span> 123 Somewhere Road, Nashville, TN 00000</li>-->
-					<li><span class="icon fa-envelope"></span> <a href="#">ourmail@nccu.edu.tw</a></li>
-				</ul>
-			</div>
-		</footer>
-
-		<!-- Scripts -->
-		<script src="/stylesheets/assets/js/jquery.min.js"></script>
-		<script src="/stylesheets/assets/js/jquery.scrolly.min.js"></script>
-		<script src="/stylesheets/assets/js/skel.min.js"></script>
-		<script src="/stylesheets/assets/js/util.js"></script>
-		<script src="/stylesheets/assets/js/main.js"></script>
-
-	</body>
-</html>
+		<!--button-->
+		<ul class="actions fit">
+			<li><a href="#" class="button fit">錢包查看餘額</a></li>
+		</ul>
+		</div>
+</section>
+<%- include('../root/footer')-%>

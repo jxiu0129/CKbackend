@@ -103,7 +103,8 @@ exports.sponsor_create_post = [
             time : req.body.time,
             location : req.body.location,
             expense : req.body.expense,      //投資點數
-            amount : 0
+            amount : 0,
+            ncculink : req.body.link,
         });
 
 
@@ -241,16 +242,20 @@ exports.sponsor_update_post= [
 
 exports.events_attendancelist = function(req,res,next){
 
-    Attendance.findOne({event_id : req.params.eventid},'list')
-        .sort([['student_id','descending']])
+    Event.findById(req.params.eventid)
+    .populate('holder')
+    .exec((err,theevt) =>{
+        Attendance.findOne({event_id : req.params.eventid},'list')
+        // .sort([['email','descending']])
         .exec(function (err, thisattnd){
             if (err) { return next(err); }
             // Successful, so render.
             console.log(thisattnd);
-            res.render('sponsor/attendancelist', { title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd } );
-        })
+            res.render('sponsor/attendancelist', { title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+        });
+    });
     
-    };
+};
 
 exports.SignIn_create_get= function(req,res){
     res.render('sponsor/add_checkin_record' , { title : "Create Sign In | NCCU Attendance"});

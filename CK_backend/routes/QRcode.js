@@ -527,13 +527,6 @@ router.get('/timeTest',(req,res,next)=>{
 
 router.get('/tttest',(req,res)=>{
     req.session.reload();
-    User.findOneAndUpdate({email : req.session.user_info.user_info.email},{name : "馬如龍"})
-    .exec((err,_user)=>{
-        if(err){console.log(err)}
-        else{
-            res.send(_user);
-        }
-    })
     User.findOne({email : req.session.user_info.user_info.email})
     .exec((err,_user)=>{
         console.log(_user.hold.holded_events);
@@ -549,8 +542,12 @@ router.get('/tttest',(req,res)=>{
         //         console.log(evt);
         //     })
         // });
-    })
-})
+    });
+});
 
+
+router.get('/successfullyPost',(req,res)=>{
+    res.render('qrcode/alertmessage',{title:'發錢成功',msg:'點數已成功發放'});
+});
 
 module.exports = router;

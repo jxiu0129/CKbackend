@@ -96,6 +96,6 @@ exports.event_list = (req,res)=>{
     .populate('holder')
     .sort([['time','descending']])
     .exec((err,_event)=>{
-        res.render('eventlist', { title: 'Event List | NCCU Attendance', _event:  _event});
+        res.render('root/eventlist', { title: 'Event List | NCCU Attendance', _event:  _event});
     });
 };

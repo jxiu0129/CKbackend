@@ -51,18 +51,25 @@
 					</header>
 					<div>
 						<ul class="list=group list-group-flush">
-							<li class="list-group-item list-group-item-action align-items-center">活動名稱：1234</li>
-							<li class="list-group-item list-group-item-action align-items-center">主辦人：你媽</li>
-							<li class="list-group-item list-group-item-action align-items-center">活動地點：乾你屁事</li>
-							<li class="list-group-item list-group-item-action align-items-center">簽到人數：0</li>
-							<li class="list-group-item list-group-item-action align-items-center">簽退人數：0</li>
-							<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：舉辦中</li>
+							<li class="list-group-item list-group-item-action align-items-center">活動名稱：<%=event.name%></li>
+							<li class="list-group-item list-group-item-action align-items-center">主辦人：<%=event.holder.name%></li>
+							<li class="list-group-item list-group-item-action align-items-center">活動地點：<%=event.location%></li>
+							<!-- <li class="list-group-item list-group-item-action align-items-center">簽到人數：0</li> -->
+							<!-- <li class="list-group-item list-group-item-action align-items-center">簽退人數：0</li> -->
+							<%if(event.status == 'willhold'){%>
+								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：尚未開始</li>
+							<%}else if( event.status == 'holding'){%>
+								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：正在進行</li>
+							<%}else if( event.status == 'finish'){%>
+								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：活動已結束</li>
+							<%}%>
 						</ul>
 					</div>
+					<hr>
 					<form method="post" action="#">
 						<div class="row uniform">
 							<div class="9u 12u$(small)">
-								<input type="text" name="query" id="query" value="" placeholder="輸入參與者id" />
+								<input type="text" name="query" id="query" value="" placeholder="輸入參與者email" />
 							</div>
 							<div class="3u$ 12u$(small)">
 								<input type="submit" value="搜尋" class="fit" />
@@ -74,7 +81,7 @@
 						<table>
 							<thead>
 							<tr>
-								<th>參與者id</th>
+								<th>參與者email</th>
 								<th>報到時間</th>
 								<th>刷退時間</th>
 							</tr>
@@ -85,7 +92,7 @@
 							<% }else{ %>
 								<% for(let i = 0;i < thisattnd.list.length; i++){ %>
 								<tr>
-									<td><%= thisattnd.list[i].student_id  %></td>
+									<td><%= thisattnd.list[i].email  %></td>
 									<% if(thisattnd.list[i].time_in == undefined) {%>
 										<td><%= thisattnd.list[i].time_in  %></td>
 									<% } else { %>

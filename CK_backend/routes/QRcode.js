@@ -13,41 +13,6 @@ const User = require("../models/user");
 //QRCODE
 
 /* GET QR page. */
-//原本是到這個頁面就會create一個新的QRcode.jpg，但因為在新增活動時就會create圖片，所以這邊要改成直接get要顯示的圖片
-router.get('/qrlist/:sponsorid', function(req, res, next) {
-
-    User.findById(req.params.sponsorid)
-    .exec((err,theuser)=>{                              
-        let event_id = theuser.hold.holded_events;          //find的條件理應是找目前正在舉辦的event，因為正常來說這個其實是一個array
-    
-        const opts = {                                    //容錯率包含QRcode圖片的大小，若把太大的圖片硬縮成小圖就會增加讀取錯誤率
-            errorCorrectionLevel: 'H',                    //version越高，圖片能包含的data也就越多   
-            version: 10                                    //但別太高
-        };
-        
-        const qr_urlIN = 'http://localhost:3000/testsignin/'+event_id+'?userid=777';           //data的部分
-        const qr_pathIN = './public/images/QRcode/qrcode_'+event_id+"_in.jpg";
-    
-        QRCode.toFile(qr_pathIN, qr_urlIN, opts, (err) => {
-            if (err) throw err;
-            console.log('savedIN.');
-        });
-        
-        const qr_urlOUT = 'http://localhost:3000/testsignout/'+event_id+'?userid=777';           //data的部分
-        const qr_pathOUT = './public/images/QRcode/qrcode_'+event_id+"_out.jpg";
-    
-
-        QRCode.toFile(qr_pathOUT, qr_urlOUT, opts, (err) => {
-            if (err) throw err;
-            console.log('savedOUT.');
-        });
-
-        res.render('qrcode/qrcodelist',
-        {qr_pathIN : '../images/QRcode/qrcode_'+ event_id +'_in.jpg' , 
-        qr_pathOUT : '../images/QRcode/qrcode_'+ event_id +'_out.jpg'});
-    });
-
-});
 
 // 掃描qrcode 並 簽到
 router.get('/testSignIn/:eventid',async (req,res,next)=>{
@@ -74,7 +39,7 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
         async (err,results)=>{
 
             req.session.reload();
-            let _stdId = req.session.user_info.user_info.student_id;
+            let _stdId = req.session.user_info.user_info.email;
             let _timein = Date.now();
             let _atnd = results.attendance;
             let _SignIn;
@@ -87,7 +52,7 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                 let _newSignIn = new Attendance({
                     event_id : req.params.eventid,
                     list : [{
-                        student_id : _stdId,
+                        email : _stdId,
                         time_in : _timein
                     }]
                 });
@@ -125,7 +90,7 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                 let _atndList = results.list.list;
                 if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
                     _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
-                        student_id : _stdId,
+                        email : _stdId,
                         time_in : _timein
                     });
                     _SignIn = {
@@ -137,8 +102,8 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                         console.log("Successfully Create SignIn 671");
                         res.render('qrcode/alertmessage',
                         {title: 'Successfully Sign In | NCCU Attendance',
-                        msg:'簽到成功'})
-                    })
+                        msg:'簽到成功'});
+                    });
                 }
 
 
@@ -146,14 +111,14 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
 
                     for(let i = 0; i < _atndList.length; i++){
                         console.log("i:  "+i);
-                        console.log(_atndList[i].student_id);
+                        console.log(_atndList[i].email);
 
 
-                        if(_stdId != _atndList[i].student_id){              //輸入的userid不等於目前檢查的studentId
+                        if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
                             else{
                                 _atndList.push({
-                                    student_id : _stdId,
+                                    email : _stdId,
                                     time_in : _timein
                                 });
                                 _SignIn = {
@@ -166,7 +131,7 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                         
                         
                         
-                        else if (_stdId == _atndList[i].student_id){                    //如果輸入的使用者id已經存在於紀錄中
+                        else if (_stdId == _atndList[i].email){                    //如果輸入的使用者id已經存在於紀錄中
                             if (_atndList[i].time_in == undefined){                          //則檢查timein有沒有輸入過
                                 _atndList[i].time_in = _timein;
                                 _atndList[i].reward = true;
@@ -254,7 +219,7 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
     async (err,results) =>{
 
         req.session.reload();
-        let _stdId = req.session.user_info.user_info.student_id;
+        let _stdId = req.session.user_info.user_info.email;
         let _timeout = Date.now();
         let _atnd = results.attendance;
         let _SignOut;
@@ -267,7 +232,7 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
             let _newSignOut = new Attendance({
                 event_id : req.params.eventid,
                 list : [{
-                    student_id : _stdId,
+                    email : _stdId,
                     time_out : _timeout
                 }]
             });
@@ -306,7 +271,7 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
             let _atndList = results.list.list;
             if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
                 _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
-                    student_id : _stdId,
+                    email : _stdId,
                     time_out : _timeout
                 });
                 _SignOut = {
@@ -319,7 +284,7 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                     res.render('qrcode/alertmessage',
                     {title: 'Successfully Sign Out | NCCU Attendance',
                     msg:'刷退成功'});
-                })
+                });
             }
 
 
@@ -327,14 +292,14 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
 
                 for(let i = 0; i < _atndList.length; i++){
                     console.log("i:  "+i);
-                    console.log(_atndList[i].student_id);
+                    console.log(_atndList[i].email);
 
 
-                    if(_stdId != _atndList[i].student_id){              //輸入的userid不等於目前檢查的studentId
+                    if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                         if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
                         else{
                             _atndList.push({
-                                student_id : _stdId,
+                                email : _stdId,
                                 time_out : _timeout
                             });
                             _SignOut = {
@@ -347,7 +312,7 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                     
                     
                     
-                    else if (_stdId == _atndList[i].student_id){                    //如果輸入的使用者id已經存在於紀錄中
+                    else if (_stdId == _atndList[i].email){                    //如果輸入的使用者id已經存在於紀錄中
                         if (_atndList[i].time_out == undefined){                          //則檢查timein有沒有輸入過
                             _atndList[i].time_out = _timeout;
                             _atndList[i].reward = true;

@@ -475,11 +475,11 @@ router.get('/QRtest', function(req, res, next) {
 //TIME TEST
 const schedule = require('node-schedule');
 
-router.get('/qrcodelist/:userid', (req,res,next)=>{
+router.get('/qrcodelist', (req,res,next)=>{
     req.session.reload();
 
     console.log(req.session.user_info);
-    User.findById(req.params.userid,'hold')
+    User.findOne({email : req.session.user_info.user_info.email},'hold')
     .exec(async (err,thisuser)=>{
        
         if (err) { return next(err); };

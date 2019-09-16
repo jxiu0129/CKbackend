@@ -89,13 +89,16 @@ exports.sponsor_create_post = [
         // Extract the validation errors from a request.
         console.log(req.session.user_info.user_info.sponsor_point);
         const errors = validationResult(req);
-        
         // if (req.session.user_info.user_info.sponsor_point < req.body.expense ){
         //     console.log("餘額不足");   
         // };
         // Create a genre object with escaped and trimmed data.
+
+        let _user = await User.findOne({email:req.session.user_info.user_info.email});
+
         let event = new Event({
             // _id : req.body._id, 
+            holder : _user._id,
             name : req.body.name,
             time : req.body.time,
             location : req.body.location,
@@ -167,8 +170,8 @@ exports.sponsor_delete_post= async (req,res,next) => {
 
     //沒有寫檢查的機制，照理來說應該是先檢查attendancelist存不存在才能刪，但莫名的無論存不存在他都會刪所以都可以跑，先這樣寫好了
                 Attendance.findOneAndRemove({event_id:req.params.eventid},(err,theAtd)=>{
-                    if(err){console.log(err)}
-                    else{console.log("Successfully Delete Attendance")}
+                    if(err){console.log(err);}
+                    else{console.log("Successfully Delete Attendance");}
                 });
 
                 User.findOne({email:req.session.user_info.user_info.email})
@@ -186,13 +189,13 @@ exports.sponsor_delete_post= async (req,res,next) => {
             });
 
             fs.unlink('./public/images/QRcode/qrcode_' +req.params.eventid+'_in.jpg',(err)=>{
-                if(err){console.log(err)}
-                else{console.log("Successfully Delete QRcode_in.jpg")}
+                if(err){console.log(err);}
+                else{console.log("Successfully Delete QRcode_in.jpg");}
             });
 
             fs.unlink('./public/images/QRcode/qrcode_' +req.params.eventid+'_out.jpg',(err)=>{
-                if(err){console.log(err)}
-                else{console.log("Successfully Delete QRcode_out.jpg")}
+                if(err){console.log(err);}
+                else{console.log("Successfully Delete QRcode_out.jpg");}
             } );
 
         };
@@ -245,7 +248,7 @@ exports.events_attendancelist = function(req,res,next){
             // Successful, so render.
             console.log(thisattnd);
             res.render('sponsor/attendancelist', { title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd } );
-        })
+        });
     
     };
 
@@ -269,18 +272,18 @@ exports.SignIn_create_post= [
         async.parallel({
             event: function(callback){
                 Event.findById(req.params.eventid)
-                .exec(callback)
+                .exec(callback);
             },
 
             attendance: function(callback){
                 Attendance.findOne({event_id:req.params.eventid})
-                .exec(callback)
+                .exec(callback);
 
             },
 
             list : function(callback){
                 Attendance.findOne({event_id:req.params.eventid},'list')
-                .exec(callback)
+                .exec(callback);
 
             }
         },
@@ -456,18 +459,18 @@ exports.SignOut_create_post= [
         async.parallel({
             event: function(callback){
                 Event.findById(req.params.eventid)
-                .exec(callback)
+                .exec(callback);
             },
 
             attendance: function(callback){
                 Attendance.findOne({event_id:req.params.eventid})
-                .exec(callback)
+                .exec(callback);
 
             },
 
             list : function(callback){
                 Attendance.findOne({event_id:req.params.eventid},'list')
-                .exec(callback)
+                .exec(callback);
 
             }
         },
@@ -509,7 +512,7 @@ exports.SignOut_create_post= [
                     AttendanceList : _newSignOut,
                     amount : results.event.amount,
                     _id : results.event._id,
-                })
+                });
                 // results.event.AttendanceList._id = _newSignOut._id
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
@@ -534,7 +537,7 @@ exports.SignOut_create_post= [
 
                     Attendance.findByIdAndUpdate(_atnd._id,_SignOut,{},function(err){
                         console.log("Successfully Create SignOut");
-                    })
+                    });
                 }
 
 
@@ -596,7 +599,7 @@ exports.SignOut_create_post= [
                         if(theAtd.list[j].reward == true){
                             _rwd ++;
                         }
-                    };
+                    }
                     
                     console.log(_rwd);
 
@@ -608,7 +611,7 @@ exports.SignOut_create_post= [
                         AttendanceList : _atnd._id,
                         _id : results.event._id,
                         amount : _rwd
-                    }
+                    };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
                         if(err) { return next(err);}
@@ -616,7 +619,7 @@ exports.SignOut_create_post= [
                     });                
                 }
             }
-        })
+        });
     }       
 ];
 
@@ -640,18 +643,18 @@ exports.SignBoth_create_post= [
         async.parallel({
             event: function(callback){
                 Event.findById(req.params.eventid)
-                .exec(callback)
+                .exec(callback);
             },
 
             attendance: function(callback){
                 Attendance.findOne({event_id:req.params.eventid})
-                .exec(callback)
+                .exec(callback);
 
             },
 
             list : function(callback){
                 Attendance.findOne({event_id:req.params.eventid},'list')
-                .exec(callback)
+                .exec(callback);
 
             }
         },
@@ -696,7 +699,7 @@ exports.SignBoth_create_post= [
                     AttendanceList : _newSign,
                     _id : results.event._id,
                     amount : 1
-                })
+                });
                 // results.event.AttendanceList._id = _newSignOut._id
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
@@ -732,7 +735,7 @@ exports.SignBoth_create_post= [
                         AttendanceList : _newSign,
                         _id : results.event._id,
                         amount : 1
-                    })
+                    });
                     // results.event.AttendanceList._id = _newSignOut._id
     
                     Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
@@ -802,7 +805,7 @@ exports.SignBoth_create_post= [
                         if(theAtd.list[j].reward == true){
                             _rwd ++;
                         }
-                    };
+                    }
 
                     console.log(_rwd);
                     
@@ -822,7 +825,7 @@ exports.SignBoth_create_post= [
                      });
                 }
             }
-        })
+        });
     }       
 ];
 
@@ -838,7 +841,7 @@ exports.SignIn_delete_post= [
         
             event: function(callback){
                 Event.findById(req.params.eventid)
-                .exec(callback)      
+                .exec(callback);
 
             }},
 
@@ -848,7 +851,7 @@ exports.SignIn_delete_post= [
             let _sign_in = results.event.Sign_in;
             let _userid = req.body.userid;
             console.log(_userid);
-            console.log(_sign_in)
+            console.log(_sign_in);
 
             for(let i = 0;i < _userid.length ; i++){
                 console.log("i : "+i+"  userid : " + _userid[i]);
@@ -861,7 +864,7 @@ exports.SignIn_delete_post= [
                 time : results.event.time,
                 expense : results.event.expense,
                 Sign_in : _sign_in
-            }
+            };
 
             Event.findByIdAndUpdate(req.params.eventid, new_event, {}, function (err, theevent) {
                 if (err) { return next(err); }
@@ -869,8 +872,8 @@ exports.SignIn_delete_post= [
                 console.log('Successfully Update');
                 res.redirect("../attendancelist/:eventid");
             }
-        )}
-    )
+        );}
+    );
     }];
 
 exports.SignOut_delete_post= function(req,res){
@@ -880,7 +883,7 @@ exports.SignOut_delete_post= function(req,res){
         
             event: function(callback){
                 Event.findById(req.params.eventid)
-                .exec(callback)      
+                .exec(callback);      
 
             }},
 
@@ -890,7 +893,7 @@ exports.SignOut_delete_post= function(req,res){
             let _sign_out = results.event.Sign_out;
             let _userid = req.body.userid;
             console.log(_userid);
-            console.log(_sign_out)
+            console.log(_sign_out);
 
             for(let i = 0;i < _userid.length ; i++){
                 console.log("i : "+i+"  userid : " + _userid[i]);
@@ -903,7 +906,7 @@ exports.SignOut_delete_post= function(req,res){
                 time : results.event.time,
                 expense : results.event.expense,
                 Sign_out : _sign_out
-            }
+            };
 
             Event.findByIdAndUpdate(req.params.eventid, new_event, {}, function (err, theevent) {
                 if (err) { return next(err); }
@@ -911,9 +914,9 @@ exports.SignOut_delete_post= function(req,res){
                 console.log('Successfully Update');
                 res.redirect("../attendancelist/:eventid");
             }
-        )}
-    )
-    }};
+        );}
+    );
+    };};
 
 
 

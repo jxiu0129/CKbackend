@@ -1,5 +1,7 @@
 const rp = require('request-promise');
 const request = require('request');
+const Event = require("../models/event");
+
 let API_LoginCode;
 let API_Access;
 let API_RefreshClock;
@@ -83,5 +85,17 @@ exports.Send_Multi_Point = (list, from, point, des, ApiToken) => {
     })
     .catch((err) =>{
         console.log(err);
+    });
+};
+
+
+//活動列表
+exports.event_list = (req,res)=>{
+    req.session.reload();
+    Event.find({ $or : [{status : 'willhold'},{status : 'holding'}] })
+    .populate('holder')
+    .sort([['time','descending']])
+    .exec((err,_event)=>{
+        res.render('eventlist', { title: 'Event List | NCCU Attendance', _event:  _event});
     });
 };

@@ -31,13 +31,13 @@ exports.sponsor_events= async(req,res,next) =>{
         
             for(let i =0; i < list_event.length;i++){
 
-            if (Date.now() < list_event[i].time){continue;}
-            else if(Date.now() >= list_event[i].time){
-                console.log(i+' : b : '+list_event[i].status);
-                
-                await Event.findByIdAndUpdate(list_event[i]._id,{ status :'holding'});
-                console.log(i+' : a : '+list_event[i].status);
+                if (Date.now() < list_event[i].time){
+                    await Event.findByIdAndUpdate(list_event[i]._id,{ status :'willhold'});    
                 }
+                else if(Date.now() >= list_event[i].time){                
+                    await Event.findByIdAndUpdate(list_event[i]._id,{ status :'holding'});
+                }
+
             }
             console.log("sponsor/events :list_event :"+list_event);
 
@@ -85,7 +85,7 @@ exports.sponsor_create_post = [
     sanitizeBody('expense').escape(),
     
     // Process request after validation and sanitization.
-    (req, res, next) => {
+    async (req, res, next) => {
         // Extract the validation errors from a request.
         console.log(req.session.user_info.user_info.sponsor_point);
         const errors = validationResult(req);
@@ -138,28 +138,19 @@ exports.sponsor_create_post = [
                 console.log('savedOUT.');
             });
 
-            // Second,Data from form is valid, Save
-            event.save(function (err) {
+            // Second, Data from form is valid, Save
+            await event.save(function (err) {
                 if (err) { return next(err); }
-                // Successful 
-                res.redirect('./');
-                console.log('Successfully Create');
+                console.log('Successfully Create Event');
             });
 
             User.findOne({email:req.session.user_info.user_info.email})
-            .exec((err,theuser)=>{
+            .exec((err,theuser) => {
                 theuser.hold.holded_events.push(event._id);
                 let _holdedEvents = theuser.hold.holded_events;
-                User.findByIdAndUpdate(theuser._id,{hold:{holded_events : _holdedEvents}});
-                console.log(theuser.hold.holded_events);
+                User.findByIdAndUpdate(theuser._id, {hold: { holded_events : _holdedEvents}})
+                .exec(res.redirect('./'));
             });
-            // .exec((err,_user)=>{
-            //     console.log("eventid:  "+event._id);
-            //     _user.hold.holded_events.push(event._id);
-            //     User.findByIdAndUpdate(_user._id,{holdholded_events : holded_events.push(event._id)});
-            //     console.log("push:  "+_user.hold.holded_events.push(event._id));
-
-            // });
         }
     }
 ];
@@ -167,6 +158,8 @@ exports.sponsor_create_post = [
 
 
 exports.sponsor_delete_post= async (req,res,next) => {
+
+            req.session.reload();
 
             await Event.findByIdAndRemove(req.params.eventid, function deleteEvent(err,theevt) {
                 if (err) { return next(err); }
@@ -178,7 +171,18 @@ exports.sponsor_delete_post= async (req,res,next) => {
                     else{console.log("Successfully Delete Attendance")}
                 });
 
-                res.redirect('../');
+                User.findOne({email:req.session.user_info.user_info.email})
+                .exec((err,theuser) => {
+                    if (theuser.hold.holded_events.indexOf(req.params.eventid) != -1){
+                        let _holdedEvents = theuser.hold.holded_events;
+
+                        _holdedEvents.splice(_holdedEvents.indexOf(req.params.eventid),1);
+    
+                        User.findByIdAndUpdate(theuser._id, {hold: { holded_events : _holdedEvents}})
+                        .exec(res.redirect('../'));
+                    }
+                    else{res.redirect('../');}
+                });
             });
 
             fs.unlink('./public/images/QRcode/qrcode_' +req.params.eventid+'_in.jpg',(err)=>{

@@ -71,11 +71,7 @@ let multipoint = {
     json: true // Automatically stringifies the body to JSON
 };
 
-<<<<<<< HEAD
-exports.Send_Multi_Point = (list, from, point, des) => {
-=======
 exports.Send_Multi_Point = (list, from, point, des, ApiToken) => {
->>>>>>> faf07ed40bdcd952219b672dfd9cf6555a8d7a79
     multipoint.body.email = from;
     multipoint.auth.bearer = ApiToken;
     multipoint.body.to_account.push(list);

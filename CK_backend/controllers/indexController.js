@@ -60,7 +60,7 @@ let multipoint = {
     method: 'POST',
     uri: 'http://wm.nccu.edu.tw:3001/openapi/send_point',
     auth: {
-        'bearer' : API_Access.access_token
+        'bearer' : ''
     },
     body: {
         email: "",
@@ -71,8 +71,9 @@ let multipoint = {
     json: true // Automatically stringifies the body to JSON
 };
 
-exports.Send_Multi_Point = (list, from, point, des) => {
+exports.Send_Multi_Point = (list, from, point, des, ApiToken) => {
     multipoint.body.email = from;
+    multipoint.auth.bearer = ApiToken;
     multipoint.body.to_account.push(list);
     multipoint.body.point = point;
     multipoint.body.description = des;

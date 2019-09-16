@@ -11,6 +11,9 @@ const index_controller = require('../controllers/indexController');
 // Home_Routes 
 // GET home page
 router.get('/', index_controller.index);
+router.get('/layout', (req, res) => {
+  res.render('root/layout');
+});
 
 // session test
 router.get('/session', function(req, res, next) {
@@ -38,12 +41,12 @@ router.get('/login_index',index_controller.login_index);
 
 // GET event list
 router.get('/eventslist',function(req,res,next){
-  res.render('eventlist' , { title : "Event List | NCCU Attendance"});
+  res.render('root/eventlist' , { title : "Event List | NCCU Attendance"});
 });
 
 // GET coupon list
 router.get('/couponlist',function(req,res,next){
-  res.render('couponlist' , { title : "Event List | NCCU Attendance"});
+  res.render('root/couponlist' , { title : "Event List | NCCU Attendance"});
 });
 
 router.get('/user_profile', index_controller.profile_user);

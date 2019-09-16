@@ -5,16 +5,17 @@ const async = require('async');
 
 
 exports.user = function(req,res){
-    res.render('index' , { title : "使用者管理"});
+    res.render('root/index' , { title : "使用者管理"});
 };
 
 // connect to myrecords.ejs
 // user routes 裡有個test 去上傳測試用資料
 
 exports.user_record = (req, res, next) => {
-    
+    req.session.reload();
+    console.log('session HERE --->' + req.session.user_info.user_info.email);
     User
-    .findById(req.query._id, 'attend')
+    .findOne({email:req.session.user_info.user_info.email}, 'attend')
     // using http://localhost:3000/user/record?_id=5d70d857107eb226b4b8f770 for test
     // .populate('hold.holded_events')
     .populate('attend.event_id')
@@ -31,13 +32,13 @@ exports.user_record = (req, res, next) => {
 
         res.render('user/myrecords', {event_info: data.attend});
         // res.send('fuck');
-        // res.send(data);
+        // res.send(req.session);
     });
     
 };
 
 exports.user_events = function(req,res){
-    res.render('index' , { title : "我的活動"});
+    res.render('root/index' , { title : "我的活動"});
 };
 
 // connect to myrecords.ejs

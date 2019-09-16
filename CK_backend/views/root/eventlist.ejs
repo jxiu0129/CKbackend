@@ -6,7 +6,7 @@
 -->
 <html>
 	<head>
-		<title>Coupon - NCCU Attendance</title>
+		<title><%=title%></title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="/stylesheets/css/bootstrap.min.css">
@@ -37,7 +37,6 @@
 				<li><a href="myrecords.html">我參加的活動</a></li>
                 <li><a href="./sponsor/events">我辦的活動</a></li>
 				<li><a href="qrcodelist.html">QRCode<img src="../images/fire.png" height="25" width="25"/></a></li>
-
 			</ul>
 			<!--<ul class="actions vertical">
 				<li><a href="#" class="button fit">Login</a></li>
@@ -48,53 +47,88 @@
 			<section id="main" class="wrapper">
 				<div class="inner">
 					<header class="align-center">
-						<h1>電子禮券排行榜</h1>
-						<p>以下為暢銷電子禮券組前三名！</p>
+						<h1>活動列表</h1>
+						<p>以下活動都是與我們共同創造雙贏局面的活動喔！</p>
 					</header>
+
+					<form method="post" action="#">
+						<div class="row uniform">
+							<div class="9u 12u$(small)">
+								<input type="text" name="query" id="query" value="" placeholder="輸入活動名稱" />
+							</div>
+							<div class="3u$ 12u$(small)">
+								<input type="submit" value="搜尋" class="fit" />
+							</div>
+						</div>
+					</form>
+
 					<div class="table-wrapper">
 						<table>
 							<thead>
 							<tr>
-								<th>排名</th>
-								<th>票券組合</th>
-								<th>價錢（點數）</th>
+								<th>活動名稱/ID<br>(將滑鼠移至活動名稱即可檢視ID)</th>
+								<th>活動日期</th>
+								<th>活動地點</th>
+								<th>承辦單位</th>
+								<th>報名連結</th>
 							</tr>
 							</thead>
 							<tbody>
+							<% for(let i = 0 ; i < _event.length; i++){ %>
+
 							<tr>
-								<td>Top 1</td>
-								<td>Haagen-dazs百元現金兌換券</td>
-								<td>
-									<img src="../images/piggy-bank.png" height="20" width="20"/>
-									10
-								</td>
+								<td title="T2019082301"><%=_event[i].name%></td>
+								<td><%=_event[i].time.toLocaleString()%></td>
+								<td><%=_event[i].location%></td>
+								<%if (_event[i].holder != undefined){%>
+									<td><a href="" data-toggle="modal" data-target="#sponsorInfo1"><%=_event[i].holder.name%></a></td>
+								<%}else{%>
+									<td></td>
+								<%}%>
+								<!-- Modal -->
+								<div class="modal fade" id="sponsorInfo1" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
+									<div class="modal-dialog" role="document">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h3 class="modal-title" id="infoLabel">承辦單位聯絡資訊</h3>
+												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+													<span aria-hidden="true">&times;</span>
+												</button>
+											</div>
+											<div class="modal-body">
+												<h3 class="inline">承辦單位名稱：</h3><p class="inline">處室1</p>
+												<br>
+												<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline">(02)23108312</p>
+												<br>
+												<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><a href="emailsample001@gmial.com">emailsample001@gmial.com</a></p>
+												<br>
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<td><a href="" style="font-weight: bold">我要報名</a></td>
 							</tr>
-							<tr>
-								<td>Top 2</td>
-								<td>威秀影城電影票即享券</td>
-								<td>
-									<img src="../images/piggy-bank.png" height="20" width="20"/>
-									27
-								</td>
-							</tr>
-							<tr>
-								<td>Top 3</td>
-								<td>Cold Stone百元商品兌換券</td>
-								<td>
-									<img src="../images/piggy-bank.png" height="20" width="20"/>
-									10
-								</td>
-							</tr>
+							<%}%>
 							</tbody>
+
+							<!--表格換頁
+							<tfoot>
+								<a href="#">更多活動</a>
+							</tfoot> -->
+
 						</table>
 					</div>
 					<header class="align-center">
-						<p>若要購買或兌換電子禮券，請前往政大錢包！</p>
+						<p>再來舉辦一場活動吧！</p>
 					</header>
 
 					<!--button-->
 					<ul class="actions fit">
-						<li><a href="addevent.html" class="button fit">前往政大錢包</a></li>
+						<li><a href="addevent.html" class="button fit">新增活動</a></li>
 					</ul>
 					</div>
 			</section>

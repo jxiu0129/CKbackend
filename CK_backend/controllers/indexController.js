@@ -9,13 +9,13 @@ let API_RefreshClock;
 let API_User;
 
 exports.index = function(req,res){
-    if(!req.session.code){
-        res.render('index');
-    }
-    else{
-        res.render('login_index' + '?code' + req.session.code + '&state=123');
-    }
-    // res.render('index');
+    // if(!req.session.code){
+    //     res.render('index');
+    // }
+    // else{
+    //     res.render('login_index');
+    // }
+    res.render('root/index');
 };
 
 exports.logout_but = (req, res) => {
@@ -56,12 +56,12 @@ exports.login_index = function(req, res){
                 console.log('fail');
             });
         });
-        res.render('login_index');
+        res.render('root/login_index');
     }
 };
 
 exports.profile_user = async function(req, res){
-    res.render('profile');
+    res.render('root/profile');
 };
 
 let multipoint = {
@@ -117,4 +117,16 @@ exports.Send_Multi_Point = async function(req, res){
     //     console.log(err);
     // });
     res.render('dick');
+};
+
+
+//活動列表
+exports.event_list = (req,res)=>{
+    req.session.reload();
+    Event.find({ $or : [{status : 'willhold'},{status : 'holding'}] })
+    .populate('holder')
+    .sort([['time','descending']])
+    .exec((err,_event)=>{
+        res.render('eventlist', { title: 'Event List | NCCU Attendance', _event:  _event});
+    });
 };

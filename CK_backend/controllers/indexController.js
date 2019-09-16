@@ -12,7 +12,7 @@ exports.index = function(req,res){
     else{
         res.render('login_index');
     }*/
-    res.render('index');
+    res.render('root/index');
 };
 
 exports.login_index = function(req, res){
@@ -48,12 +48,12 @@ exports.login_index = function(req, res){
                 console.log('fail');
             });
         });
-        res.render('login_index');
+        res.render('root/login_index');
     }
 };
 
 exports.profile_user = async function(req, res){
-    res.render('profile');
+    res.render('root/profile');
 };
 
 let multipoint = {

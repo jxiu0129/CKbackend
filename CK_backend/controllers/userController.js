@@ -5,7 +5,7 @@ const async = require('async');
 
 
 exports.user = function(req,res){
-    res.render('index' , { title : "使用者管理"});
+    res.render('root/index' , { title : "使用者管理"});
 };
 
 // connect to myrecords.ejs
@@ -37,7 +37,7 @@ exports.user_record = (req, res, next) => {
 };
 
 exports.user_events = function(req,res){
-    res.render('index' , { title : "我的活動"});
+    res.render('root/index' , { title : "我的活動"});
 };
 
 // connect to myrecords.ejs

@@ -11,6 +11,9 @@ const index_controller = require('../controllers/indexController');
 // Home_Routes 
 // GET home page
 router.get('/', index_controller.index);
+router.get('/layout', (req, res) => {
+  res.render('layout');
+});
 
 // session test
 router.get('/session', function(req, res, next) {

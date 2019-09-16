@@ -20,14 +20,12 @@ exports.sponsor_events= async(req,res,next) =>{
     .exec(async (err,_user)=>{
         if (err) { return next(err); }
 
-        console.log(_user);
+        console.log("sponsor/events :_user:  "+_user);
         
-        Event.findById(_user.hold.holded_events,'_id shortid name time location expense amount status')
+        Event.find({_id:_user.hold.holded_events},'_id shortid name time location expense amount status')
         .sort([['time','descending']])
-        .exec(async (err,list_event)=>{
+        .exec(async (err,list_event) => {
             if (err) { return next(err); }
-
-            console.log(list_event);
 
         // 顯示狀態： 活動開始前都是willhold，活動開始時就是holding並會顯示活動結束按鈕，直到隔天凌晨1:00會統一把前一天的名單傳給錢包並顯示finish
         
@@ -37,11 +35,11 @@ exports.sponsor_events= async(req,res,next) =>{
             else if(Date.now() >= list_event[i].time){
                 console.log(i+' : b : '+list_event[i].status);
                 
-                await Event.findbyIddAndUpdate(list_event[i]._id,{ status :'holding'});
+                await Event.findByIdAndUpdate(list_event[i]._id,{ status :'holding'});
                 console.log(i+' : a : '+list_event[i].status);
                 }
             }
-            console.log(list_event);
+            console.log("sponsor/events :list_event :"+list_event);
 
             // Successful, so render.
             res.render('sponsor/myevents', { title: 'My Events | NCCU Attendance', list_event:  list_event});
@@ -52,7 +50,9 @@ exports.sponsor_events= async(req,res,next) =>{
 };
 
 exports.sponsor_create_get= function(req, res,){
-    res.render('sponsor/addevents' , { title : "Add Events | NCCU Attendance"});
+    req.session.reload();
+    console.log(req.session.user_info.user_info.sponsor_point);
+    res.render('sponsor/addevents' , { title : "Add Events | NCCU Attendance",balance:req.session.user_info.user_info.sponsor_point});
 };
 
 

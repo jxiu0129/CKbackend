@@ -537,10 +537,18 @@ router.get('/tttest',(req,res)=>{
     User.findOne({email : req.session.user_info.user_info.email})
     .exec((err,_user)=>{
         console.log(_user.hold.holded_events);
-        Event.findById(_user.hold.holded_events)
-        .exec((err,_events)=>{
-            console.log(_events);
-        }) 
+        let h_events = _user.hold.holded_events;
+        Event.find({_id : h_events})
+        .exec((err,evt)=>{
+            console.log(evt);
+        })
+        // h_events.forEach(element => {
+        //     console.log(element);
+        //     Event.findById(element)
+        //     .exec((err,evt)=>{
+        //         console.log(evt);
+        //     })
+        // });
     })
 })
 

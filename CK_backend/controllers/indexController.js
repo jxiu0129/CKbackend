@@ -1,19 +1,27 @@
 const rp = require('request-promise');
 const request = require('request');
+const Attendance = require("../models/attendance");
+const Event = require("../models/event");
+
 let API_LoginCode;
 let API_Access;
 let API_RefreshClock;
 let API_User;
 
 exports.index = function(req,res){
-    /*if(req.session.name == 'undefined'){
+    if(!req.session.code){
         res.render('index');
     }
     else{
-        res.render('login_index');
-    }*/
-    res.render('index');
+        res.render('login_index' + '?code' + req.session.code + '&state=123');
+    }
+    // res.render('index');
 };
+
+exports.logout_but = (req, res) => {
+    console.log('log out!');
+    req.session.destroy();
+}
 
 exports.login_index = function(req, res){
     console.log('location.code : ' + req.query.code);
@@ -71,17 +79,42 @@ let multipoint = {
     json: true // Automatically stringifies the body to JSON
 };
 
-exports.Send_Multi_Point = (list, from, point, des, ApiToken) => {
-    multipoint.body.email = from;
-    multipoint.auth.bearer = ApiToken;
-    multipoint.body.to_account.push(list);
-    multipoint.body.point = point;
-    multipoint.body.description = des;
-    rp(multipoint)
-    .then((message) =>{
-        console.log(message);
-    })
-    .catch((err) =>{
-        console.log(err);
+exports.Send_Multi_Point = async function(req, res){    
+    let attndid;
+    let list = [];
+    await Event.findById(req.params.eventid)
+    .exec((err, data) => {
+        if (err) { 
+            console.log(err);
+        }else{
+            console.log(data.AttendanceList[0]);
+            attndid = data.AttendanceList[0];
+            Attendance.findById(attndid)
+            .exec((err, data) => {
+                if (err){
+                    console.log(err);
+                }else{
+                    console.log(data.list);
+                    for(let i = 0; i < data.list.length;i++)
+                    {
+                        list.push(data.list[i].email);
+                    }
+                }
+            });
+        }
     });
+    // let sendpoint = multipoint;
+    // sendpoint.body.email = req.session.user_info.user_info.email;
+    // sendpoint.auth.bearer = req.session.API_Access.access_token;
+    // sendpoint.body.to_account.push(list);
+    // sendpoint.body.point = point;
+    // sendpoint.body.description = des;
+    // rp(sendpoint)
+    // .then((message) =>{
+    //     console.log(message);
+    // })
+    // .catch((err) =>{
+    //     console.log(err);
+    // });
+    res.render('dick');
 };

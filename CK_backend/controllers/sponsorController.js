@@ -95,7 +95,7 @@ exports.sponsor_create_post = [
         // };
         // Create a genre object with escaped and trimmed data.
         let _user = await User.findOne({email:req.session.user_info.user_info.email});
-        
+
         let event = new Event({
             // _id : req.body._id, 
             holder : _user._id,
@@ -488,7 +488,6 @@ exports.SignOut_create_post= [
             let _atnd = results.attendance;
             let _SignOut;
 
-
             if(err){return next(err);}
 
             else if (_atnd == null){
@@ -518,7 +517,7 @@ exports.SignOut_create_post= [
                     AttendanceList : _newSignOut,
                     amount : results.event.amount,
                     _id : results.event._id,
-                })
+                });
                 // results.event.AttendanceList._id = _newSignOut._id
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){

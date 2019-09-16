@@ -27,7 +27,7 @@ const UserSchema = new Schema({
             required : true
         },
         signin: Date,
-        signiout: Date
+        signout: Date
     }]
 });
 

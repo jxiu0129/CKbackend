@@ -22,32 +22,34 @@ exports.login_index = function(req, res){
     if(!req.session.API_LoginCode){
         console.log('wrong dude');
         res.redirect("http://localhost:3000/");
-    }
-    else {}
-    rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
-        API_Access = JSON.parse(body);
-    })
-    .catch(() => {
-        console.log('wrong');
-        console.log(API_Access);
-        rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
-            'auth': {
-                'bearer': API_Access.access_token
-            }
+    }else{
+        rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
+            API_Access = JSON.parse(body);
         })
-        .then((message) => {
-            API_User = JSON.parse(message);
-            console.log(message);
-            console.log(API_User.user_info.sponsor_point);
-            req.session.user_info = API_User;
-            req.session.API_Access = API_Access;
-            req.session.save();
-        })
-        .catch(() =>{
-            console.log('fail');
+        .catch(() => {
+            console.log('wrong');
+            console.log(API_Access);
+            rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+                'auth': {
+                    'bearer': API_Access.access_token
+                }
+            })
+            .then((message) => {
+                API_User = JSON.parse(message);
+                console.log(API_User.user_info.sponsor_point);
+                req.session.user_info = API_User;
+                req.session.API_Access = API_Access;
+                req.session.API_RefreshClock = Date.now();
+                req.session.save();
+    
+                console.log(req.session.user_info);
+            })
+            .catch(() =>{
+                console.log('fail');
+            });
         });
-    });
-    res.render('login_index');
+        res.render('login_index');
+    }
 };
 
 exports.profile_user = async function(req, res){
@@ -57,17 +59,30 @@ exports.profile_user = async function(req, res){
 let multipoint = {
     method: 'POST',
     uri: 'http://wm.nccu.edu.tw:3001/openapi/send_point',
+    auth: {
+        'bearer' : API_Access.access_token
+    },
     body: {
-        list: []
+        email: "",
+	    to_accounts : [],
+	    point : 0,
+	    description : ''
     },
     json: true // Automatically stringifies the body to JSON
 };
 
 exports.Send_Multi_Point = (list, from, point, des) => {
+<<<<<<< HEAD
     multipoint.list.email = from;
     multipoint.list.to_account.push(list);
     multipoint.list.point = point;
     multipoint.list.description = des;
+=======
+    multipoint.body.email = from;
+    multipoint.body.to_account.push(list);
+    multipoint.body.point = point;
+    multipoint.body.description = des;
+>>>>>>> 7eac35e11785b05959220f3c3917cea02acefb31
     rp(multipoint)
     .then((message) =>{
         console.log(message);

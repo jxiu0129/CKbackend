@@ -152,7 +152,7 @@ exports.sponsor_create_post = [
             .exec((err,theuser) => {
                 theuser.hold.holded_events.push(event._id);
                 let _holdedEvents = theuser.hold.holded_events;
-                User.findByIdAndUpdate(theuser._id, {hold: { holded_events : _holdedEvents}})
+                User.findByIdAndUpdate(theuser._id, {hold: { isHolder : true, holded_events : _holdedEvents}})
                 .exec(res.redirect('./'));
             });
         }
@@ -181,8 +181,9 @@ exports.sponsor_delete_post= async (req,res,next) => {
                         let _holdedEvents = theuser.hold.holded_events;
 
                         _holdedEvents.splice(_holdedEvents.indexOf(req.params.eventid),1);
-    
-                        User.findByIdAndUpdate(theuser._id, {hold: { holded_events : _holdedEvents}})
+                        
+                        //如果刪除的活動是最後一個活動，則把isholder改成false，目前是先維持true
+                        User.findByIdAndUpdate(theuser._id, {hold: { isHolder : true, holded_events : _holdedEvents}})
                         .exec(res.redirect('../'));
                     }
                     else{res.redirect('../');}

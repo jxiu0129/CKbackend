@@ -132,11 +132,11 @@ exports.Send_Multi_Point = async function(req, res){
 
 //活動列表
 exports.event_list = (req,res)=>{
-    req.session.reload();
     Event.find({ $or : [{status : 'willhold'},{status : 'holding'}] })
     .populate('holder')
     .sort([['time','descending']])
     .exec((err,_event)=>{
+        console.log(_event);
         res.render('root/eventlist', { title: 'Event List | NCCU Attendance', _event:  _event});
     });
 };

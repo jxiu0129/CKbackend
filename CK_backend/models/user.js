@@ -20,11 +20,11 @@ const UserSchema = new Schema({
         event_id: { 
             type: Schema.Types.ObjectId,
             ref : 'Event',
-            required : true
+            required : true   
         },
         income : {
             type: Number,
-            required : true
+            // required : true  //暫時註解掉
         },
         signin: Date,
         signout: Date

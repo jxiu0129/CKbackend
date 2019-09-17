@@ -511,8 +511,9 @@ router.get('/tttest',(req,res)=>{
 });
 
 
-router.get('/successfullyPost',(req,res)=>{
-    res.render('qrcode/alertmessage',{title:'發錢成功',msg:'點數已成功發放'});
+router.get('/userinfo',(req,res)=>{
+    req.session.reload();
+    res.send(req.session.user_info);
 });
 
 module.exports = router;

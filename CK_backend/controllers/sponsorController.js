@@ -272,24 +272,29 @@ exports.SignIn_create_post= [
 
     // Process request after validation and sanitization.
     (req,res,next) =>{
-        console.log("????"),
+        console.log("????"),   
+        req.session.reload();
 
 
         async.parallel({
+            user : function(callback){
+                User.findOne({email:req.body.email})
+                .exec(callback);
+            },
             event: function(callback){
                 Event.findById(req.params.eventid)
-                .exec(callback)
+                .exec(callback);
             },
 
             attendance: function(callback){
                 Attendance.findOne({event_id:req.params.eventid})
-                .exec(callback)
+                .exec(callback);
 
             },
 
             list : function(callback){
                 Attendance.findOne({event_id:req.params.eventid},'list')
-                .exec(callback)
+                .exec(callback);
 
             }
         },
@@ -299,6 +304,8 @@ exports.SignIn_create_post= [
             let _stdId = req.body.email;
             let _timein = req.body.time;
             let _atnd = results.attendance;
+            let _user = results.user;
+            let U_atnd;
             let _SignIn;
 
 
@@ -337,10 +344,21 @@ exports.SignIn_create_post= [
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
                     if(err) { return next(err);}
-                    res.redirect("./attendancelist");
-
                 });
                 
+                let user_atnd = {
+                    event_id : req.params.eventid,
+                    signin : _timein
+                };
+
+                _user.attend.push(user_atnd);
+
+                User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                    if(err) { return next(err);}
+                    res.redirect("./attendancelist");
+                });
+                console.log("here!!!"+theuser);
+
             }
         
             else{
@@ -359,7 +377,21 @@ exports.SignIn_create_post= [
                     Attendance.findByIdAndUpdate(_atnd._id,_SignIn,{},function(err){
                         console.log("Successfully Create SignIn 671");
                     });
-                }
+                    
+                let user_atnd = {
+                    event_id : req.params.eventid,
+                    signin : _timein
+                };
+
+                _user.attend.push(user_atnd);
+
+                User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                    if(err) { return next(err);}
+                    res.redirect("./attendancelist");
+                });
+                console.log("here!!!"+theuser);
+
+            }
 
 
                 else{
@@ -376,10 +408,19 @@ exports.SignIn_create_post= [
                                     email : _stdId,
                                     time_in : _timein
                                 });
+
                                 _SignIn = {
                                     event_id : req.params.eventid,
                                     list : _atndList,
                                 };
+
+                                U_atnd ={
+                                    event_id : req.params.eventid,
+                                    signin : _timein
+                                };
+
+                                _user.attend.push(U_atnd);
+
                                 break;
                             }
                         }
@@ -394,7 +435,17 @@ exports.SignIn_create_post= [
                                     event_id : req.params.eventid,
                                     list : _atndList,
                                 };
+
+                                U_atnd ={
+                                    event_id : req.params.eventid,
+                                    signin : _timein,
+                                    signout : _user.signout
+                                };
+                                _user.attend.push(U_atnd);
+
+
                                 break;
+
                             }else{
                                 console.log("This User Has Already Signed In");
                                 res.redirect('./SigninCreate');
@@ -412,6 +463,12 @@ exports.SignIn_create_post= [
                         if(err){return next(err);}
                         console.log("Successfully Create SignIn");
                     });
+
+                    await User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function (err,theuser) {
+                        if(err){return next(err);}
+                        console.log("Successfully Update User attend");
+                    });
+
 
                     const theAtd = await Attendance.findOne({event_id:req.params.eventid});
 
@@ -460,9 +517,14 @@ exports.SignOut_create_post= [
     // Process request after validation and sanitization.
     (req,res,next) =>{
         console.log("????"),
+        req.session.reload();
 
 
         async.parallel({
+            user : function(callback){
+                User.findOne({email:req.body.email})
+                .exec(callback);
+            },
             event: function(callback){
                 Event.findById(req.params.eventid)
                 .exec(callback)
@@ -486,6 +548,8 @@ exports.SignOut_create_post= [
             let _stdId = req.body.email;
             let _timeout = req.body.time;
             let _atnd = results.attendance;
+            let _user = results.user;
+            let U_atnd;
             let _SignOut;
 
             if(err){return next(err);}
@@ -522,10 +586,22 @@ exports.SignOut_create_post= [
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
                     if(err) { return next(err);}
-                    res.redirect("./attendancelist");
-
                 });
                 
+                
+                let user_atnd = {
+                    event_id : req.params.eventid,
+                    signout : _timeout
+                };
+
+                _user.attend.push(user_atnd);
+
+                User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                    if(err) { return next(err);}
+                    res.redirect("./attendancelist");
+                });
+                console.log("here!!!"+theuser);
+
             }
         
             else{
@@ -543,6 +619,20 @@ exports.SignOut_create_post= [
                     Attendance.findByIdAndUpdate(_atnd._id,_SignOut,{},function(err){
                         console.log("Successfully Create SignOut");
                     });
+                        
+                let user_atnd = {
+                    event_id : req.params.eventid,
+                    signout : _timeout
+                };
+
+                _user.attend.push(user_atnd);
+
+                User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                    if(err) { return next(err);}
+                    res.redirect("./attendancelist");
+                });
+                console.log("here!!!"+theuser);
+
                 }
 
 
@@ -560,10 +650,18 @@ exports.SignOut_create_post= [
                                     email : _stdId,
                                     time_out : _timeout
                                 });
+
                                 _SignOut = {
                                     event_id : req.params.eventid,
                                     list : _atndList,
                                 };
+
+                                U_atnd ={
+                                    event_id : req.params.eventid,
+                                    signout : _timeout
+                                };
+                                _user.attend.push(U_atnd);
+
                                 break;
                             }
                         }
@@ -578,7 +676,16 @@ exports.SignOut_create_post= [
                                     event_id : req.params.eventid,
                                     list : _atndList,
                                 };
+                                
+                                U_atnd ={
+                                    event_id : req.params.eventid,
+                                    signout : _timeout,
+                                    signin : _user.signin
+                                };
+                                _user.attend.push(U_atnd);
+
                                 break;
+                                
                             }else{
                                 console.log("This User Has Already Signed Out");
                                 res.redirect('./SignOutCreate');
@@ -595,6 +702,11 @@ exports.SignOut_create_post= [
                     await Attendance.findByIdAndUpdate(results.attendance._id,_SignOut,{},function(err,theAtd){
                         if(err){return next(err);}
                         console.log("Successfully Create SignOut");
+                    });
+
+                    await User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function (err,theuser) {
+                        if(err){return next(err);}
+                        console.log("Successfully Update User attend");
                     });
 
                     const theAtd = await Attendance.findOne({event_id:req.params.eventid});
@@ -643,9 +755,14 @@ exports.SignBoth_create_post= [
     // Process request after validation and sanitization.
     (req,res,next) =>{
         console.log("????"),
+        req.session.reload();
 
 
         async.parallel({
+            user : function(callback){
+                User.findOne({email:req.body.email})
+                .exec(callback);
+            },
             event: function(callback){
                 Event.findById(req.params.eventid)
                 .exec(callback)
@@ -670,6 +787,8 @@ exports.SignBoth_create_post= [
             let _timein = req.body.timein;
             let _timeout = req.body.timeout;
             let _atnd = results.attendance;
+            let _user = results.user;
+            let U_atnd;
             let _Sign;
 
 
@@ -704,14 +823,26 @@ exports.SignBoth_create_post= [
                     AttendanceList : _newSign,
                     _id : results.event._id,
                     amount : 1
-                })
+                });
                 // results.event.AttendanceList._id = _newSignOut._id
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
                     if(err) { return next(err);}
-                    res.redirect("./attendancelist");
-
                 });
+                
+                let user_atnd = {
+                    event_id : req.params.eventid,
+                    signin : _timein,
+                    signout : _timeout
+                };
+
+                _user.attend.push(user_atnd);
+
+                User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                    if(err) { return next(err);}
+                    res.redirect("./attendancelist");
+                });
+                console.log("here!!!"+theuser);
                 
             }
         
@@ -740,13 +871,27 @@ exports.SignBoth_create_post= [
                         AttendanceList : _newSign,
                         _id : results.event._id,
                         amount : 1
-                    })
+                    });
                     // results.event.AttendanceList._id = _newSignOut._id
-    
+                                                
+                    let user_atnd = {
+                        event_id : req.params.eventid,
+                        signin : _timein,
+                        signout : _timeout
+                    };
+
+                    _user.attend.push(user_atnd);
+
+                    User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                        if(err) { return next(err);}
+                    });
+
+                    console.log("here!!!"+theuser);
+
                     Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
                         if(err) { return next(err);}
                         res.redirect("./attendancelist");
-    
+
                     });
                 }
 
@@ -767,10 +912,19 @@ exports.SignBoth_create_post= [
                                     time_out : _timeout,
                                     reward : true
                                 });
+
                                 _Sign = {
                                     event_id : req.params.eventid,
                                     list : _atndList,
                                 };
+
+                                U_atnd ={
+                                    event_id : req.params.eventid,
+                                    signin : _timein,
+                                    signout : _timeout
+                                };
+                                _user.attend.push(U_atnd);
+
                                 break;
                             }
                         }
@@ -802,6 +956,12 @@ exports.SignBoth_create_post= [
                         if(err){return next(err);}
                         console.log("Successfully Create SingIn and SignOut");
                     });
+                    
+                    await User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function (err,theuser) {
+                        if(err){return next(err);}
+                        console.log("Successfully Update User attend");
+                    });
+
                    
                     const theAtd = await Attendance.findOne({event_id:req.params.eventid});
 

@@ -126,7 +126,7 @@ exports.Send_Multi_Point = async function(req, res){
             });
         }
     });
-    res.render('dick');
+    res.render('qrcode/alertmessage',{title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'});
 };
 
 

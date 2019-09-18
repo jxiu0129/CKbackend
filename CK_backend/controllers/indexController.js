@@ -140,3 +140,14 @@ exports.event_list = (req,res)=>{
         res.render('root/eventlist', { title: 'Event List | NCCU Attendance', _event:  _event});
     });
 };
+
+exports.grant_new_token = (req, res) => {
+    req.session.reload();
+    rp.post("http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
+    .then((data)=>{
+        console.log(data);
+    })
+    .catch((err) =>{
+        console.log(err);
+    });
+}

@@ -45,12 +45,26 @@
 										<span aria-hidden="true">&times;</span>
 									</button>
 								</div>
+
 								<div class="modal-body">
-									<h3 class="inline">報到時間：</h3><p class="inline"><%=event_info[i].signin.toLocaleString()%></p>
+									<%if(event_info[i].signin == undefined){%>
+										<h3 class="inline">報到時間：</h3><p class="inline">尚未刷到</p>
+									<%}else{%>
+										<h3 class="inline">報到時間：</h3><p class="inline"><%=event_info[i].signin.toLocaleString()%></p>
+									<%}%>
+
 									<br>
-									<h3 class="inline">刷退時間：</h3><p class="inline"><%=event_info[i].signout.toLocaleString()%></p>
+
+									<%if(event_info[i].signout == undefined){%>
+										<h3 class="inline">刷退時間：</h3><p class="inline">尚未刷退</p>
+									<%}else{%>
+										<h3 class="inline">刷退時間：</h3><p class="inline"><%=event_info[i].signout.toLocaleString()%></p>
+									<%}%>
+
 									<br>
+
 								</div>
+
 								<div class="modal-footer">
 									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 								</div>

@@ -443,7 +443,6 @@ const schedule = require('node-schedule');
 router.get('/qrcodelist', (req,res,next)=>{
     req.session.reload();
 
-    console.log(req.session.user_info);
     User.findOne({email : req.session.user_info.user_info.email},'hold')
     .exec(async (err,thisuser)=>{
        
@@ -463,15 +462,16 @@ router.get('/qrcodelist', (req,res,next)=>{
                 if ((evt.time - _now) <= timespan){
                     timesup_event.push(event_array[i]);
                 }
-            };
-
-            console.log(timesup_event);
-
-            if( timesup_event[0] == null ){
-                res.render('qrcode/alertmessage',{title:'Not Yet',msg:'目前沒有即將進行的活動哦！\n (活動前一小時才會產生QRcode)'});
-            }else{
-                res.render('qrcode/qrcodelist',{timesup_event : timesup_event});
             }
+
+            Event.find({_id : timesup_event},'name shortid')
+            .exec((err,EV) =>{
+                if( timesup_event[0] == null ){
+                    res.render('qrcode/alertmessage',{title:'Not Yet',msg:'目前沒有即將進行的活動哦！\n (活動前一小時才會產生QRcode)'});
+                }else{
+                    res.render('qrcode/qrcodelist',{EV : EV});
+                }
+            });
         } 
     });
 });
@@ -491,22 +491,9 @@ router.get('/timeTest',(req,res,next)=>{
 });
 
 router.get('/tttest',(req,res)=>{
-    req.session.reload();
-    User.findOne({email : req.session.user_info.user_info.email})
-    .exec((err,_user)=>{
-        console.log(_user.hold.holded_events);
-        let h_events = _user.hold.holded_events;
-        Event.find({_id : h_events})
-        .exec((err,evt)=>{
-            console.log(evt);
-        })
-        // h_events.forEach(element => {
-        //     console.log(element);
-        //     Event.findById(element)
-        //     .exec((err,evt)=>{
-        //         console.log(evt);
-        //     })
-        // });
+    Attendance.findById('5d809d0dc68916e09c090d58')
+    .exec((err,atd)=>{
+        res.send(atd);
     });
 });
 

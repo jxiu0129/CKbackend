@@ -83,11 +83,37 @@
 													</button>
 												</div>
 												<div class="modal-body">
-													<h3>簽到條碼</h3>
-													<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_in.jpg" /></span>
-													<h3>刷退條碼</h3>
-													<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
+													<script>
+														function check_in_link() {
+															var x = document.getElementById('check_in_code<%i%>');
+															if (x.style.display === 'none') {
+																x.style.display = 'block';
+															}else{
+																x.style.display = 'none';
+															}
+														}
+													</script>
+													<a href="#" onclick="check_in_link()"><h3>簽到條碼</h3></a>
+													<div id="check_in_code<%i%>" style="display:none;">
+														<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_in.jpg" /></span>
+													</div>	
+
+													<script>
+														function check_out_link1() {
+															var x = document.getElementById('check_out_code1');
+															if (x.style.display === 'none') {
+																x.style.display = 'block';
+															}else{
+																x.style.display = 'none';
+															}
+														}
+													</script>
+													<a href="#" onclick="check_out_link1()"><h3>刷退條碼</h3></a>
+													<div id="check_out_code1" style="display:none;">
+														<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
+													</div>
 												</div>
+
 												<div class="modal-footer">
 													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close<%=i%></button>
 												</div>
@@ -108,8 +134,12 @@
 									<%= list_event[i].expense %>
 								</td>
 								<td><a href="/sponsor/events/<%= list_event[i]._id %>/attendancelist"><%=list_event[i].amount%></a></td> 
-								<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
-									<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
+								<%if(list_event[i].status == 'willhold'){%>
+									<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
+										<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
+								<%}else{%>
+									<td>已超過活動時間</td>
+								<%}%>
 								
 								<%if(list_event[i].status == 'willhold'){%>
 									<td>尚未開始</td>
@@ -120,7 +150,7 @@
 								<%}%>
 
 								<!-- Modal -->
-								<form method="post" action="./<%= list_event[i]._id %>/update">
+								<form method="post" action="/sponsor/events/<%= list_event[i]._id %>/update">
 									<div class="modal fade" id="event-edit<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
 										<div class="modal-dialog" role="document">
 											<div class="modal-content">
@@ -159,7 +189,7 @@
 								</form>
 							
 								<!-- Modal -->
-								<form method="post" action="./<%= list_event[i]._id %>/delete">
+								<form method="post" action="/sponsor/events/<%= list_event[i]._id %>/delete">
 									<div class="modal fade" id="event-delete<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-deleteLabel" aria-hidden="true">
 										<div class="modal-dialog" role="document">
 											<div class="modal-content">

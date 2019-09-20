@@ -1,29 +1,55 @@
 <%-include('../root/header')-%>
 
-	<% for(ev of timesup_event){ %>
+	<% for(ev of EV){ %>
 
 	<!-- QRcode List -->
-	<h3 style="text-align: center">活動ID： <%=ev%></h3>
+	<h3 style="text-align: center">活動ID： <%=ev.shortid%></h3>
+	<h3 style="text-align: center">活動名稱： <%=ev.name%></h3>
 	<section id="three" class="wrapper">
 		<div class="inner flex flex-3">
-			<div class="flex-item box">
-				<div class="image fit">
-                    <img src="../images/QRcode/qrcode_<%= ev._id %>_in.jpg" />
+			<div class="content">
+				<script>
+					function check_in_button() {
+						var x = document.getElementById('check_in_code');
+						if (x.style.display === 'none') {
+							x.style.display = 'block';
+						}else{
+							x.style.display = 'none';
+							}
+					}
+				</script>
+
+				<button onclick="check_in_button()">簽到條碼</button>
+
+				<div id="check_in_code" style="display:none;">
+					<div class="image fit">
+						<img src="../images/QRcode/qrcode_<%= ev._id %>_in.jpg" />
+					</div>
 				</div>
-				<div class="content">
-					<h3>簽到條碼</h3>
-				</div>
-			</div>
-			<div class="flex-item box">
-				<div class="image fit">
-                    <img src="../images/QRcode/qrcode_<%= ev._id %>_out.jpg" />
-				</div>
-				<div class="content">
-					<h3>刷退條碼</h3>
+			</div>					
+			<div class="content">
+				<script>
+					function check_out_button() {
+						var x = document.getElementById('check_out_code');
+						if (x.style.display === 'none') {
+							x.style.display = 'block';
+						}else{
+							x.style.display = 'none';
+						}
+					}
+				</script>
+
+				<button onclick="check_out_button()">刷退條碼</button>
+
+				<div id="check_out_code" style="display:none;">
+					<div class="image fit">
+							<img src="../images/QRcode/qrcode_<%= ev._id %>_out.jpg" />
+					</div>
 				</div>
 			</div>
 		</div>
 	</section>
+	<hr>
 
 	<%}%>
 

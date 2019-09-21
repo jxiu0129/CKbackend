@@ -11,6 +11,21 @@ const QRCode = require('qrcode');
 const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 
+//----------------------------網站自動執行功能---------------------------
+// 1.自動更新status(活動開始前為willhold,活動時間一到改為holding,按下活動結束成為finish)
+Event.find({status : 'willhold'},'_id status time')
+.exec(async(err,list_event)=>{
+    console.log(list_event);        
+    for(let i =0; i < list_event.length ; i++){
+        if(Date.now() >= list_event[i].time){
+            console.log(i);                
+            await Event.findByIdAndUpdate(list_event[i]._id,{ status :'holding'});
+        }
+    }
+});
+
+
+
 
 exports.sponsor_events= async(req,res,next) =>{
 
@@ -26,19 +41,6 @@ exports.sponsor_events= async(req,res,next) =>{
         .sort([['time','descending']])
         .exec(async (err,list_event) => {
             if (err) { return next(err); }
-
-        // 顯示狀態： 活動開始前都是willhold，活動開始時就是holding並會顯示活動結束按鈕，直到隔天凌晨1:00會統一把前一天的名單傳給錢包並顯示finish
-        
-            for(let i =0; i < list_event.length;i++){
-
-                if (Date.now() < list_event[i].time){
-                    await Event.findByIdAndUpdate(list_event[i]._id,{ status :'willhold'});    
-                }
-                else if(Date.now() >= list_event[i].time){                
-                    await Event.findByIdAndUpdate(list_event[i]._id,{ status :'holding'});
-                }
-
-            }
             console.log("sponsor/events :list_event :"+list_event);
 
             // Successful, so render.
@@ -182,11 +184,17 @@ exports.sponsor_delete_post= async (req,res,next) => {
 
                         _holdedEvents.splice(_holdedEvents.indexOf(req.params.eventid),1);
                         
-                        //如果刪除的活動是最後一個活動，則把isholder改成false，目前是先維持true
-                        User.findByIdAndUpdate(theuser._id, {hold: { isHolder : true, holded_events : _holdedEvents}})
-                        .exec(res.redirect('../'));
+                        if(_holdedEvents.length == 0){
+                            User.findByIdAndUpdate(theuser._id, {hold: { isHolder : false, holded_events : _holdedEvents}})
+                            .exec(res.redirect('../'));
+                            console.log("Successfully Update User (false)");    
+                        }else if (_holdedEvents.length > 0){
+                            User.findByIdAndUpdate(theuser._id, {hold: { isHolder : true, holded_events : _holdedEvents}})
+                            .exec(res.redirect('../'));    
+                            console.log("Successfully Update User (true)");    
+                        }
                     }
-                    else{res.redirect('../');}
+                    else {res.redirect('../');}
                 });
             });
 
@@ -302,6 +310,10 @@ exports.SignIn_create_post= [
         
         async (err,results) => {
 
+            if(results.user == undefined){
+                res.redirect('./SignInCreate');
+                throw new Error("results.user is not defined");
+            }
             let _stdId = req.body.email;
             let _timein = req.body.time;
             let _atnd = results.attendance;
@@ -545,6 +557,10 @@ exports.SignOut_create_post= [
         },
         
         async (err,results) => {
+            if(results.user == undefined){
+                res.redirect('./SignOutCreate');
+                throw new Error("results.user is not defined");
+            }
 
             let _stdId = req.body.email;
             let _timeout = req.body.time;
@@ -783,6 +799,10 @@ exports.SignBoth_create_post= [
         },
         
         async(err,results) => {
+            if(results.user == undefined){
+                res.redirect('./SignBothCreate');
+                throw new Error("results.user is not defined");
+            }
 
             let _stdId = req.body.email;
             let _timein = req.body.timein;
@@ -994,274 +1014,3 @@ exports.SignBoth_create_post= [
         })
     }       
 ];
-
-
-// Delete 不會分 signin 或 signout，而是直接delete有出席紀錄(in+out都有)的人，如果只有單一的in或out就不會算出席，就不需要delete(或是由管理員delete)
-// 所以下面之後要改，概念是一樣的就把signin改成attendance就好
-
-exports.SignIn_delete_post= [
-
-    (req,res,next) =>{
-
-        async.parallel({
-        
-            event: function(callback){
-                Event.findById(req.params.eventid)
-                .exec(callback)      
-
-            }},
-
-            function(err,results){
-            if(err) {return next(err);}
-    
-            let _sign_in = results.event.Sign_in;
-            let _userid = req.body.userid;
-            console.log(_userid);
-            console.log(_sign_in)
-
-            for(let i = 0;i < _userid.length ; i++){
-                console.log("i : "+i+"  userid : " + _userid[i]);
-                _sign_in.splice(_sign_in.indexOf(_userid[i]),1);
-            }
-            console.log("new Sign In List: "+_sign_in);
-
-            let new_event = {
-                name : results.event.name,
-                time : results.event.time,
-                expense : results.event.expense,
-                Sign_in : _sign_in
-            }
-
-            Event.findByIdAndUpdate(req.params.eventid, new_event, {}, function (err, theevent) {
-                if (err) { return next(err); }
-                // Successful - redirect to genre detail page.
-                console.log('Successfully Update');
-                res.redirect("../attendancelist/:eventid");
-            }
-        )}
-    )
-    }];
-
-exports.SignOut_delete_post= function(req,res){
-    (req,res,next) =>{
-
-        async.parallel({
-        
-            event: function(callback){
-                Event.findById(req.params.eventid)
-                .exec(callback)      
-
-            }},
-
-            function(err,results){
-            if(err) {return next(err);}
-    
-            let _sign_out = results.event.Sign_out;
-            let _userid = req.body.userid;
-            console.log(_userid);
-            console.log(_sign_out)
-
-            for(let i = 0;i < _userid.length ; i++){
-                console.log("i : "+i+"  userid : " + _userid[i]);
-                _sign_out.splice(_sign_out.indexOf(_userid[i]),1);
-            }
-            console.log("new Sign In List: "+_sign_out);
-
-            let new_event = {
-                name : results.event.name,
-                time : results.event.time,
-                expense : results.event.expense,
-                Sign_out : _sign_out
-            }
-
-            Event.findByIdAndUpdate(req.params.eventid, new_event, {}, function (err, theevent) {
-                if (err) { return next(err); }
-                // Successful - redirect to genre detail page.
-                console.log('Successfully Update');
-                res.redirect("../attendancelist/:eventid");
-            }
-        )}
-    )
-    }};
-
-
-
-    
-// exports.sponsor_delete_get= function(req,res,next){
-//     async.parallel({
-//         event: function (callback) {
-//             Event.findById(req.params.eventid).exec(callback)
-//         },
-//     }, function (err, results) {
-//         if (err) { return next(err); }
-//         // No Need this function
-//         if (results.event == null) { // No results.
-//             console.log('Results.event is null');
-//             // res.redirect('../');
-//         }
-//         console.log(results.event);
-//         // Successful, so render.
-//         // res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books });
-//     });
-
-//     res.render('index' , { title : "刪除活動"});
-// };
-
-
-// exports.sponsor_update_get= function(req,res,next){
-//     // console.log(req.params.eventid);
-//     Event.findById(req.params.eventid, function (err, event) {
-//         if (err) { return next(err); }
-//         if (event == null) { // No results.
-//             let err = new Error('Event not found');
-//             err.status = 404;
-//             return next(err);
-//         }
-//         // Success.
-//         console.log("GET");
-//         // res.render('author_form', { title: 'Update Author', author: author });
-
-//     });
-// };
-
-// exports.SignInCreatetest = [
-//     (req,res,next) =>{
-//         console.log("????"),
-
-
-//         async.parallel({
-//             event: function(callback){
-//                 Event.findById(req.params.eventid)
-//                 .exec(callback)
-//             },
-
-//             attendance: function(callback){
-//                 Attendance.findOne({event_id:req.params.eventid})
-//                 .exec(callback)
-
-//             },
-
-//             list : function(callback){
-//                 Attendance.findOne({event_id:req.params.eventid},'list')
-//                 .exec(callback)
-
-//             }
-//         },
-        
-//         function(err,results){
-
-//             let _stdId = req.body.userid;
-//             let _timein = req.body.time;
-//             let _atnd = results.attendance;
-//             let _SignIn;
-
-
-//             if(err){return next(err);}
-
-//             else if (_atnd == null){
-
-//                 let _newSignIn = new Attendance({
-//                     event_id : req.params.eventid,
-//                     list : [{
-//                         student_id : _stdId,
-//                         time_in : _timein
-//                     }]
-//                 });
-
-//                 _SignIn = _newSignIn;
-
-//                 _newSignIn.save(function(err){
-
-//                     if(err) {return next(err);}
-//                     console.log("Successfully Create SignIn");
-
-//                 });
-                
-//                 let thisevent = new Event({
-//                     name : results.event.name,
-//                     time : results.event.time,
-//                     expense : results.event.expense,
-//                     location : results.event.location,
-//                     AttendanceList : _newSignIn,
-//                     _id : results.event._id
-//                 })
-//                 // results.event.AttendanceList._id = _newSignIn._id
-
-//                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
-//                     if(err) { return next(err);}
-//                     res.redirect("./attendancelist");
-
-//                 });
-                
-//             }
-        
-//             else{
-//                 let _atndList = results.list.list;
-//                 if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
-//                     _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
-//                         student_id : _stdId,
-//                         time_in : _timein
-//                     });
-//                     _SignIn = {
-//                         event_id : req.params.eventid,
-//                         list : _atndList,
-//                     };
-
-//                     Attendance.findByIdAndUpdate(_atnd._id,_SignIn,{},function(err){
-//                         console.log("Successfully Create SignIn 671");
-//                     })
-//                 }
-
-
-//                 else{
-
-//                     for(let i = 0; i < _atndList.length; i++){
-//                         console.log("i:  "+i);
-//                         console.log(_atndList[i].student_id);
-
-
-//                         if(_stdId != _atndList[i].student_id){              //輸入的userid不等於目前檢查的studentId
-//                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
-//                             else{
-//                                 _atndList.push({
-//                                     student_id : _stdId,
-//                                     time_in : _timein
-//                                 });
-//                                 _SignIn = {
-//                                     event_id : req.params.eventid,
-//                                     list : _atndList,
-//                                 };
-//                                 break;
-//                             }
-//                         }
-                        
-                        
-                        
-//                         else if (_stdId == _atndList[i].student_id){                    //如果輸入的使用者id已經存在於紀錄中
-//                             if (_atndList[i].time_in == undefined){                          //則檢查timein有沒有輸入過
-//                                 _atndList[i].time_in = _timein;
-//                                 _SignIn = {
-//                                     event_id : req.params.eventid,
-//                                     list : _atndList,
-//                                 };
-//                                 break;
-//                             }else{
-//                                 console.log("This User Has Already Signed In");
-//                                 res.redirect('./SigninCreate');
-//                                 return;
-//                             }
-//                         }else{
-//                             console.log("?");
-//                             break;
-//                         }
-//                     }
-//                     console.log(_SignIn);
-//                     Attendance.findByIdAndUpdate(results.attendance._id,_SignIn,{},function(err,theAtd){
-//                         if(err){return next(err);}
-//                         console.log("Successfully Create SignIn");
-//                         res.redirect("./attendancelist");
-//                     })
-//                 }
-//             }
-//         })
-//     }]

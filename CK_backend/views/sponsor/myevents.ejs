@@ -38,183 +38,160 @@
 							</thead>
 
 							<tbody>
-							
-							<% for(let i = 0;i < list_event.length;i++){ %>
-							<tr>
-								<!-- <td><a href="" data-toggle="modal" data-target="#event<%=i%>-qrModal"><%= list_event[i]._id %></a></td> -->
-
-								<!-- Modal Below is Correct-->
-								<!-- <div class="modal fade" id="event<%=i%>-qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
+							<%if(list_event.length == 0){%>
+								<h1>您還沒有舉辦過任何活動哦！</h1>
+							<%}else{%>
+								<% for(let i = 0;i < list_event.length;i++){ %>
+								<tr>
 									
-									<div class="modal-dialog" role="document">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h3 class="modal-title" id="qrModalLabel">QR Code</h3>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body">
-												<h3>簽到條碼</h3>
-												<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_in.jpg" /></span>
-												<h3>刷退條碼</h3>
-												<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close<%=i%></button>
-											</div>
-										</div>
-									</div>
+									<%if((list_event[i].time - Date.now()) <= 3600000){%>
+										<td><a href="" data-toggle="modal" data-target="#event<%=i%>-qrModal"><%= list_event[i].shortid %></a></td>
 
-								</div> -->
-								<!-- Here is Test -->
-
-								<%if((list_event[i].time - Date.now()) <= 3600000){%>
-									<td><a href="" data-toggle="modal" data-target="#event<%=i%>-qrModal"><%= list_event[i].shortid %></a></td>
-
-									<div class="modal fade" id="event<%=i%>-qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
-									
-										<div class="modal-dialog" role="document">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h3 class="modal-title" id="qrModalLabel">QR Code<%=i%></h3>
-													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-														<span aria-hidden="true">&times;</span>
-													</button>
-												</div>
-												<div class="modal-body">
-													<script>
-														function check_in_link() {
-															var x = document.getElementById('check_in_code<%i%>');
-															if (x.style.display === 'none') {
-																x.style.display = 'block';
-															}else{
-																x.style.display = 'none';
+										<div class="modal fade" id="event<%=i%>-qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
+										
+											<div class="modal-dialog" role="document">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h3 class="modal-title" id="qrModalLabel">QR Code<%=i%></h3>
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+															<span aria-hidden="true">&times;</span>
+														</button>
+													</div>
+													<div class="modal-body">
+														<script>
+															function check_in_link() {
+																var x = document.getElementById('check_in_code<%i%>');
+																if (x.style.display === 'none') {
+																	x.style.display = 'block';
+																}else{
+																	x.style.display = 'none';
+																}
 															}
-														}
-													</script>
-													<a href="#" onclick="check_in_link()"><h3>簽到條碼</h3></a>
-													<div id="check_in_code<%i%>" style="display:none;">
-														<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_in.jpg" /></span>
-													</div>	
+														</script>
+														<a href="#" onclick="check_in_link()"><h3>簽到條碼</h3></a>
+														<div id="check_in_code<%i%>" style="display:none;">
+															<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_in.jpg" /></span>
+														</div>	
 
-													<script>
-														function check_out_link1() {
-															var x = document.getElementById('check_out_code1');
-															if (x.style.display === 'none') {
-																x.style.display = 'block';
-															}else{
-																x.style.display = 'none';
+														<script>
+															function check_out_link1() {
+																var x = document.getElementById('check_out_code1');
+																if (x.style.display === 'none') {
+																	x.style.display = 'block';
+																}else{
+																	x.style.display = 'none';
+																}
 															}
-														}
-													</script>
-													<a href="#" onclick="check_out_link1()"><h3>刷退條碼</h3></a>
-													<div id="check_out_code1" style="display:none;">
-														<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
+														</script>
+														<a href="#" onclick="check_out_link1()"><h3>刷退條碼</h3></a>
+														<div id="check_out_code1" style="display:none;">
+															<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
+														</div>
+													</div>
+
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close<%=i%></button>
 													</div>
 												</div>
+											</div>
+		
+										</div>
+									<%}else{%>
+										<td><%= list_event[i].shortid %></td>
+									<%}%>
 
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close<%=i%></button>
+
+									<td><%= list_event[i].name %></td>
+									<td><%= list_event[i].time.toLocaleString() %></td>
+									<td><%= list_event[i].location %></td>
+									<td>
+										<img src="../images/piggy-bank.png" height="20" width="20"/>
+										<%= list_event[i].expense %>
+									</td>
+									<td><a href="/sponsor/events/<%= list_event[i]._id %>/attendancelist"><%=list_event[i].amount%></a></td>
+									<!-- 測試用，先開放超過時間能夠修改和刪除，之後上線直接解除此處的註解並在ejs前面補齊即可  -->
+									<!-- if(list_event[i].status == 'willhold'){%> -->
+										<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
+											<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
+									<!-- }else{%>
+										<td>已超過活動時間</td>
+									}%> -->
+									
+									<%if(list_event[i].status == 'willhold'){%>
+										<td>尚未開始</td>
+									<%}else if( list_event[i].status == 'holding'){%>
+										<td>正在進行</td>
+									<%}else if( list_event[i].status == 'finish'){%>
+										<td>活動已結束</td>
+									<%}%>
+
+									<!-- Modal -->
+									<form method="post" action="/sponsor/events/<%= list_event[i]._id %>/update">
+										<div class="modal fade" id="event-edit<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
+											<div class="modal-dialog" role="document">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h3 class="modal-title" id="event-editLabel">修改活動資訊</h3>
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+															<span aria-hidden="true">&times;</span>
+														</button>
+													</div>
+													<div class="modal-body" style="text-align: left">
+
+														<h3 class="inline">活動名稱：</h3>
+														<div class="6u 12u$(xsmall) inline">
+															<input type="text" name="name" id="event-editName" value="<%= list_event[i].name %>" placeholder="修改活動名稱" />
+														</div>
+														<br>
+														<h3 class="inline">活動日期：</h3>
+														<br>
+														<input type="datetime-local" name="time" id="event-editDateTime" value="2019-01-01T00:00" placeholder="2014-09-18">
+														<br>
+														<h3 class="inline">活動地點：</h3>
+														<br>
+														<div class="6u 12u$(xsmall) inline">
+															<input type="text" name="location" id="event-editLocation" value="<%= list_event[i].location %>" placeholder="修改活動地點">
+														</div>
+														<br>
+													</div>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+														<input type="submit" class="btn btn-primary" value="Save"/>
+
+													</div>
 												</div>
 											</div>
 										</div>
-	
-									</div>
-								<%}else{%>
-									<td><%= list_event[i].shortid %></td>
-								<%}%>
-
-
-								<td><%= list_event[i].name %></td>
-								<td><%= list_event[i].time.toLocaleString() %></td>
-								<td><%= list_event[i].location %></td>
-								<td>
-									<img src="../images/piggy-bank.png" height="20" width="20"/>
-									<%= list_event[i].expense %>
-								</td>
-								<td><a href="/sponsor/events/<%= list_event[i]._id %>/attendancelist"><%=list_event[i].amount%></a></td> 
-								<%if(list_event[i].status == 'willhold'){%>
-									<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
-										<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
-								<%}else{%>
-									<td>已超過活動時間</td>
-								<%}%>
+									</form>
 								
-								<%if(list_event[i].status == 'willhold'){%>
-									<td>尚未開始</td>
-								<%}else if( list_event[i].status == 'holding'){%>
-									<td>正在進行</td>
-								<%}else if( list_event[i].status == 'finish'){%>
-									<td>活動已結束</td>
-								<%}%>
-
-								<!-- Modal -->
-								<form method="post" action="/sponsor/events/<%= list_event[i]._id %>/update">
-									<div class="modal fade" id="event-edit<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
-										<div class="modal-dialog" role="document">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h3 class="modal-title" id="event-editLabel">修改活動資訊</h3>
-													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-														<span aria-hidden="true">&times;</span>
-													</button>
-												</div>
-												<div class="modal-body" style="text-align: left">
-
-													<h3 class="inline">活動名稱：</h3>
-													<div class="6u 12u$(xsmall) inline">
-														<input type="text" name="name" id="event-editName" value="<%= list_event[i].name %>" placeholder="修改活動名稱" />
+									<!-- Modal -->
+									<form method="post" action="/sponsor/events/<%= list_event[i]._id %>/delete">
+										<div class="modal fade" id="event-delete<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-deleteLabel" aria-hidden="true">
+											<div class="modal-dialog" role="document">
+												<div class="modal-content">
+													<div class="modal-header">
+														<p> <%= list_event[i]._id %> </p>
+														<h3 class="modal-title" id="event-deleteLabel">刪除活動</h3>
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+															<span aria-hidden="true">&times;</span>
+														</button>
 													</div>
-													<br>
-													<h3 class="inline">活動日期：</h3>
-													<br>
-													<input type="datetime-local" name="time" id="event-editDateTime" value="2019-01-01T00:00" placeholder="2014-09-18">
-													<br>
-													<h3 class="inline">活動地點：</h3>
-													<br>
-													<div class="6u 12u$(xsmall) inline">
-														<input type="text" name="location" id="event-editLocation" value="<%= list_event[i].location %>" placeholder="修改活動地點">
+													<div class="modal-body">
+														<p>請注意！當你按下Delete，該活動將被刪除。</p>
+														<p>若有需要復原，請洽詢系統服務人員。</p>
 													</div>
-													<br>
-												</div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-													<input type="submit" class="btn btn-primary" value="Save"/>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+														<button type="submit" class="btn btn-primary">Delete</button>
 
+													</div>
 												</div>
 											</div>
 										</div>
-									</div>
-								</form>
-							
-								<!-- Modal -->
-								<form method="post" action="/sponsor/events/<%= list_event[i]._id %>/delete">
-									<div class="modal fade" id="event-delete<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-deleteLabel" aria-hidden="true">
-										<div class="modal-dialog" role="document">
-											<div class="modal-content">
-												<div class="modal-header">
-													<p> <%= list_event[i]._id %> </p>
-													<h3 class="modal-title" id="event-deleteLabel">刪除活動</h3>
-													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-														<span aria-hidden="true">&times;</span>
-													</button>
-												</div>
-												<div class="modal-body">
-													<p>請注意！當你按下Delete，該活動將被刪除。</p>
-													<p>若有需要復原，請洽詢系統服務人員。</p>
-												</div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-													<button type="submit" class="btn btn-primary">Delete</button>
+									</form>
+								</tr>
 
-												</div>
-											</div>
-										</div>
-									</div>
-								</form>
-							</tr>
-
+								<% } %>
 							<% } %>
 						
 

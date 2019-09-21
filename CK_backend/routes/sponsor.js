@@ -32,20 +32,7 @@ router.post('/sponsor/events/:eventid/SigninCreate', sponsor_controller.SignIn_c
 router.post('/sponsor/events/:eventid/SignoutCreate', sponsor_controller.SignOut_create_post);
 router.post('/sponsor/events/:eventid/SignbothCreate', sponsor_controller.SignBoth_create_post);
 
-// POST request to delete users.
-router.post('/sponsor/events/:eventid/deleteuser', sponsor_controller.SignIn_delete_post);
 
 router.get('/sponsor/events/:eventid/SendMultiPoint', index_controller.Send_Multi_Point);
-
-// POST request to delete checks.
-// router.post('/sponsor/events/SignInDelete/:eventid', sponsor_controller.SignIn_delete_post);
-// router.post('/sponsor/events/SignOutDelete/:eventid', sponsor_controller.SignOut_delete_post);
-
-// GET request to delete events.
-// router.get('/sponsor/manage/delete/:eventid', sponsor_controller.sponsor_delete_get);
-
-// GET request to update events.
-// router.get('/sponsor/manage/update/:eventid', sponsor_controller.sponsor_update_get);
-
 
 module.exports = router;

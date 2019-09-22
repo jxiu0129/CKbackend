@@ -21,6 +21,10 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
         res.render('qrcode/alertmessage',{title:'Please Log in',msg:'請先登入'});
     }else{
         async.parallel({
+            user:function(callback){
+                User.findOne({email : req.session.user_info.user_info.email})
+                .exec(callback)
+            },
             event: function(callback){
                 Event.findById(req.params.eventid)
                 .exec(callback)
@@ -41,6 +45,8 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
         
         async (err,results)=>{
 
+            let _user = results.user;
+            let U_atnd;
             let _stdId = req.session.user_info.user_info.email;
             let _timein = Date.now();
             let _atnd = results.attendance;
@@ -48,7 +54,6 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
 
 
             if(err){return next(err);}
-
             else if (_atnd == null){
 
                 let _newSignIn = new Attendance({
@@ -81,9 +86,22 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
                     if(err) { return next(err);}
-                    res.render('qrcode/alertmessage',
-                    {title: 'Successfully Sign In | NCCU Attendance',
-                    msg:'簽到成功'})
+                });
+
+                let user_atnd = {
+                    event_id : req.params.eventid,
+                    signin : _timein
+                };
+
+                _user.attend.push(user_atnd);
+
+                User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                    if(err) { return next(err);}
+                    else if (_user.inited == false){
+                        res.render('qrcode/checkin(first)',{user : _user});
+                    }else{
+                        res.render('qrcode/checkin(second)',{user : _user});
+                    }
                 });
                 
             }
@@ -102,9 +120,22 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
 
                     Attendance.findByIdAndUpdate(_atnd._id,_SignIn,{},function(err){
                         console.log("Successfully Create SignIn 671");
-                        res.render('qrcode/alertmessage',
-                        {title: 'Successfully Sign In | NCCU Attendance',
-                        msg:'簽到成功'});
+                    });
+                    
+                    let user_atnd = {
+                        event_id : req.params.eventid,
+                        signin : _timein
+                    };
+    
+                    _user.attend.push(user_atnd);
+    
+                    User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                        if(err) { return next(err);}
+                        else if (_user.inited == false){
+                            res.render('qrcode/checkin(first)',{user : _user});
+                        }else{
+                            res.render('qrcode/checkin(second)',{user : _user});
+                        }
                     });
                 }
 
@@ -127,6 +158,13 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                                     event_id : req.params.eventid,
                                     list : _atndList,
                                 };
+
+                                U_atnd ={
+                                    event_id : req.params.eventid,
+                                    signin : _timein
+                                };
+
+                                _user.attend.push(U_atnd);
                                 break;
                             }
                         }
@@ -141,12 +179,16 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                                     event_id : req.params.eventid,
                                     list : _atndList,
                                 };
+
+                                let _ind =_user.attend.map(x => x.event_id).indexOf(results.event._id);
+                                _user.attend[_ind].signin= _timein;
+
                                 break;
                             }else{
                                 console.log("This User Has Already Signed In");
                                 res.render('qrcode/alertmessage',
                                 {title: 'Already Signed In | NCCU Attendance',
-                                msg:'這個使用者ID已經簽到過囉！'})
+                                msg: _user.name+' ,這個使用者ID已經簽到過囉！'});
                                 return;
                             }
                         }else{
@@ -156,12 +198,15 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                     }
 
                     console.log(_SignIn);
+
                     await Attendance.findByIdAndUpdate(results.attendance._id,_SignIn,{},function(err,theAtd){
                         if(err){return next(err);}
                         console.log("Successfully Create SignIn");
-                        res.render('qrcode/alertmessage',
-                        {title: 'Successfully Sign In | NCCU Attendance',
-                        msg:'簽到成功'});
+                    });
+
+                    await User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function (err,theuser) {
+                        if(err){return next(err);}
+                        console.log("Successfully Update User attend");
                     });
 
                     
@@ -190,7 +235,12 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
                         if(err) { return next(err);}
                         console.log("reward successfully update");
-                     });
+                        if (_user.inited == false){
+                            res.render('qrcode/checkin(first)',{user : _user});
+                        }else{
+                            res.render('qrcode/checkin(second)',{user : _user});
+                        }
+                    });
                 }
             }
         });
@@ -206,6 +256,10 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
         res.render('qrcode/alertmessage',{title:'Please Log in',msg:'請先登入'});
     }else{
         async.parallel({
+            user : function(callback){
+                User.findOne({email:req.session.user_info.user_info.email})
+                .exec(callback);
+            },
             event: function(callback){
                 Event.findById(req.params.eventid)
                 .exec(callback)
@@ -229,6 +283,8 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
             let _stdId = req.session.user_info.user_info.email;
             let _timeout = Date.now();
             let _atnd = results.attendance;
+            let _user = results.user;
+            let U_atnd;
             let _SignOut;
 
 
@@ -261,16 +317,29 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                     AttendanceList : _newSignOut,
                     amount : results.event.amount,
                     _id : results.event._id
-                })
+                });
                 // results.event.AttendanceList._id = _newSignOut._id
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
                     if(err) { return next(err);}
-                    res.render('qrcode/alertmessage',
+                });
+
+                let user_atnd = {
+                    event_id : req.params.eventid,
+                    signout : _timeout
+                };
+
+                _user.attend.push(user_atnd);
+
+                User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                    if(err) { return next(err);}
+                    res.render('qrcode/checkout',
                     {title: 'Successfully Sign Out | NCCU Attendance',
-                    msg:'刷退成功'});
+                    user : _user
+                    });
 
                 });
+                console.log("here!!!"+theuser);
                 
             }
         
@@ -288,10 +357,24 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
 
                     Attendance.findByIdAndUpdate(_atnd._id,_SignOut,{},function(err){
                         console.log("Successfully Create SignOut");
-                        res.render('qrcode/alertmessage',
-                        {title: 'Successfully Sign Out | NCCU Attendance',
-                        msg:'刷退成功'});
                     });
+
+                    let user_atnd = {
+                        event_id : req.params.eventid,
+                        signout : _timeout
+                    };
+    
+                    _user.attend.push(user_atnd);
+    
+                    User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                        if(err) { return next(err);}
+                        res.render('qrcode/checkout',
+                        {title: 'Successfully Sign Out | NCCU Attendance',
+                        user : _user
+
+                        });
+                    });
+                    console.log("here!!!"+theuser);
                 }
 
 
@@ -313,6 +396,14 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                                     event_id : req.params.eventid,
                                     list : _atndList,
                                 };
+
+                                
+                                U_atnd ={
+                                    event_id : req.params.eventid,
+                                    signout : _timeout
+                                };
+                                _user.attend.push(U_atnd);
+
                                 break;
                             }
                         }
@@ -327,12 +418,17 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                                     event_id : req.params.eventid,
                                     list : _atndList,
                                 };
+
+                                let _ind =_user.attend.map(x => x.event_id).indexOf(results.event._id);
+                                _user.attend[_ind].signout= _timeout;
+
                                 break;
+
                             }else{
                                 console.log("This User Has Already Signed Out");
                                 res.render('qrcode/alertmessage',
                                 {title: 'Already Signed Out | NCCU Attendance',
-                                msg:'這個使用者ID已經刷退過囉！'});
+                                msg:_user.name + ' ,這個使用者ID已經刷退過囉！'});
                                 return;
                             }
                         }else{
@@ -343,12 +439,14 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                     console.log(_SignOut);
                     await Attendance.findByIdAndUpdate(results.attendance._id,_SignOut,{},function(err,theAtd){
                         if(err){return next(err);}
-                        console.log("Successfully Create SignOut");
-                        res.render('qrcode/alertmessage',
-                        {title: 'Successfully Sign Out | NCCU Attendance',
-                        msg:'刷退成功'});
-                        
+                        console.log("Successfully Create SignOut");                        
                     });
+
+                    await User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function (err,theuser) {
+                        if(err){return next(err);}
+                        console.log("Successfully Update User attend");
+                    });
+
                     
                     const theAtd = await Attendance.findOne({event_id:req.params.eventid});
 
@@ -373,6 +471,10 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
                         if(err) { return next(err);}
+                        res.render('qrcode/checkout',
+                        {title: 'Successfully Sign Out | NCCU Attendance',
+                        user : _user
+                        });
                         console.log("reward successfully update");
                     });
                 }
@@ -384,80 +486,19 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
 
 
 
-
-//////////////////////////////////////////////////////////////
-//Test : new一個user
-router.post('/createuser',(req,res,next)=>{
-
-    // Create a genre object with escaped and trimmed data.
-    let user = new User({
-        name : req.body.name,
-        hold:{
-            isHolder : req.body.isholder,
-            holded_events : req.body.eventid
-        }
-    });
-
-
-        // Data from form is valid, Save
-        user.save(function (err) {
-            if (err) { return next(err); }
-            // Successful - redirect to new author record.
-            res.redirect('./');
-            console.log('Successfully Create');
-        });
-    
-});
-
-//////////////////////////////////////////////////////////
-router.get('/QRtest', function(req, res, next) {
-    //理應這裡要用req.params.userid
-    User.findById('5d6eb21f4839c50f085196e4')
-    .exec((err,theuser)=>{                              
-        let event_id = theuser.hold.holded_events;          //find的條件理應是找目前正在舉辦的event
-    
-        const opts = {                                    //容錯率包含QRcode圖片的大小，若把太大的圖片硬縮成小圖就會增加讀取錯誤率
-            errorCorrectionLevel: 'H',                    //version越高，圖片能包含的data也就越多   
-            version: 10                                    //但別太高
-        };
-        
-        const qr_urlIN = 'https://www.youtube.com/watch?v=hHW1oY26kxQ';           //data的部分
-        const qr_pathIN = './public/images/QRcode/qrcode_'+event_id+"_in.jpg";
-    
-        QRCode.toFile(qr_pathIN, qr_urlIN, opts, (err) => {
-            if (err) throw err;
-            console.log('savedIN.');
-        });
-        
-        const qr_urlOUT = 'https://www.youtube.com/watch?v=NbNPJr_0tqA';           //data的部分
-        const qr_pathOUT = './public/images/QRcode/qrcode_'+event_id+"_out.jpg";
-    
-
-        QRCode.toFile(qr_pathOUT, qr_urlOUT, opts, (err) => {
-            if (err) throw err;
-            console.log('savedOUT.');
-        });
-
-        res.render('qrcode/qrtest',
-        {qr_pathIN : './images/QRcode/qrcode_'+ event_id +'_in.jpg' , 
-        qr_pathOUT : './images/QRcode/qrcode_'+ event_id +'_out.jpg'
-    });
-    });
-});
-
 //TIME TEST
 const schedule = require('node-schedule');
 
 router.get('/qrcodelist', (req,res,next)=>{
     req.session.reload();
 
-    User.findOne({email : req.session.user_info.user_info.email},'hold')
+    User.findOne({email : req.session.user_info.user_info.email},'name hold')
     .exec(async (err,thisuser)=>{
        
         if (err) { return next(err); };
 
         if (thisuser.hold.isHolder == false){
-            res.render('qrcode/alertmessage',{title:'No Event',msg:'您沒有舉辦過任何活動哦！'});
+            res.render('qrcode/alertmessage',{title:'No Event',msg:thisuser.name+' ,您還沒有舉辦過任何活動哦！'});
         }else{
             
             let event_array = thisuser.hold.holded_events;
@@ -485,23 +526,27 @@ router.get('/qrcodelist', (req,res,next)=>{
 });
 
 
-router.get('/timeTest',(req,res,next)=>{
-    let _date = new Date(Date.now());
-    console.log(_date);
-    let A = [];
-    let B = [0,1,2,3,4]
-    for (b of B){
-        A.push(b);
-        console.log(A);
-    }
-    console.log(A);
-
-});
-
 router.get('/tttest',(req,res)=>{
-    Attendance.findById('123')
-    .exec((err,atd)=>{
-        console.log(atd);
+
+    User.findById('5d807cc11c9d440000ac87e2')
+    .exec((err,theuser)=>{
+        // console.log(theuser.attend);
+        let A = theuser.attend;
+        let B = A.map(x => x.event_id);        
+        // var p = people.map(x => x.name);
+        console.log(B);
+          //find object in list
+        //   var result = $.map(people, function(item, index) {
+        //     return item.name
+        //   }).indexOf('Nina');
+        
+        //   console.log(result);
+        let C = {
+            'a':1,
+            'b':2
+        };
+        C.d =3;
+        console.log(C);
     });
 });
 

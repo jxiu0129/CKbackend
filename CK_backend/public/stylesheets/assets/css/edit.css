@@ -101,3 +101,9 @@
 .hidden {
     display:none;
 }
+
+.important{
+    color: red;
+    text-decoration: underline;
+    font-weight: bold;
+}

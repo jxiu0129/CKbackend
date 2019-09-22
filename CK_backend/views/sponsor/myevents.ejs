@@ -34,6 +34,7 @@
 								<th>參加人數</th>
 								<th>修改/刪除</th>
 								<th>活動狀態</th>
+								<!-- <th>活動結束（發放點數）</th> -->
 							</tr>
 							</thead>
 
@@ -114,16 +115,49 @@
 										<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
 											<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
 									<!-- }else{%>
-										<td>已超過活動時間</td>
+										<td>已超過更改時間</td>
 									}%> -->
 									
 									<%if(list_event[i].status == 'willhold'){%>
 										<td>尚未開始</td>
 									<%}else if( list_event[i].status == 'holding'){%>
-										<td>正在進行</td>
+										<td>正在進行 <br>
+										<img src="../images/stop.png" height="20" width="20"/>
+										<a href="" class="important" data-toggle="modal" data-target="#end">活動結束</a>
+									</td>
+
 									<%}else if( list_event[i].status == 'finish'){%>
 										<td>活動已結束</td>
 									<%}%>
+<!-- 
+									
+									<td>
+										<img src="../images/stop.png" height="20" width="20"/>
+										<a href="" class="important" data-toggle="modal" data-target="#end">活動結束</a>
+									</td> -->
+	
+									<!-- Modal -->
+									<div class="modal fade" id="end" tabindex="-1" role="dialog" aria-labelledby="end_event" aria-hidden="true">
+										<div class="modal-dialog" role="document">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h3 class="modal-title" id="event-deleteLabel">活動結束</h3>
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
+												</div>
+												<div class="modal-body">
+													<p>請注意！當你按下活動結束，該活動將開始發放點數。</p>
+													<p>一旦開始發放點數，活動細則及出席表將再也無法更動。</p>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+													<button type="button" class="btn btn-primary">活動結束</button>
+	
+												</div>
+											</div>
+										</div>
+									</div>
 
 									<!-- Modal -->
 									<form method="post" action="/sponsor/events/<%= list_event[i]._id %>/update">
@@ -203,7 +237,45 @@
 					<ul class="actions fit">
 						<li><a href="#" class="button special fit">錢包查詢餘額</a></li>
 						<li><a href="/sponsor/events/createevent" class="button fit">新增活動</a></li>
-						<li><a href="#" class="button alt fit">活動出席狀況</a></li>
+                        <li><a href="#" class="button alt fit" data-toggle="modal" data-target="#bar_line_chart">投資報酬率</a></li>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="bar_line_chart" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h3 class="modal-title" id="return_on_investment">投資報酬率</h3>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="modal-body" style="text-align: left">
+
+                                        <h3 class="inline">活動名稱：</h3><p class="inline">活動5</p>
+                                        <div class="6u 12u$(xsmall) inline">
+                                            <input type="text" name="name" id="event-editName" value="" placeholder="修改活動名稱" />
+                                        </div>
+                                        <br>
+                                        <h3 class="inline">活動日期：</h3><p class="inline">時間5</p>
+                                        <br>
+                                        <input type="datetime-local" id="event-editDateTime" value="2018-06-10T19:30">
+                                        <br>
+                                        <br>
+                                        <h3 class="inline">活動地點：</h3><p class="inline">地點5</p>
+                                        <div class="6u 12u$(xsmall) inline">
+                                            <input type="text" name="name" id="event-editLocation" value="" placeholder="修改活動地點" />
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <input type="submit" class="btn btn-primary" value="Save"/>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 					</ul>
 					</div>
 			</section>

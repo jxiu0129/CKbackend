@@ -1615,7 +1615,7 @@
 
 	body, input, select, textarea {
 		color: #767d85;
-		font-family: "Open Sans", Arial, Helvetica, sans-serif;
+        font-family: "Microsoft JhengHei", sans-serif;
 		font-size: 13pt;
 		font-weight: 300;
 		line-height: 1.65;
@@ -1686,7 +1686,7 @@
 	h1, h2, h3, h4, h5, h6 {
 		color: #727a82;
 		font-weight: 700;
-		font-family: "Montserrat", sans-serif;
+        font-family: "Microsoft JhengHei", sans-serif;
 		line-height: 1.5;
 		margin: 0 0 1em 0;
 	}
@@ -1758,7 +1758,7 @@
 		background: rgba(144, 144, 144, 0.075);
 		border-radius: 4px;
 		border: solid 1px #dee1e3;
-		font-family: "Courier New", monospace;
+		font-family: "Microsoft JhengHei", sans-serif;
 		font-size: 0.9em;
 		margin: 0 0.25em;
 		padding: 0.25em 0.65em;
@@ -1766,7 +1766,7 @@
 
 	pre {
 		-webkit-overflow-scrolling: touch;
-		font-family: "Courier New", monospace;
+        font-family: "Microsoft JhengHei", sans-serif;
 		font-size: 0.9em;
 		margin: 0 0 2em 0;
 	}
@@ -1852,6 +1852,7 @@
 	input[type="text"],
 	input[type="number"],
 	input[type="datetime-local"],
+	input[type="url"],
 	select,
 	textarea {
 		-moz-appearance: none;
@@ -1874,6 +1875,7 @@
 		input[type="number"]:invalid,
 		input[type="datetime-local"]:invalid,
 		input[type="tel"]:invalid,
+		input[type="url"]:invalid,
 		select:invalid,
 		textarea:invalid {
 			box-shadow: none;
@@ -1883,6 +1885,7 @@
 		input[type="number"]:focus,
 		input[type="datetime-local"]:focus,
 		input[type="tel"]:focus,
+		input[type="url"]:focus,
 		select:focus,
 		textarea:focus {
 			border-color: #25a2c3;
@@ -1899,7 +1902,7 @@
 			content: "";
 			-moz-osx-font-smoothing: grayscale;
 			-webkit-font-smoothing: antialiased;
-			font-family: FontAwesome;
+            font-family: "Microsoft JhengHei", sans-serif;
 			font-style: normal;
 			font-weight: normal;
 			text-transform: none !important;
@@ -1925,6 +1928,7 @@
 	input[type="text"],
 	input[type="number"],
 	input[type="datetime-local"],
+	input[type="url"],
 	select {
 		height: 3.5em;
 		line-height: 3.5em;
@@ -1965,7 +1969,7 @@
 			input[type="radio"] + label:before {
 				-moz-osx-font-smoothing: grayscale;
 				-webkit-font-smoothing: antialiased;
-				font-family: FontAwesome;
+                font-family: "Microsoft JhengHei", sans-serif;
 				font-style: normal;
 				font-weight: normal;
 				text-transform: none !important;
@@ -2402,7 +2406,7 @@
 		color: #ffffff;
 		cursor: pointer;
 		display: inline-block;
-		font-family: "Montserrat", sans-serif;
+        font-family: "Microsoft JhengHei", sans-serif;
 		height: 3.5em;
 		line-height: 3.5em;
 		padding: 0 3.5em;
@@ -2726,7 +2730,7 @@
 					z-index: 10005;
 				}
 
-					#header nav a[href="#menu"]:before {
+					/**#header nav a[href="#menu"]:before {
 						content: "";
 						-moz-osx-font-smoothing: grayscale;
 						-webkit-font-smoothing: antialiased;
@@ -2734,7 +2738,19 @@
 						font-style: normal;
 						font-weight: normal;
 						text-transform: none !important;
-					}
+					}**/
+
+                    #header nav a[href="#menu"]:before {
+                        content: "您好，Username ▾ ";
+                        -moz-osx-font-smoothing: grayscale;
+                        -webkit-font-smoothing: antialiased;
+                        font-family: FontAwesome;
+                        font-size: medium;
+                        font-style: normal;
+                        font-weight: normal;
+                        text-transform: none !important;
+                        color: rgba(78, 85, 91, 0.66);
+                    }
 
 					#header nav a[href="#menu"] span {
 						display: none;
@@ -2920,7 +2936,7 @@
 
 	#banner {
 		padding: 14em 0 12em 0;
-		background-image: url(../../../images/banner.jpg);
+		background-image: url(../../images/banner.jpg);
 		background-size: cover;
 		background-position: center top;
 		background-repeat: no-repeat;

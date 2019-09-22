@@ -106,7 +106,7 @@ exports.sponsor_create_post = [
             location : req.body.location,
             expense : req.body.expense,      //投資點數
             amount : 0,
-            ncculink : req.body.link,
+            ncculink : req.body.event_link,
         });
 
 
@@ -449,13 +449,8 @@ exports.SignIn_create_post= [
                                     list : _atndList,
                                 };
 
-                                U_atnd ={
-                                    event_id : req.params.eventid,
-                                    signin : _timein,
-                                    signout : _user.signout
-                                };
-                                _user.attend.push(U_atnd);
-
+                                let _ind =_user.attend.map(x => x.event_id).indexOf(results.event._id);
+                                _user.attend[_ind].signin= _timein;
 
                                 break;
 
@@ -686,7 +681,7 @@ exports.SignOut_create_post= [
                         
                         
                         else if (_stdId == _atndList[i].email){                    //如果輸入的使用者id已經存在於紀錄中
-                            if (_atndList[i].time_out == undefined){                          //則檢查timein有沒有輸入過
+                            if (_atndList[i].time_out == undefined){                          //則檢查timeout有沒有輸入過
                                 _atndList[i].time_out = _timeout;
                                 _atndList[i].reward = true;
                                 _SignOut = {
@@ -694,12 +689,8 @@ exports.SignOut_create_post= [
                                     list : _atndList,
                                 };
                                 
-                                U_atnd ={
-                                    event_id : req.params.eventid,
-                                    signout : _timeout,
-                                    signin : _user.signin
-                                };
-                                _user.attend.push(U_atnd);
+                                let _ind =_user.attend.map(x => x.event_id).indexOf(results.event._id);
+                                _user.attend[_ind].signout= _timeout;
 
                                 break;
                                 

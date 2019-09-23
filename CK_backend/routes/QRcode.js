@@ -526,28 +526,33 @@ router.get('/qrcodelist', (req,res,next)=>{
 });
 
 
-router.get('/tttest',(req,res)=>{
+router.get('/tttest/:eventid',async(req,res)=>{
+    // User.update({name:'王瀚'},{$unset:{name:'王瀚'}})
+    // .exec((err,u)=>{
+    //     res.send(u);
+    // });
+    await Attendance.findOne({event_id : req.params.eventid},'list')
+    .exec(async(err,atd)=>{
+        let ATD = atd.list.map(x => x.email);
 
-    User.findById('5d807cc11c9d440000ac87e2')
-    .exec((err,theuser)=>{
-        // console.log(theuser.attend);
-        let A = theuser.attend;
-        let B = A.map(x => x.event_id);        
-        // var p = people.map(x => x.name);
-        console.log(B);
-          //find object in list
-        //   var result = $.map(people, function(item, index) {
-        //     return item.name
-        //   }).indexOf('Nina');
-        
-        //   console.log(result);
-        let C = {
-            'a':1,
-            'b':2
-        };
-        C.d =3;
-        console.log(C);
+        for (let i =0 ;i < ATD.length ; i++){
+            await User.findOne({email:ATD[i]},'attend name')
+            .exec(async(err,us)=>{
+                console.log(i+" : "+us);
+                
+                let US = us.attend.map(x => x.event_id).indexOf(req.params.eventid);
+
+                if (US == -1){
+                    console.log("return");
+                    return;
+                }else{
+                    us.attend.splice(US,1);
+                    await User.findByIdAndUpdate(us._id,{attend : us.attend});
+                }
+            });
+        }
     });
+
 });
 
 

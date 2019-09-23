@@ -34,15 +34,11 @@ exports.sponsor_events= async(req,res,next) =>{
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{
         if (err) { return next(err); }
-
-        console.log("sponsor/events :_user:  "+_user);
         
         Event.find({_id:_user.hold.holded_events},'_id shortid name time location expense amount status')
         .sort([['time','descending']])
         .exec(async (err,list_event) => {
             if (err) { return next(err); }
-            console.log("sponsor/events :list_event :"+list_event);
-
             // Successful, so render.
             res.render('sponsor/myevents', { title: 'My Events | NCCU Attendance', list_event:  list_event});
 
@@ -170,32 +166,57 @@ exports.sponsor_delete_post= async (req,res,next) => {
             await Event.findByIdAndRemove(req.params.eventid, function deleteEvent(err,theevt) {
                 if (err) { return next(err); }
                 console.log("Successfully Delete Event");
+            });
 
-    //沒有寫檢查的機制，照理來說應該是先檢查attendancelist存不存在才能刪，但莫名的無論存不存在他都會刪所以都可以跑，先這樣寫好了
-                Attendance.findOneAndRemove({event_id:req.params.eventid},(err,theAtd)=>{
-                    if(err){console.log(err)}
-                    else{console.log("Successfully Delete Attendance")}
-                });
+            await Attendance.findOne({event_id : req.params.eventid},'list')
+            .exec(async(err,atd)=>{
+                if (err) { return next(err); }
 
-                User.findOne({email:req.session.user_info.user_info.email})
-                .exec((err,theuser) => {
-                    if (theuser.hold.holded_events.indexOf(req.params.eventid) != -1){
-                        let _holdedEvents = theuser.hold.holded_events;
-
-                        _holdedEvents.splice(_holdedEvents.indexOf(req.params.eventid),1);
+                let ATD = atd.list.map(x => x.email);
+        
+                for (let i =0 ;i < ATD.length ; i++){
+                    await User.findOne({email:ATD[i]},'attend')
+                    .exec(async(err,us)=>{
                         
-                        if(_holdedEvents.length == 0){
-                            User.findByIdAndUpdate(theuser._id, {hold: { isHolder : false, holded_events : _holdedEvents}})
-                            .exec(res.redirect('../'));
-                            console.log("Successfully Update User (false)");    
-                        }else if (_holdedEvents.length > 0){
-                            User.findByIdAndUpdate(theuser._id, {hold: { isHolder : true, holded_events : _holdedEvents}})
-                            .exec(res.redirect('../'));    
-                            console.log("Successfully Update User (true)");    
+                        let US = us.attend.map(x => x.event_id).indexOf(req.params.eventid);
+        
+                        if (US == -1){
+                            console.log("return");
+                            return;
+                        }else{
+                            us.attend.splice(US,1);
+                            await User.findByIdAndUpdate(us._id,{attend : us.attend});
                         }
+                    });
+                }
+                console.log("Successfully Update User.attend");
+            });
+
+            //沒有寫檢查的機制，照理來說應該是先檢查attendancelist存不存在才能刪，但莫名的無論存不存在他都會刪所以都可以跑，先這樣寫好了               
+
+            await Attendance.findOneAndRemove({event_id:req.params.eventid},(err,theAtd)=>{
+                if(err){console.log(err);}
+                else{console.log("Successfully Delete Attendance");}
+            });
+
+            await User.findOne({email:req.session.user_info.user_info.email})
+            .exec((err,theuser) => {
+                if (theuser.hold.holded_events.indexOf(req.params.eventid) != -1){
+                    let _holdedEvents = theuser.hold.holded_events;
+
+                    _holdedEvents.splice(_holdedEvents.indexOf(req.params.eventid),1);
+                    
+                    if(_holdedEvents.length == 0){
+                        User.findByIdAndUpdate(theuser._id, {hold: { isHolder : false, holded_events : _holdedEvents}})
+                        .exec(res.redirect('../'));
+                        console.log("Successfully Update User.hold (false)");    
+                    }else if (_holdedEvents.length > 0){
+                        User.findByIdAndUpdate(theuser._id, {hold: { isHolder : true, holded_events : _holdedEvents}})
+                        .exec(res.redirect('../'));    
+                        console.log("Successfully Update User.hold (true)");    
                     }
-                    else {res.redirect('../');}
-                });
+                }
+                else {res.redirect('../');}
             });
 
             fs.unlink('./public/images/QRcode/qrcode_' +req.params.eventid+'_in.jpg',(err)=>{

@@ -47,18 +47,18 @@
 								</div>
 
 								<div class="modal-body">
-									<%if(event_info[i].signin == undefined){%>
-										<h3 class="inline">報到時間：</h3><p class="inline">尚未刷到</p>
-									<%}else{%>
+									<%if(event_info[i].signin != undefined){%>
 										<h3 class="inline">報到時間：</h3><p class="inline"><%=event_info[i].signin.toLocaleString()%></p>
+									<%}else{%>
+											<h3 class="inline">報到時間：</h3><p class="inline">尚未刷到</p>
 									<%}%>
 
 									<br>
 
-									<%if(event_info[i].signout == undefined){%>
-										<h3 class="inline">刷退時間：</h3><p class="inline">尚未刷退</p>
-									<%}else{%>
+									<%if(event_info[i].signout != undefined){%>
 										<h3 class="inline">刷退時間：</h3><p class="inline"><%=event_info[i].signout.toLocaleString()%></p>
+									<%}else{%>
+										<h3 class="inline">刷退時間：</h3><p class="inline">尚未刷退</p>
 									<%}%>
 
 									<br>

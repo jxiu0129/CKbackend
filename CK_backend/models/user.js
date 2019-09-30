@@ -8,6 +8,7 @@ const UserSchema = new Schema({
     email : String,
     inited : { type: Boolean, default: false},
     name : { type: String, required : true},
+    real_point : Number,
     hold : {
         isHolder : { type:Boolean, default: false },
         holded_events:[{ //要看完整event資訊，在query用populate叫
@@ -22,10 +23,10 @@ const UserSchema = new Schema({
             ref : 'Event',
             required : true   
         },
-        income : {
-            type: Number,
-            // required : true  //暫時註解掉
-        },
+        // income : {
+        //     type: Number,
+        //     // required : true  //暫時註解掉
+        // },
         signin: Date,
         signout: Date
     }]

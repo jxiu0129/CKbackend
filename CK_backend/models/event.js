@@ -18,6 +18,7 @@ const EventSchema = new Schema({
    //活動狀態依序分為：尚未開始，正在進行，活動結束(名單送出)
    status : {type: String, required : true , enum :['willhold','holding','finish'], default: 'willhold'},
    ncculink : String,
+   SendPoint : Number    //此活動發送出去的點數，即expense / amount
 
    });
 

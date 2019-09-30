@@ -1,5 +1,14 @@
 <%-include('../root/header')-%>
-
+<script>
+	function check_button(jpgid) {
+		var x = document.getElementById(jpgid);
+		if (x.style.display === 'none') {
+			x.style.display = 'block';
+		}else{
+			x.style.display = 'none';
+			}
+	}
+</script>
 	<% for(ev of EV){ %>
 
 	<!-- QRcode List -->
@@ -8,40 +17,21 @@
 	<section id="three" class="wrapper">
 		<div class="inner flex flex-3">
 			<div class="content">
-				<script>
-					function check_in_button() {
-						var x = document.getElementById('check_in_code');
-						if (x.style.display === 'none') {
-							x.style.display = 'block';
-						}else{
-							x.style.display = 'none';
-							}
-					}
-				</script>
+				
 
-				<button onclick="check_in_button()">簽到條碼</button>
+				<button onclick="check_button('check_in_code<%=ev.shortid%>')">簽到條碼</button>
 
-				<div id="check_in_code" style="display:none;">
+				<div id="check_in_code<%=ev.shortid%>" style="display:none;">
 					<div class="image fit">
 						<img src="../images/QRcode/qrcode_<%= ev._id %>_in.jpg" />
 					</div>
 				</div>
 			</div>					
 			<div class="content">
-				<script>
-					function check_out_button() {
-						var x = document.getElementById('check_out_code');
-						if (x.style.display === 'none') {
-							x.style.display = 'block';
-						}else{
-							x.style.display = 'none';
-						}
-					}
-				</script>
+				
+				<button onclick="check_button('check_out_code<%=ev.shortid%>')">刷退條碼</button>
 
-				<button onclick="check_out_button()">刷退條碼</button>
-
-				<div id="check_out_code" style="display:none;">
+				<div id="check_out_code<%=ev.shortid%>" style="display:none;">
 					<div class="image fit">
 							<img src="../images/QRcode/qrcode_<%= ev._id %>_out.jpg" />
 					</div>

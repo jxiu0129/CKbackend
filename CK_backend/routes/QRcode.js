@@ -80,7 +80,9 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                     location : results.event.location,
                     AttendanceList : _newSignIn,
                     amount : results.event.amount,
-                    _id : results.event._id
+                    _id : results.event._id,
+                    status : results.event.status,
+                    ncculink : results.event.ncculink
                 });
                 // results.event.AttendanceList._id = _newSignIn._id
 
@@ -229,7 +231,9 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                         location : results.event.location,
                         AttendanceList : _atnd._id,
                         _id : results.event._id,
-                        amount : _rwd
+                        amount : _rwd,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink    
                     };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
@@ -316,7 +320,9 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                     location : results.event.location,
                     AttendanceList : _newSignOut,
                     amount : results.event.amount,
-                    _id : results.event._id
+                    _id : results.event._id,
+                    status : results.event.status,
+                    ncculink : results.event.ncculink
                 });
                 // results.event.AttendanceList._id = _newSignOut._id
 
@@ -466,7 +472,9 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                         location : results.event.location,
                         AttendanceList : _atnd._id,
                         _id : results.event._id,
-                        amount : _rwd
+                        amount : _rwd,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink    
                     };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
@@ -502,20 +510,20 @@ router.get('/qrcodelist', (req,res,next)=>{
         }else{
             
             let event_array = thisuser.hold.holded_events;
-            let timesup_event = [];
-            let _now = Date.now();
-            let timespan = 3600000;                         //時間差，目前是設定為一個小時
+            // let timesup_event = [];
+            // let _now = Date.now();
+            // let timespan = 3600000;                         //時間差，目前是設定為一個小時
             
-            for (let i =0 ; i < event_array.length ; i++) {                       //檢查此user舉辦的所有活動，如果有一小時後開始的活動就把他push進timesup_event
-                const evt = await Event.findById(event_array[i]);
-                if ((evt.time - _now) <= timespan && evt.status != "finish"){
-                    timesup_event.push(event_array[i]);
-                }
-            }
+            // for (let i =0 ; i < event_array.length ; i++) {                       //檢查此user舉辦的所有活動，如果有一小時後開始的活動就把他push進timesup_event
+            //     const evt = await Event.findById(event_array[i]);
+            //     if ((evt.time - _now) <= timespan && evt.status != "finish"){
+            //         timesup_event.push(event_array[i]);
+            //     }
+            // }
 
-            Event.find({_id : timesup_event},'name shortid')
+            Event.find({'$and' :[{_id : event_array},{status : 'holding'}]},'name shortid')
             .exec((err,EV) =>{
-                if( timesup_event[0] == null ){
+                if( EV[0] == null ){
                     res.render('qrcode/alertmessage',{title:'Not Yet',msg:'目前沒有即將進行的活動哦！\n (活動前一小時才會產生QRcode)'});
                 }else{
                     res.render('qrcode/qrcodelist',{EV : EV});
@@ -527,32 +535,8 @@ router.get('/qrcodelist', (req,res,next)=>{
 
 
 router.get('/tttest/:eventid',async(req,res)=>{
-    // User.update({name:'王瀚'},{$unset:{name:'王瀚'}})
-    // .exec((err,u)=>{
-    //     res.send(u);
-    // });
-    await Attendance.findOne({event_id : req.params.eventid},'list')
-    .exec(async(err,atd)=>{
-        let ATD = atd.list.map(x => x.email);
-
-        for (let i =0 ;i < ATD.length ; i++){
-            await User.findOne({email:ATD[i]},'attend name')
-            .exec(async(err,us)=>{
-                console.log(i+" : "+us);
-                
-                let US = us.attend.map(x => x.event_id).indexOf(req.params.eventid);
-
-                if (US == -1){
-                    console.log("return");
-                    return;
-                }else{
-                    us.attend.splice(US,1);
-                    await User.findByIdAndUpdate(us._id,{attend : us.attend});
-                }
-            });
-        }
-    });
-
+    Event.findByIdAndUpdate(req.params.eventid,{location :'測試的啦',name:'測試的啦',SendPoint : 10})
+    .exec(res.send('s'));
 });
 
 

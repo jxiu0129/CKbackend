@@ -6,6 +6,7 @@ const fs = require("fs");
 const async = require("async");
 const request = require('request');
 const QRCode = require('qrcode');
+const schedule = require('node-schedule');
 
 
 const { body,validationResult } = require('express-validator/check');
@@ -13,17 +14,22 @@ const { sanitizeBody } = require('express-validator/filter');
 
 //----------------------------網站自動執行功能---------------------------
 // 1.自動更新status(活動開始前為willhold,活動時間一到改為holding,按下活動結束成為finish)
-Event.find({status : 'willhold'},'_id status time')
-.exec(async(err,list_event)=>{
-    console.log(list_event);        
-    for(let i =0; i < list_event.length ; i++){
-        if(Date.now() >= list_event[i].time){
-            console.log(i);                
-            await Event.findByIdAndUpdate(list_event[i]._id,{ status :'holding'});
-        }
-    }
-});
+let updateStaus = function(){
+    schedule.scheduleJob('1 * * * * *',function(){
+        console.log('updateStaus: ');
+        Event.find({status : 'willhold'},'_id status time')
+        .exec(async(err,list_event)=>{
+            for(let i =0; i < list_event.length ; i++){
+                if((list_event[i].time - Date.now()) <= 3600000){
+                    console.log(list_event[i]);                
+                    await Event.findByIdAndUpdate(list_event[i]._id,{ status :'holding'});
+                }
+            }
+        });
+    });
+};
 
+updateStaus();
 
 
 
@@ -38,7 +44,15 @@ exports.sponsor_events= async(req,res,next) =>{
         Event.find({_id:_user.hold.holded_events},'_id shortid name time location expense amount status')
         .sort([['time','descending']])
         .exec(async (err,list_event) => {
+            // console.log(list_event);
             if (err) { return next(err); }
+            // for(let i =0; i < list_event.length;i++){
+
+            //     if((list_event[i].time - Date.now()) <= 3600000 && list_event[i].status == 'willhold'){                
+            //         await Event.findByIdAndUpdate(list_event[i]._id,{ status :'holding'});
+            //     }
+
+            // }
             // Successful, so render.
             res.render('sponsor/myevents', { title: 'My Events | NCCU Attendance', list_event:  list_event});
 
@@ -372,7 +386,9 @@ exports.SignIn_create_post= [
                     location : results.event.location,
                     AttendanceList : _newSignIn,
                     amount : results.event.amount,
-                    _id : results.event._id
+                    _id : results.event._id,
+                    status : results.event.status,
+                    ncculink : results.event.ncculink
                 });
                 // results.event.AttendanceList._id = _newSignIn._id
 
@@ -517,7 +533,9 @@ exports.SignIn_create_post= [
                         location : results.event.location,
                         AttendanceList : _atnd._id,
                         _id : results.event._id,
-                        amount : _rwd
+                        amount : _rwd,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink    
                     };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
@@ -614,6 +632,8 @@ exports.SignOut_create_post= [
                     AttendanceList : _newSignOut,
                     amount : results.event.amount,
                     _id : results.event._id,
+                    status : results.event.status,
+                    ncculink : results.event.ncculink
                 });
                 // results.event.AttendanceList._id = _newSignOut._id
 
@@ -756,7 +776,9 @@ exports.SignOut_create_post= [
                         location : results.event.location,
                         AttendanceList : _atnd._id,
                         _id : results.event._id,
-                        amount : _rwd
+                        amount : _rwd,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink    
                     };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
@@ -855,7 +877,10 @@ exports.SignBoth_create_post= [
                     location : results.event.location,
                     AttendanceList : _newSign,
                     _id : results.event._id,
-                    amount : 1
+                    amount : 1,
+                    status : results.event.status,
+                    ncculink : results.event.ncculink
+
                 });
                 // results.event.AttendanceList._id = _newSignOut._id
 
@@ -1014,7 +1039,9 @@ exports.SignBoth_create_post= [
                         location : results.event.location,
                         AttendanceList : _atnd._id,
                         _id : results.event._id,
-                        amount : _rwd
+                        amount : _rwd,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink    
                     };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){

@@ -3,16 +3,16 @@
 			<section id="main" class="wrapper">
 				<div class="inner">
 					<header class="align-center">
-						<h1>活動細節</h1>
+						<h1> <u><%=event.name%></u> 的活動出席表 </h1>
 					</header>
-					<div>
+					<!-- <div>
 						<ul class="list=group list-group-flush">
 							<li class="list-group-item list-group-item-action align-items-center">活動名稱：<%=event.name%></li>
 							<li class="list-group-item list-group-item-action align-items-center">主辦人：<%=event.holder.name%></li>
-							<li class="list-group-item list-group-item-action align-items-center">活動地點：<%=event.location%></li>
+							<li class="list-group-item list-group-item-action align-items-center">活動地點：<%=event.location%></li> -->
 							<!-- <li class="list-group-item list-group-item-action align-items-center">簽到人數：0</li> -->
 							<!-- <li class="list-group-item list-group-item-action align-items-center">簽退人數：0</li> -->
-							<%if(event.status == 'willhold'){%>
+							<!-- <%if(event.status == 'willhold'){%>
 								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：尚未開始</li>
 							<%}else if( event.status == 'holding'){%>
 								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：正在進行</li>
@@ -20,8 +20,8 @@
 								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：活動已結束</li>
 							<%}%>
 						</ul>
-					</div>
-					<hr>
+					</div> -->
+					<!-- <hr> -->
 					<form method="post" action="#">
 						<div class="row uniform">
 							<div class="9u 12u$(small)">

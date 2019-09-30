@@ -93,7 +93,8 @@
 
 
 									<td><%= list_event[i].name %></td>
-									<td><%= list_event[i].time.toLocaleString() %></td>
+									<td><%= list_event[i].time.toLocaleString() %><br>
+									~<%= list_event[i].time.toLocaleString() %></td>
 									<td><%= list_event[i].location %></td>
 									<td>
 										<img src="../images/piggy-bank.png" height="20" width="20"/>
@@ -227,9 +228,8 @@
 					<ul class="actions fit">
 						<li><a href="#" class="button special fit">錢包查詢餘額</a></li>
 						<li><a href="/sponsor/events/createevent" class="button fit">新增活動</a></li>
-                        <li><a href="#" class="button alt fit" data-toggle="modal" data-target="#bar_line_chart">投資報酬率</a></li>
+                        <!-- <li><a href="#" class="button alt fit" data-toggle="modal" data-target="#bar_line_chart">投資報酬率</a></li>
 
-                        <!-- Modal -->
                         <div class="modal fade" id="bar_line_chart" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
@@ -265,7 +265,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 					</ul>
 					</div>
 			</section>

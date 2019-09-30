@@ -21,6 +21,7 @@ router.post('/sponsor/events/:eventid/update', sponsor_controller.sponsor_update
 
 // GET request for attendance list
 router.get('/sponsor/events/:eventid/attendancelist', sponsor_controller.events_attendancelist);
+router.get('/sponsor/events/:eventid/attendancelist_test', sponsor_controller.events_attendancelist_record);
 
 // GET request for creating a check in or check out of users.
 router.get('/sponsor/events/:eventid/SigninCreate', sponsor_controller.SignIn_create_get);

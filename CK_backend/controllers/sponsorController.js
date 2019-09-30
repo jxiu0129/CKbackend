@@ -302,6 +302,24 @@ exports.events_attendancelist = function(req,res,next){
     
 };
 
+exports.events_attendancelist_record = function(req,res,next){
+
+    Event.findById(req.params.eventid)
+    .populate('holder')
+    .exec((err,theevt) =>{
+        Attendance.findOne({event_id : req.params.eventid},'list')
+        // .sort([['email','descending']])
+        .exec(function (err, thisattnd){
+            if (err) { return next(err); }
+            // Successful, so render.
+            console.log(theevt);
+            console.log(thisattnd);
+            res.render('sponsor/attendancelist_record', { title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+        });
+    });
+    
+};
+
 exports.SignIn_create_get= function(req,res){
     res.render('sponsor/add_checkin_record' , { title : "Create Sign In | NCCU Attendance"});
 };

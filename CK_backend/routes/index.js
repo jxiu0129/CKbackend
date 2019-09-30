@@ -30,7 +30,27 @@ router.get('/session', function(req, res, next) {
       res.end('welcome to the session demo. refresh!');
     }
   });
-  
+
+// nodemailer test
+const nodemailer = require('nodemailer');
+
+let transporter = nodemailer.createTransport({
+  host: "nccu.edu.tw",
+  port: "25",
+  secure: false
+});
+
+
+router.get('/sendMail', (req,res) => {
+  transporter.sendMail({
+    from: '"test" <105306035@nccu.edu.tw>',
+    to: 'h.s.i.e.h.tw.29@gmail.com',
+    subject: 'test nodemailer',
+  }, (err, info) => {
+    res.send(err);
+  });
+});
+
 
 // POST user login
 router.get('/login_index',index_controller.login_index);
@@ -41,11 +61,6 @@ router.get('/login_index',index_controller.login_index);
 
 // GET event list
 router.get('/eventslist',index_controller.event_list);
-
-// GET coupon list
-router.get('/couponlist',function(req,res,next){
-  res.render('root/couponlist' , { title : "Event List | NCCU Attendance"});
-});
 
 router.get('/user_profile', index_controller.profile_user);
 

@@ -9,12 +9,6 @@ let API_RefreshClock;
 let API_User;
 
 exports.index = function(req,res){
-    // if(!req.session.code){
-    //     res.render('index');
-    // }
-    // else{
-    //     res.render('login_index');
-    // }
     res.render('root/index');
 };
 
@@ -56,7 +50,7 @@ exports.login_index = function(req, res){
                 console.log('fail');
             });
         });
-        res.render('root/login_index');
+        res.render('root/login_index', {username: req.session.user_info.user_info.name});
     }
 };
 

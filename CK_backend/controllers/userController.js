@@ -16,9 +16,8 @@ exports.user_record = (req, res, next) => {
     console.log('session HERE --->' + req.session.user_info.user_info.email);
     User
     .findOne({email:req.session.user_info.user_info.email}, 'attend')
-    // using http://localhost:3000/user/record?_id=5d70d857107eb226b4b8f770 for test
-    // .populate('hold.holded_events')
     .populate('attend.event_id')
+    // .sort([['time', 'descending']])
     .exec((err, data) => {
         if(err){ console.log(err); }
         console.log('here!!!=>'+ data.attend);

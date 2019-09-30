@@ -2730,7 +2730,7 @@
 					z-index: 10005;
 				}
 
-					/**#header nav a[href="#menu"]:before {
+					#header nav a[href="#menu"]:before {
 						content: "";
 						-moz-osx-font-smoothing: grayscale;
 						-webkit-font-smoothing: antialiased;
@@ -2738,9 +2738,9 @@
 						font-style: normal;
 						font-weight: normal;
 						text-transform: none !important;
-					}**/
+					}
 
-                    #header nav a[href="#menu"]:before {
+                    /* #header nav a[href="#menu"]:before {
                         content: "您好，Username ▾ ";
                         -moz-osx-font-smoothing: grayscale;
                         -webkit-font-smoothing: antialiased;
@@ -2750,7 +2750,7 @@
                         font-weight: normal;
                         text-transform: none !important;
                         color: rgba(78, 85, 91, 0.66);
-                    }
+                    } */
 
 					#header nav a[href="#menu"] span {
 						display: none;

@@ -190,7 +190,7 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                                 console.log("This User Has Already Signed In");
                                 res.render('qrcode/alertmessage',
                                 {title: 'Already Signed In | NCCU Attendance',
-                                msg: _user.name+' ,這個使用者ID已經簽到過囉！'});
+                                msg: _user.name+' ,您已經簽到過囉！'});
                                 return;
                             }
                         }else{
@@ -434,7 +434,7 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                                 console.log("This User Has Already Signed Out");
                                 res.render('qrcode/alertmessage',
                                 {title: 'Already Signed Out | NCCU Attendance',
-                                msg:_user.name + ' ,這個使用者ID已經刷退過囉！'});
+                                msg:_user.name + ' ,您已經刷退過囉！'});
                                 return;
                             }
                         }else{

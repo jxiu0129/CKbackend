@@ -532,11 +532,15 @@ router.get('/qrcodelist', (req,res,next)=>{
         } 
     });
 });
-
+let aa = 100;
+let bb = 30;
+let cc = aa % bb;
+let dd = (aa-cc) / bb;
+console.log(cc);
+console.log(dd);
 
 router.get('/tttest/:eventid',async(req,res)=>{
-    Event.findByIdAndUpdate(req.params.eventid,{location :'測試的啦',name:'測試的啦',SendPoint : 10})
-    .exec(res.send('s'));
+
 });
 
 

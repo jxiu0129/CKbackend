@@ -18,8 +18,10 @@ const EventSchema = new Schema({
    //活動狀態依序分為：尚未開始，正在進行，活動結束(名單送出)
    status : {type: String, required : true , enum :['willhold','holding','finish'], default: 'willhold'},
    ncculink : String,
-   SendPoint : Number    //此活動發送出去的點數，即expense / amount
-
+   SendPoint : Number,    //此活動發送出去的點數，為整數，即expense / amount 的商數
+   
+   LeftPoint : Number     //此活動沒發送出去的點數，即expens/amount的餘數
+   // EX: 100點，30個人參加，則sendpoint為3,LeftPoint為10
    });
 
 EventSchema.set('collection', 'Event'); // .set(配置選項,collection名稱) （若沒有此行配置，預設會透過下一行所設定的model名稱產生collection名稱）

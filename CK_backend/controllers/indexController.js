@@ -23,6 +23,42 @@ exports.logout_but = (req, res) => {
     req.session.destroy();
 }
 
+let getUserInfo = (req, access_token_input) => {
+    rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+        'auth': {
+            'bearer': access_token_input
+        }
+    }).then((msg) => {
+        console.log(msg);
+        API_User = msg;
+        req.session.user_info = API_User;
+        req.session.API_Access = API_Access;
+        req.session.API_RefreshClock = Date.now();
+        req.session.save();
+    }).catch((err) => {
+        console.log('Fail to get userinfo because of :');
+        console.log(err);
+    });
+}
+
+exports.getUserInfoOutSide = (req, access_token_input) => {
+    rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+        'auth': {
+            'bearer': access_token_input
+        }
+    }).then((msg) => {
+        console.log(msg);
+        API_User = msg;
+        req.session.user_info = API_User;
+        req.session.API_Access = API_Access;
+        req.session.API_RefreshClock = Date.now();
+        req.session.save();
+    }).catch((err) => {
+        console.log('Fail to get userinfo because of :');
+        console.log(err);
+    });
+}
+// module.exports =  getUserInfo();
 exports.login_index = function(req, res){
     console.log('location.code : ' + req.query.code);
     API_LoginCode = req.query.code;
@@ -35,28 +71,30 @@ exports.login_index = function(req, res){
             API_Access = JSON.parse(body);
         })
         .catch(() => {
+            req.session.reload();
             console.log('wrong');
             console.log(API_Access);
-            rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
-                'auth': {
-                    'bearer': API_Access.access_token
-                }
-            })
-            .then((message) => {
-                API_User = JSON.parse(message);
-                console.log(API_User.user_info.sponsor_point);
-                req.session.user_info = API_User;
-                req.session.API_Access = API_Access;
-                req.session.API_RefreshClock = Date.now();
-                req.session.save();
+            getUserInfo(req ,API_Access.access_token);
+            res.render('root/login_index');
+            // rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+            //     'auth': {
+            //         'bearer': API_Access.access_token
+            //     }
+            // })
+            // .then((message) => {
+            //     API_User = JSON.parse(message);
+            //     console.log(API_User.user_info.sponsor_point);
+            //     req.session.user_info = API_User;
+            //     req.session.API_Access = API_Access;
+            //     req.session.API_RefreshClock = Date.now();
+            //     req.session.save();
     
-                console.log(req.session.user_info);
-            })
-            .catch(() =>{
-                console.log('fail');
-            });
+            //     console.log(req.session.user_info);
+            // })
+            // .catch(() =>{
+            //     console.log('fail');
+            // });
         });
-        res.render('root/login_index');
     }
 };
 
@@ -84,6 +122,7 @@ exports.Send_Multi_Point = async function(req, res){
     let list = [];
     let event_name;
     let point;
+    let remainder;
     let count=0;
     await Event.findById(req.params.eventid)
     .exec((err, data) => {
@@ -108,7 +147,8 @@ exports.Send_Multi_Point = async function(req, res){
                     }
                 }
                 console.log(list);
-                point = point / count;
+                remainder = point % count;
+                point = (point - remainder) / count;
                 let sendpoint = multipoint;
                 sendpoint.body.email = req.session.user_info.user_info.email;
                 sendpoint.auth.bearer = req.session.API_Access.access_token;

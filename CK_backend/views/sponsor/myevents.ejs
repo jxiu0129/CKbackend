@@ -37,7 +37,7 @@
 						<table>
 							<thead>
 							<tr>
-								<th><img src="../images/code.jpeg" height="20" width="20"/>活動id</th>
+								<th><img src="../images/code.jpeg" height="20" width="20"/></th>
 								<th>活動名稱</th>
 								<th>活動日期</th>
                                 <th>活動地點</th>
@@ -89,7 +89,7 @@
 		
 										</div>
 									<%}else{%>
-										<td><%= list_event[i].shortid %></td>
+										<td>QRcode</td>
 									<%}%>
 
 
@@ -114,7 +114,7 @@
 										<td>尚未開始</td>
 									<%}else if( list_event[i].status == 'holding'){%>
 										<td>正在進行 <br>
-										<img src="../images/stop.png" height="20" width="20"/>
+										<img src="../images/stop.png" height="15" width="15"/>
 										<a href="" class="important" data-toggle="modal" data-target="#end<%= i %>">活動結束</a>
 									</td>
 
@@ -227,7 +227,7 @@
 
 					<!--button-->
 					<ul class="actions fit">
-						<li><a href="#" class="button special fit">錢包查詢餘額</a></li>
+						<!-- <li><a href="#" class="button special fit">錢包查詢餘額</a></li> -->
 						<li><a href="/sponsor/events/createevent" class="button fit">新增活動</a></li>
                         <!-- <li><a href="#" class="button alt fit" data-toggle="modal" data-target="#bar_line_chart">投資報酬率</a></li>
 

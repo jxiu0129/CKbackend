@@ -10,7 +10,6 @@
 				<thead>
 				<tr>
 					<th>活動名稱</th>
-					<th>活動ID</th>
 					<th>活動日期</th>
 					<th>活動地點</th>
 					<th>主辦單位投資點數</th>
@@ -22,31 +21,34 @@
 				<tbody>
 				<% for(let i = 0; i < event_info.length; i++) {%>
 				<tr>
-					<td title="T2019082301"><%= event_info[i].event_id.name%></td>
-					<td><%= event_info[i].event_id.shortid%></td>
+					<td title="活動ID: <%= event_info[i].event_id.shortid%>"><%= event_info[i].event_id.name%></td>
 					<td><%= event_info[i].event_id.time.toLocaleDateString()%></td>
 					<td><%= event_info[i].event_id.location%></td>
 					<td><%= event_info[i].event_id.expense%></td>
 
-					<%if(event_info[i].event_id.SendPoint != undefined){%>
+					<%if(event_info[i].event_id.SendPoint != undefined && event_info[i].event_id.SendPoint != null){%>
 						<td><img src="../images/piggy-bank.png" height="20" width="20"/>
 							<%=event_info[i].event_id.SendPoint%></td>
 					<%}else{%>
-							<td>活動尚未結束</td>
+							<td title="活動結束才會發放點數">活動尚未結束</td>
 					<%}%>
 
 
-					<%if(event_info[i].signin != undefined){%>
-						<td><%=event_info[i].signin.toLocaleString('ko-KR', { timeZone: 'UTC' })%></td>
+					<%if(event_info[i].signin != undefined && event_info[i].signin != null){%>
+						<%//console.log('刷進!進else')%>
+						<td><%=event_info[i].signin.toLocaleString({second:'numeric', hour12: false})%></td>
 					<%}else{%>
+						<%//console.log('刷進進else')%>
 							<td class="inline">尚未刷到</td>
 					<%}%>
 
 
-					<%if(event_info[i].signin != undefined){%>
-						<td><%=event_info[i].signout.toLocaleString()%></td>
+					<%if(event_info[i].signout != undefined && event_info[i].signout != null){%>
+						<%//console.log('刷退!進else')%>
+						<td><%=event_info[i].signout.toLocaleString({hour12: false})%></td>
 					<%}else{%>
-							<td>尚未刷到</td>
+						<%//console.log('刷退進else')%>
+							<td>尚未刷退</td>
 					<%}%>
 
 					<!--Modal 這裡不需要了QQ-->

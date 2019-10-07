@@ -15,21 +15,22 @@ exports.user_record = (req, res, next) => {
     req.session.reload();
     console.log('session HERE --->' + req.session.user_info.user_info.email);
     User
-    .findOne({email:req.session.user_info.user_info.email}, 'attend')
+    .findOne({email:req.session.user_info.user_info.email}, 'attend email')
     .populate('attend.event_id')
-    // .sort([['time', 'descending']])
+    // .sort([['attend.event_id.time', 'descending']]) 
     .exec((err, data) => {
         if(err){ console.log(err); }
-        console.log('here!!!=>'+ data.attend);
+        console.log('data ==>'+data);
+        console.log('data.attend ==>'+ data.attend);
 
-        if(data._id == null){
+        if(data.attend == null){
             let err = new Error('你還沒有參加任何活動喔');
             err.status = 404;
             return next(err);
         }
 
 
-        res.render('user/myrecords', {event_info: data.attend});
+        res.render('user/myrecords', {event_info: data.attend, username: req.session.user_info.user_info.name});
         // res.send('fuck');
         // res.send(req.session);
     });

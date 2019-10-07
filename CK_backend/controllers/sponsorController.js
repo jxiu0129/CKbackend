@@ -16,7 +16,6 @@ const { sanitizeBody } = require('express-validator/filter');
 // 1.自動更新status(活動開始前為willhold,活動時間一到改為holding,按下活動結束成為finish)
 let updateStaus = function(){
     schedule.scheduleJob('1 * * * * *',function(){
-        console.log('updateStaus: ');
         Event.find({status : 'willhold'},'_id status time')
         .exec(async(err,list_event)=>{
             for(let i =0; i < list_event.length ; i++){
@@ -41,7 +40,7 @@ exports.sponsor_events= async(req,res,next) =>{
     .exec(async (err,_user)=>{
         if (err) { return next(err); }
         
-        Event.find({_id:_user.hold.holded_events},'_id shortid name time location expense amount status')
+        Event.find({_id:_user.hold.holded_events},'_id shortid name time endtime location expense amount status')
         .sort([['time','descending']])
         .exec(async (err,list_event) => {
             // console.log(list_event);
@@ -79,6 +78,12 @@ exports.sponsor_create_post = [
         }
         return true;
     }),
+    body('endtime',  'Invalid date').isISO8601().custom((value) => {
+        if (value < Date.now()){
+            throw new Error('Cannot hold event in past!');
+        }
+        return true;
+    }),
     body('location', 'Name is required').isLength({ min: 1 }).trim(),
     body('expense','Expense is required').isInt().custom((value, {req}) => {
         if(value < 0){
@@ -93,6 +98,7 @@ exports.sponsor_create_post = [
     // Sanitize (trim) the name field.
     sanitizeBody('name').escape(),
     sanitizeBody('time').escape().toDate(),
+    sanitizeBody('endtime').escape().toDate(),
     sanitizeBody('location').escape(),
     sanitizeBody('expense').escape(),
     
@@ -113,6 +119,7 @@ exports.sponsor_create_post = [
             holder : _user._id,
             name : req.body.name,
             time : req.body.time,
+            endtime : req.body.endtime,
             location : req.body.location,
             expense : req.body.expense,      //投資點數
             amount : 0,
@@ -278,7 +285,7 @@ exports.sponsor_update_post= [
                 if (err) { return next(err); }
                 // Successful - redirect to genre detail page.
                 console.log('Successfully Update');
-                res.redirect("../");
+                res.redirect("./events");
             });
         
     }
@@ -327,10 +334,10 @@ exports.SignIn_create_get= function(req,res){
 exports.SignIn_create_post= [
 
     // Validate fields.
-    // body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim(),
+    body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim(),
 
     // Sanitize fields.
-    // sanitizeBody('*').escape(),
+    sanitizeBody('*').escape(),
 
     // Process request after validation and sanitization.
     (req,res,next) =>{
@@ -574,10 +581,12 @@ exports.SignOut_create_get= function(req,res){
 exports.SignOut_create_post= [
 
     // Validate fields.
-    // body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim(),
+    body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim().custom((req, value) => {
+        req.session.user_info.user_info.email != value;
+    }),
 
     // Sanitize fields.
-    // sanitizeBody('*').escape(),
+    sanitizeBody('*').escape(),
 
     // Process request after validation and sanitization.
     (req,res,next) =>{

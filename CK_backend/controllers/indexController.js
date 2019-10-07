@@ -117,7 +117,7 @@ exports.Send_Multi_Point = async function(req, res){
                 .catch((err) =>{
                     console.log(err);
                 });
-
+                
                 // 按下活動結束後會更改活動的status為finsih
                 Event.findByIdAndUpdate(req.params.eventid , {status : 'finish',SendPoint : point})
                 .exec(res.render('qrcode/alertmessage',{title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'}));

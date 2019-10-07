@@ -9,6 +9,7 @@ const EventSchema = new Schema({
    holder : { type: Schema.Types.ObjectId, ref: 'User',/*required : true*/} ,  //註解For test
    name : { type: String, required : true},
    time : { type : Date, required: true},
+   endtime : { type : Date, required: true},
    location : String,
    expense : {type: Number, required : true },       //投資點數
    AttendanceList : [{ type: Schema.Types.ObjectId, ref: 'Attendance'}],  //有簽到and刷退 --> 出席名單

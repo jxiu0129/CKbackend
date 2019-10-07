@@ -35,7 +35,9 @@
 
 							<tr>
 								<td title="<%=_event[i].shortid%>"><%=_event[i].name%></td>
-								<td><%=_event[i].time.toLocaleString()%></td>
+								<td><%=_event[i].time.toLocaleString()%>
+									<br>～<%= _event[i].endtime.toLocaleString() %> </td>
+
 								<td><%=_event[i].location%></td>
 
 								<%if (_event[i].holder != undefined){%>

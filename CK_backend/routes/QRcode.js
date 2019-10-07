@@ -18,8 +18,9 @@ const User = require("../models/user");
 router.get('/testSignIn/:eventid',async (req,res,next)=>{
     req.session.reload();
     if(req.session.user_info == undefined){
-        res.render('qrcode/alertmessage',{title:'Please Log in',msg:'請先登入'});
+        res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'Please Log in',msg:'請先登入'});
     }else{
+        
         async.parallel({
             user:function(callback){
                 User.findOne({email : req.session.user_info.user_info.email})
@@ -53,7 +54,11 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
             let _SignIn;
 
 
+
             if(err){return next(err);}
+            else if (String(results.event.holder) == String(_user._id)) {
+                res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'',msg:'贊助商不可參加自己舉辦的活動'});
+            }
             else if (_atnd == null){
 
                 let _newSignIn = new Attendance({
@@ -293,7 +298,9 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
 
 
             if(err){return next(err);}
-
+            else if (String(results.event.holder) == String(_user._id)) {
+                res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'',msg:'贊助商不可參加自己舉辦的活動'});
+            }
             else if (_atnd == null){
 
                 let _newSignOut = new Attendance({
@@ -532,15 +539,12 @@ router.get('/qrcodelist', (req,res,next)=>{
         } 
     });
 });
-let aa = 100;
-let bb = 30;
-let cc = aa % bb;
-let dd = (aa-cc) / bb;
-console.log(cc);
-console.log(dd);
 
-router.get('/tttest/:eventid',async(req,res)=>{
-
+router.get('/tttest',async(req,res)=>{
+    User.findByIdAndUpdate('5d807cc11c9d440000ac87e2',{inited:false,name:"徐子崴"})
+    .exec((req,res)=>{
+        console.log("DONE");
+    });
 });
 
 

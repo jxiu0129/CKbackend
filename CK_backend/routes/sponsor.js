@@ -14,7 +14,7 @@ router.get('/sponsor/events/createevent', sponsor_controller.sponsor_create_get)
 router.post('/sponsor/events/createevent', sponsor_controller.sponsor_create_post);
 
 // POST request to delete events.
-router.post('/sponsor/events/:eventid/delete', sponsor_controller.sponsor_delete_post);
+router.post('/sponsor/events/:eventid/delete', sponsor_controller.sponsor_delete_post_test);
 
 // POST request to update events.
 router.post('/sponsor/events/:eventid/update', sponsor_controller.sponsor_update_post);

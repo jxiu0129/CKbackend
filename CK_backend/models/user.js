@@ -17,6 +17,7 @@ const UserSchema = new Schema({
                 required : true
         }]
     },
+    spendedAmount: Number, default : 0,
     attend: [{
         event_id: { 
             type: Schema.Types.ObjectId,

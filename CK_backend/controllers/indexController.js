@@ -120,7 +120,7 @@ exports.Send_Multi_Point = async function(req, res){
                 
                 // 按下活動結束後會更改活動的status為finsih
                 Event.findByIdAndUpdate(req.params.eventid , {status : 'finish',SendPoint : point})
-                .exec(res.render('qrcode/alertmessage',{title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'}));
+                .exec(res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'}));
 
             });
         }
@@ -135,6 +135,6 @@ exports.event_list = (req,res)=>{
     .sort([['time','descending']])
     .exec((err,_event)=>{
         console.log(_event);
-        res.render('root/eventlist', { title: 'Event List | NCCU Attendance', _event:  _event});
+        res.render('root/eventlist', { username: req.session.user_info.user_info.name,title: 'Event List | NCCU Attendance', _event:  _event});
     });
 };

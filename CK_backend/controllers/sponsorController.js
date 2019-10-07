@@ -53,7 +53,7 @@ exports.sponsor_events= async(req,res,next) =>{
 
             // }
             // Successful, so render.
-            res.render('sponsor/myevents', { title: 'My Events | NCCU Attendance', list_event:  list_event});
+            res.render('sponsor/myevents', { username: req.session.user_info.user_info.name,title: 'My Events | NCCU Attendance', list_event:  list_event});
 
                     
         });
@@ -63,7 +63,7 @@ exports.sponsor_events= async(req,res,next) =>{
 exports.sponsor_create_get= function(req, res,){
     req.session.reload();
     console.log(req.session.user_info.user_info.sponsor_point);
-    res.render('sponsor/addevents' , { title : "Add Events | NCCU Attendance",balance:req.session.user_info.user_info.sponsor_point});
+    res.render('sponsor/addevents' , { username: req.session.user_info.user_info.name,title : "Add Events | NCCU Attendance",balance:req.session.user_info.user_info.sponsor_point});
 };
 
 
@@ -129,7 +129,7 @@ exports.sponsor_create_post = [
 
         if (!errors.isEmpty()) {
             // There are errors. Render the form again with sanitized values/error messages.
-            res.render('sponsor/addevents', { title: 'Add Events | NCCU Attendance', balance : 'defined your mother' , errors: errors.array()});
+            res.render('sponsor/addevents', { username: req.session.user_info.user_info.name,title: 'Add Events | NCCU Attendance', balance : 'defined your mother' , errors: errors.array()});
             // Test
             console.log("Error : "+errors);
         return;
@@ -303,7 +303,7 @@ exports.events_attendancelist = function(req,res,next){
             // Successful, so render.
             console.log(theevt);
             console.log(thisattnd);
-            res.render('sponsor/attendancelist', { title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+            res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
         });
     });
     
@@ -321,28 +321,45 @@ exports.events_attendancelist_record = function(req,res,next){
             // Successful, so render.
             console.log(theevt);
             console.log(thisattnd);
-            res.render('sponsor/attendancelist_record', { title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+            res.render('sponsor/attendancelist_record', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
         });
     });
     
 };
 
 exports.SignIn_create_get= function(req,res){
-    res.render('sponsor/add_checkin_record' , { title : "Create Sign In | NCCU Attendance"});
+    res.render('sponsor/add_checkin_record' , { username: req.session.user_info.user_info.name,title : "Create Sign In | NCCU Attendance"});
 };
 
 exports.SignIn_create_post= [
+    
+    // // Validate fields.
+    // body('email', 'User Id must not be empty.').isLength({ min: 1 }).trim().custom((value)=>{
+    //     if (value == req.session.user_info.user_info.email){
+    //         throw new Error('Event Holder Cannot join the event');
+    //     }
+    //     return true;
+    // }),
+    // body('time',  'Invalid date').isISO8601().custom((value) => {
+    //     if (value < Date.now()){
+    //         throw new Error('Cannot hold event in past!');
+    //     }
+    //     return true;
+    // }),
 
-    // Validate fields.
-    body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim(),
-
-    // Sanitize fields.
-    sanitizeBody('*').escape(),
+    // // Sanitize fields.
+    // sanitizeBody('*').escape(),
 
     // Process request after validation and sanitization.
     (req,res,next) =>{
         console.log("????"),   
         req.session.reload();
+        body('time',  'Invalid date').isISO8601().custom((value) => {
+            if (value < Date.now()){
+                throw new Error('Cannot hold event in past!');
+            }
+            return true;
+        });
 
 
         async.parallel({
@@ -369,6 +386,13 @@ exports.SignIn_create_post= [
         },
         
         async (err,results) => {
+
+            body('time',  'Invalid date').isISO8601().custom((value) => {
+                if (value < Date.now()){
+                    throw new Error('Cannot hold event in past!');
+                }
+                return true;
+            });
 
             if(results.user == undefined){
                 res.redirect('./SignInCreate');
@@ -575,14 +599,16 @@ exports.SignIn_create_post= [
 ];
 
 exports.SignOut_create_get= function(req,res){
-    res.render('sponsor/add_checkout_record' , { title : "Create Sign Out | NCCU Attendance"});
+    res.render('sponsor/add_checkout_record' , { username: req.session.user_info.user_info.name,title : "Create Sign Out | NCCU Attendance"});
 };
 
 exports.SignOut_create_post= [
 
     // Validate fields.
-    body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim().custom((req, value) => {
-        req.session.user_info.user_info.email != value;
+    body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim().custom((value, {req}) => {
+        if(req.session.user_info.user_info.email == value){
+
+        }
     }),
 
     // Sanitize fields.
@@ -819,7 +845,7 @@ exports.SignOut_create_post= [
 ];
 
 exports.SignBoth_create_get= function(req,res){
-    res.render('sponsor/add_checkinandout_record' , { title : "Create Sign In / Sign Out | NCCU Attendance"});
+    res.render('sponsor/add_checkinandout_record' , { username: req.session.user_info.user_info.name,title : "Create Sign In / Sign Out | NCCU Attendance"});
 };
 
 exports.SignBoth_create_post= [

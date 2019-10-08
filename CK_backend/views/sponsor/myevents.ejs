@@ -56,7 +56,8 @@
 								<tr>
 									
 									<%if(list_event[i].status == 'holding'){%>
-										<td><a href="" data-toggle="modal" data-target="#event<%=i%>-qrModal"><%= list_event[i].shortid %></a></td>
+										<!-- <td><a href="" data-toggle="modal" data-target="#event<%=i%>-qrModal"><%= list_event[i].shortid %></a></td> -->
+										<td width="100px" style= "word-break:break-all"><a href="" data-toggle="modal" data-target="#event<%=i%>-qrModal">QRCode</a></td>
 
 										<div class="modal fade" id="event<%=i%>-qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
 										

@@ -12,17 +12,23 @@
 						<!--<div class="row uniform">-->
 						<div align="center">
 							<div class="6u 12u$(xsmall)">
-								<input type="text" name="email" id="userID" value="" placeholder="參與者email" />
+								<p style="text-align: left; margin-bottom: 5px;" >參與者email</p>
+								<input type="text" name="email" id="userID" value="" placeholder="參與者Email" />
 							</div>
 							<br>
+							<div class="6u 12u$(xsmall)">
+								<!-- <h3 class="inline">報到時間：</h3>
+								<input class="inline" name="timein" type="datetime-local" id="checkin-addDateTime"> -->
+								<p style="text-align: left; margin-bottom: 5px;" >簽到時間</p>
+								<input type="datetime-local" name="check_in_time" id="check_in_addDateTime" />
+							</div>	
 							<br>
-							<h3 class="inline">報到時間：</h3>
-							<input class="inline" name="timein" type="datetime-local" id="checkin-addDateTime">
-							<br>
-							<br>
-							<br>
-							<h3 class="inline">刷退時間：</h3>
-							<input class="inline" name="timeout" type="datetime-local" id="checkout-addDateTime">
+							<div class="6u 12u$(xsmall)">
+								<!-- <h3 class="inline">刷退時間：</h3>
+								<input class="inline" name="timeout" type="datetime-local" id="checkout-addDateTime"> -->
+								<p style="text-align: left; margin-bottom: 5px;" >刷退時間</p>
+								<input type="datetime-local" name="check_out_time" id="check_out_addDateTime" />
+							</div>	
 							<br>
 							<br>
 							<br>
@@ -30,10 +36,34 @@
 							<!-- Break -->
 							<div class="12u$">
 								<ul class="actions">
-									<li><input type="submit" value="新增報到與刷退紀錄" /></li>
+									<li><input type="submit" onclick="return CheckFunc();" value="新增報到與刷退紀錄" /></li>
 									<li><input type="reset" value="重填資料" class="alt" /></li>
 								</ul>
 							</div>
+							<script language="javascript" type="text/javascript">
+								function CheckFunc()
+								{
+									msg = "";
+									if(document.forms[0].name.value == "")
+									{
+										msg = "請輸入參與者ID";
+									}
+									else if(document.forms[0].check_in_time.value == "")
+									{
+										msg = "請輸入簽到時間";
+									}
+									else if(document.forms[0].check_out_time.value == "")
+									{
+										msg = "請輸入刷退時間";
+									}
+									else
+									{
+										return true;
+									}
+									alert(msg);
+									return false;
+								}
+							</script>	
 						</div>
 					</form>
 				</div>

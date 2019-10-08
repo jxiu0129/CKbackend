@@ -5,38 +5,50 @@
 					<header class="align-center">
 						<h1>新增活動</h1>
 					</header>
-<hr>
+					<hr>
 					<!-- Form -->
 
 					<form method="post" action="#">
 						<!--<div class="row uniform">-->
 						<div align="center">
-							<h4>活動id(屆時將自動生成)</h4>
 							<div class="6u 12u$(xsmall)">
-                                <input type="text" name="name" id="event_name" value="" placeholder="活動名稱" />
+								<!-- <input type="text" name="name" id="event_name" value="" placeholder="活動名稱" /> -->
+								<p style="text-align: left; margin-bottom: 5px;" >活動名稱</p>
+                                <input type="text" name="name" id="event_name" placeholder="活動名稱">
 							</div>
 							<br>
-							<div class="6u 12u$(xsmall)">
-								<input type="datetime-local" name="time" id="event_date" value="" placeholder="活動開始時間" />
-                            </div>
-							<br>
-							<div class="6u 12u$(xsmall)">
-								<input type="datetime-local" name="endtime" id="event_enddate" value="" placeholder="活動結束時間" />
-                            </div>
-                            <br>
-                            <div class="6u 12u$(xsmall)">
-                                <input type="text" name="location" id="event_location" value="" placeholder="活動地點" />
-							</div>
-							<br>
-							<div class="6u$ 12u$(xsmall)">
-								<input type="number" name="expense" id="investment" value="" placeholder="投入資金" />
-								<p>活動點 — 帳面餘額： <%= balance %></p>
-								<p>活動點 — 可用餘額： <%= realBalance %></p>
 
-								
+							<div class="6u 12u$(xsmall)">
+								<!-- <input type="datetime-local" name="time" id="event_date" value="" placeholder="活動開始時間" /> -->
+								<p style="text-align: left; margin-bottom: 5px;">活動地點</p>
+                                <input type="text" name="location" id="event_location" placeholder="活動地點" />
                             </div>
+							<br>
+							
                             <div class="6u$ 12u$(xsmall)">
+                                <p style="text-align: left; margin-bottom: 5px;">活動連結</p>
                                 <input type="url" name="event_link" id="event_link" placeholder="活動連結" />
+                            </div>
+							<br>
+
+                            <div class="6u 12u$(xsmall)">
+								<!-- <input type="text" name="location" id="event_location" value="" placeholder="活動地點" /> -->
+								<p style="text-align: left; margin-bottom: 5px;">開始時間</p>
+                                <input class="inline" type="datetime-local" name="time" id="addStartTime"/>
+							</div>
+							<br>
+								<!-- <input type="number" name="expense" id="investment" value="" placeholder="投入資金" /> --> 
+							<div class="6u 12u$(xsmall)">
+								<p style="text-align: left; margin-bottom: 5px;">結束時間</p>
+								<input class="inline" type="datetime-local" name="endtime" id="addEndTime"/>
+							</div>
+							<br>
+							
+                            <div class="6u$ 12u$(xsmall)">
+                                <p style="text-align: left; margin-bottom: 5px;">投入資金</p>
+                                <input type="number" name="expense" id="investment" min="0" placeholder="投入資金" />
+								<p style="text-align: right; margin-bottom:5px;">活動點 — 帳面餘額： <%= balance %></p>		
+								<p style="text-align: right; margin-bottom:5px;">活動點 — 可用餘額： <%= realBalance %></p>												
 							</div>
 							<br>
                             <p>請注意！當你新增此活動後，該活動的投資金額不可再做更動。
@@ -44,10 +56,47 @@
                                 若有需要更動，請刪除整筆活動再行新增。</p>
 							<div class="12u$">
 								<ul class="actions">
-									<li><input type="submit" value="新增活動" /></li>
+									<li><input type="submit" onclick="return CheckFunc();" value="新增活動" /></li>
 									<li><input type="reset" value="重填資料" class="alt" /></li>
 								</ul>
 							</div>
+							<script language="javascript" type="text/javascript">
+                                function CheckFunc()
+                                {
+                                    msg = "";
+                                    if(document.forms[0].name.value == "")
+                                    {
+                                        msg = "請輸入活動名稱";
+                                    }
+                                    else if(document.forms[0].location.value == "")
+                                    {
+                                        msg = "請輸入活動地點";
+                                    }
+                                    else if(document.forms[0].event_link.value == "")
+                                    {
+                                        msg = "請輸入活動連結";
+                                    }
+                                    else if(document.forms[0].time.value == "")
+                                    {
+                                        msg = "請輸入開始時間";
+                                    }
+                                    else if(document.forms[0].endtime.value == "")
+                                    {
+                                        msg = "請輸入結束時間";
+                                    }
+                                    else if(document.forms[0].expense.value == "")
+                                    {
+                                        msg = "請輸入投入資金";
+                                    }
+                                    else
+                                    {
+                                        return true;
+                                    }
+                                    alert(msg);
+                                    return false;
+                                }
+                            </script>
+
 						</div>
 					</form>
 					</div>

@@ -898,8 +898,8 @@ exports.SignBoth_create_post= [
             }
 
             let _stdId = req.body.email;
-            let _timein = req.body.timein;
-            let _timeout = req.body.timeout;
+            let _timein = req.body.check_in_time;
+            let _timeout = req.body.check_out_time;
             let _atnd = results.attendance;
             let _user = results.user;
             let U_atnd;

@@ -10,10 +10,10 @@
 					<form method="post" action="#">
 						<div class="row uniform">
 							<div class="9u 12u$(small)">
-								<input type="text" name="query" id="query" value="" placeholder="輸入參與者email" />
+								<input type="text" name="query" id="query" value="" style="height: 3em" placeholder="輸入參與者email" />
 							</div>
 							<div class="3u$ 12u$(small)">
-								<input type="submit" value="搜尋" class="fit" />
+									<input type="submit" value="搜尋" class="fit" style="height: 3em; line-height: 3em"/>
 							</div>
 						</div>
 					</form>
@@ -33,17 +33,17 @@
 							<% }else{ %>
 								<% for(let i = 0;i < thisattnd.list.length; i++){ %>
 								<tr>
-									<td><%= thisattnd.list[i].email  %></td>
+									<td width="200px" style= "word-break:break-all"><%= thisattnd.list[i].email  %></td>
 									<% if(thisattnd.list[i].time_in == undefined) {%>
-										<td><%= thisattnd.list[i].time_in  %></td>
+										<td width="200px" style= "word-break:break-all"><%= thisattnd.list[i].time_in  %></td>
 									<% } else { %>
-										<td><%= thisattnd.list[i].time_in.toLocaleString()  %></td>
+										<td width="200px" style= "word-break:break-all"><%= thisattnd.list[i].time_in.toLocaleString()  %></td>
 									<% } %>
 
 									<% if(thisattnd.list[i].time_out == undefined) {%>
-										<td><%= thisattnd.list[i].time_out  %></td>
+										<td width="200px" style= "word-break:break-all"><%= thisattnd.list[i].time_out  %></td>
 									<% } else { %>
-										<td><%= thisattnd.list[i].time_out.toLocaleString()  %></td>
+										<td width="200px" style= "word-break:break-all"><%= thisattnd.list[i].time_out.toLocaleString()  %></td>
 									<% } %>
 								</tr>
 								<% } %>

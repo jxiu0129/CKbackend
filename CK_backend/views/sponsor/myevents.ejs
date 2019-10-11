@@ -87,14 +87,14 @@
 		
 										</div>
 									<%}else{%>
-										<td>QRcode</td>
+										<td>QRcode <%=list_event[i].status%></td>
 									<%}%>
 
 
 									<td><%= list_event[i].name %></td>
-									<td><%= list_event[i].time.toLocaleString() %> 
-										<br>～<%= list_event[i].endtime.toLocaleString() %> </td>
-									<td><%= list_event[i].location %></td>
+									<td><%= Time[i] %> 開始
+										<br><%= endTime[i] %> 結束 </td>
+									<td><%= list_event[i].location %> </td>
 									<td>
 										<img src="../images/piggy-bank.png" height="20" width="20"/>
 										<%= list_event[i].expense %>

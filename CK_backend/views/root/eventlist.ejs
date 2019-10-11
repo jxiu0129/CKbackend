@@ -35,11 +35,10 @@
 
 							<tr>
 								<td title="<%=_event[i].shortid%>" width="300px" style= "word-break:break-all"><%=_event[i].name%></td>
-								<td width="250px" style= "word-break:break-all"><%=_event[i].time.toLocaleString()%>
-									<br>～<%= _event[i].endtime.toLocaleString() %> </td>
+								<td width="250px" style= "word-break:break-all"><%=Time[i]%> 開始
+									<br><%= endTime[i] %> 結束</td>
 
-								<!-- <td width="150px" style= "word-break:break-all"><%=_event[i].location%></td> -->
-								<td width="280px" style= "word-break:break-all">2019年8月12日 下午6：00 開始 <br>2019年8月12日 下午9：00 結束</td>
+								<td width="150px" style= "word-break:break-all"><%=_event[i].location%></td>
 
 								<%if (_event[i].holder != undefined){%>
 									<td width="150px" style= "word-break:break-all"><a href="" data-toggle="modal" data-target="#sponsorInfo<%= i %>"><%=_event[i].holder.name%></a></td>

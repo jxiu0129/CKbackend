@@ -49,9 +49,6 @@
 							</thead>
 
 							<tbody>
-							<%if(list_event.length == 0){%>
-								<h1>您還沒有舉辦過任何活動哦！</h1>
-							<%}else{%>
 								<% for(let i = 0;i < list_event.length;i++){ %>
 								<tr>
 									
@@ -170,16 +167,32 @@
 															<input type="text" name="name" id="event-editName" value="<%= list_event[i].name %>" placeholder="修改活動名稱" />
 														</div>
 														<br>
-														<h3 class="inline">活動日期：</h3>
-														<br>
-														<input type="datetime-local" name="time" id="event-editDateTime" value="2019-01-01T00:00" placeholder="2014-09-18">
-														<br>
+
 														<h3 class="inline">活動地點：</h3>
 														<br>
 														<div class="6u 12u$(xsmall) inline">
 															<input type="text" name="location" id="event-editLocation" value="<%= list_event[i].location %>" placeholder="修改活動地點">
 														</div>
 														<br>
+														
+														<h3 class="inline">活動連結：</h3>
+														<br>
+														<div class="6u 12u$(xsmall) inline">
+															<input type="text" name="link" id="event-editLink" value="<%= list_event[i].ncculink %>" placeholder="修改活動連結">
+														</div>
+														<br>
+
+														<h3 class="inline">開始時間：</h3>
+														<br>
+														
+														<input type="datetime-local" name="time" id="event-editDateTime" value="2019-01-01T00:00" placeholder="2014-09-18">
+														<br>
+
+														<h3 class="inline">結束時間：</h3>
+														<br>
+														<input type="datetime-local" name="endtime" id="event-editEndTime" value="2019-01-01T00:00" placeholder="2014-09-18">
+														<br>
+
 													</div>
 													<div class="modal-footer">
 														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -219,7 +232,6 @@
 								</tr>
 
 								<% } %>
-							<% } %>
 						
 
 							</tbody>

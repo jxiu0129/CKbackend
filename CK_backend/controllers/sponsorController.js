@@ -45,8 +45,12 @@ exports.sponsor_events= async(req,res,next) =>{
         .exec(async (err,list_event) => {
             // console.log(list_event);
             if (err) { return next(err); }
+            if (list_event.length == 0){
+                res.render('sponsor/myevents_noevent', { username: req.session.user_info.user_info.name});
 
-            res.render('sponsor/myevents', { username: req.session.user_info.user_info.name,title: 'My Events | NCCU Attendance', list_event:  list_event});
+            }else{
+                res.render('sponsor/myevents', { username: req.session.user_info.user_info.name,title: 'My Events | NCCU Attendance', list_event:  list_event});
+            }
 
                     
         });
@@ -268,12 +272,14 @@ exports.sponsor_update_post= [
     //Validate
     body('name', 'Name is required').isLength({ min: 1 }).trim(),
     body('time',  'Invalid date').optional({ checkFalsy: true}).isISO8601(),
+    body('endtime',  'Invalid date').optional({ checkFalsy: true}).isISO8601(),
     body('location', 'Name is required').isLength({ min: 1 }).trim(),
     body('expense','Expense is required').isInt({ min : 0 ,allow_leading_zeroes: false}),
 
     // Sanitize (trim) the name field.
     sanitizeBody('name').escape(),
     sanitizeBody('time').escape().toDate(),
+    sanitizeBody('endtime').escape().toDate(),
     sanitizeBody('location').escape(),
     sanitizeBody('Expense').escape(),
 
@@ -286,6 +292,8 @@ exports.sponsor_update_post= [
         // Create Author object with escaped and trimmed data (and the old id!)
         let event = {
             // _id : req.params._id, 
+            endtime : req.body.endtime,
+            ncculink : req.body.link,
             time : req.body.time,
             name : req.body.name,
             location : req.body.location
@@ -296,7 +304,8 @@ exports.sponsor_update_post= [
                 if (err) { return next(err); }
                 // Successful - redirect to genre detail page.
                 console.log('Successfully Update');
-                res.redirect("./events");
+                // ?????
+                res.redirect("#");
             });
         
     }

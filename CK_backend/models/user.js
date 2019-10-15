@@ -6,6 +6,7 @@ const UserSchema = new Schema({
     // _id : Number,
     student_id : Number,
     email : String,
+    phone : Number,
     inited : { type: Boolean, default: false},
     name : { type: String, required : true},
     real_point : Number,

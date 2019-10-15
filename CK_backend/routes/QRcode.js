@@ -513,7 +513,9 @@ router.get('/qrcodelist', (req,res,next)=>{
         if (err) { return next(err); };
 
         if (thisuser.hold.isHolder == false){
-            res.render('qrcode/alertmessage',{title:'No Event',msg:thisuser.name+' ,您還沒有舉辦過任何活動哦！'});
+            res.render('qrcode/alertmessage',{title:'No Event',msg:thisuser.name+' ,您還沒有舉辦過任何活動哦！',
+            username : req.session.user_info.user_info.name,
+        });
         }else{
             
             let event_array = thisuser.hold.holded_events;
@@ -531,9 +533,13 @@ router.get('/qrcodelist', (req,res,next)=>{
             Event.find({'$and' :[{_id : event_array},{status : 'holding'}]},'name shortid')
             .exec((err,EV) =>{
                 if( EV[0] == null ){
-                    res.render('qrcode/alertmessage',{title:'Not Yet',msg:'目前沒有即將進行的活動哦！\n (活動前一小時才會產生QRcode)'});
+                    res.render('qrcode/alertmessage',{title:'Not Yet',msg:'目前沒有即將進行的活動哦！\n (活動前一小時才會產生QRcode)',
+                    username : req.session.user_info.user_info.name,
+                });
                 }else{
-                    res.render('qrcode/qrcodelist',{EV : EV});
+                    res.render('qrcode/qrcodelist',{EV : EV,
+                        username : req.session.user_info.user_info.name,
+                    });
                 }
             });
         } 

@@ -64,4 +64,13 @@ router.get('/eventslist',index_controller.event_list);
 
 router.get('/user_profile', index_controller.profile_user);
 
+router.get('/edit_info_first', index_controller.edit_info_first_get);
+
+router.post('/edit_info_first', index_controller.edit_info_first_post);
+
+router.get('/user_profile/edit_info', index_controller.edit_info_get);
+
+router.post('/user_profile/edit_info', index_controller.edit_info_post);
+
+
 module.exports = router;

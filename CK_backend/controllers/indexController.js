@@ -252,6 +252,45 @@ exports.profile_user = async function(req, res){
     });
 };
 
+exports.edit_info_get = (req,res,next)=>{
+    req.session.reload();
+    User.findOne({email:req.session.user_info.user_info.email})
+    .exec((err,theuser)=>{
+        res.render('root/edit_member_info',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser});
+    });
+};
+
+exports.edit_info_post = [
+
+    (req,res,next)=>{
+        req.session.reload();
+        User.findOneAndUpdate({email:req.session.user_info.user_info.email},{phone : req.body.phone})
+        .exec((err,theuser)=>{
+            res.redirect("./");
+        });
+    }
+];
+
+exports.edit_info_first_get = (req,res,next)=>{
+    req.session.reload();
+    User.findOne({email:req.session.user_info.user_info.email})
+    .exec((err,theuser)=>{
+        res.render('root/edit_member_info(first)',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser});
+    });
+};
+
+exports.edit_info_first_post = [
+
+    (req,res,next)=>{
+        req.session.reload();
+        User.findOneAndUpdate({email:req.session.user_info.user_info.email},{phone : req.body.phone})
+        .exec((err,theuser)=>{
+            res.redirect("./");
+        });
+    }
+];
+
+
 let multipoint = {
     method: 'POST',
     uri: 'http://wm.nccu.edu.tw:3001/openapi/send_point',
@@ -346,9 +385,10 @@ exports.event_list = (req,res)=>{
             timeArray.push(moment(_event[i].time).format('LLL'));
             endtimeArray.push(moment(_event[i].endtime).format('LLL'));
         }
+        console.log( req.session.user_info.user_info.username);
 
         res.render('root/eventlist', {
-            username : req.session.user_info.user_info.username,
+            username : req.session.user_info.user_info.name,
             title: 'Event List | NCCU Attendance', 
             _event:  _event,
             Time :timeArray,

@@ -28,7 +28,7 @@ const UserSchema = new Schema({
         },
         signin: Date,
         signout: Date
-    }]
+    }],
 });
 
 UserSchema.set('collection', 'User');

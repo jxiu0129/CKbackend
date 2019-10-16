@@ -147,7 +147,7 @@ let getUserInfo = (req, access_token_input) => {
         console.log('Fail to get userinfo because of :');
         console.log(err);
     });
-};
+}
 
 exports.getUserInfoOutSide = (req, access_token_input) => {
     rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
@@ -165,9 +165,8 @@ exports.getUserInfoOutSide = (req, access_token_input) => {
         console.log('Fail to get userinfo because of :');
         console.log(err);
     });
-};
+}
 // module.exports =  getUserInfo();
-
 exports.login_index = function(req, res){
     console.log('location.code : ' + req.query.code);
     API_LoginCode = req.query.code;
@@ -180,48 +179,11 @@ exports.login_index = function(req, res){
             API_Access = JSON.parse(body);
         })
         .catch(() => {
-            console.log('wrong');
-            console.log(API_Access);
-            rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
-                'auth': {
-                    'bearer': API_Access.access_token
-                }
-            })
-            .then((message) => {
-                API_User = JSON.parse(message);
-                console.log(API_User.user_info.sponsor_point);
-                req.session.user_info = API_User;
-                req.session.API_Access = API_Access;
-                req.session.API_RefreshClock = Date.now();
-                req.session.save();
-    
-                console.log(req.session.user_info);
-            })
-            .catch(() =>{
-                console.log('fail');
-            });
-        });
-        res.render('root/login_index', {username: req.session.user_info.user_info.name});
-    }
-};
-
-exports.login_index_new = function(req, res){
-    console.log('location.code : ' + req.query.code);
-    API_LoginCode = req.query.code;
-    req.session.API_LoginCode = req.query.code;
-    if(!req.session.API_LoginCode){
-        console.log('wrong dude');
-        res.redirect("http://localhost:3000/");
-    }else{
-        rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
-            API_Access = JSON.parse(body);
-        })
-        .catch(async () => {
             req.session.reload();
             console.log('wrong');
             console.log(API_Access);
-            await getUserInfo(req ,API_Access.access_token);
-            res.render('root/login_index',{username :req.session.user_info.user_info.username});
+            getUserInfo(req ,API_Access.access_token);
+            res.render('root/login_index');
             // rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
             //     'auth': {
             //         'bearer': API_Access.access_token
@@ -394,6 +356,17 @@ exports.event_list = (req,res)=>{
             Time :timeArray,
             endTime : endtimeArray
         });
+    });
+};
+
+exports.grant_new_token = (req, res) => {
+    req.session.reload();
+    rp.post("http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
+    .then((data)=>{
+        console.log(data);
+    })
+    .catch((err) =>{
+        console.log(err);
     });
 };
 

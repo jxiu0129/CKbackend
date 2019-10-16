@@ -1,0 +1,110 @@
+<%-include('header')-%>
+
+
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<header class="align-center">
+						<h1>新增活動</h1>
+					</header>
+
+					<!-- Form -->
+
+					<form method="post" action="#">
+						<!--<div class="row uniform">-->
+						<div align="center">
+
+							<div class="6u 12u$(xsmall)">
+								<p style="text-align: left; margin-bottom: 5px;" >贊助商名稱： <%=user.name%></p>
+								<br>
+								<p style="text-align: left; margin-bottom: 5px;" >贊助商email： <%=user.email%></p>
+							</div>
+							<br>
+
+							<div class="6u 12u$(xsmall)">
+								<p style="text-align: left; margin-bottom: 5px;" >活動名稱</p>
+								<input type="text" name="name" id="eventName" value="" placeholder="活動名稱" />
+							</div>
+							<br>
+							<div class="6u 12u$(xsmall)">
+								<p style="text-align: left; margin-bottom: 5px;">活動地點</p>
+								<input type="text" name="location" id="eventLocation" placeholder="活動地點" />
+							</div>
+							<br>
+							<div class="6u$ 12u$(xsmall)">
+								<p style="text-align: left; margin-bottom: 5px;">活動連結</p>
+								<input type="url" name="event_link" id="eventLink" placeholder="活動連結" />
+							</div>
+							<br>
+							<div class="6u 12u$(xsmall)">
+								<p style="text-align: left; margin-bottom: 5px;">開始時間</p>
+								<input class="inline" type="datetime-local" name="time" id="addStartTime"/>
+							</div>
+							<br>
+							<div class="6u 12u$(xsmall)">
+								<p style="text-align: left; margin-bottom: 5px;">結束時間</p>
+								<input class="inline" type="datetime-local" name="endtime" id="addEndTime"/>
+							</div>
+							<br>
+							<div class="6u$ 12u$(xsmall)">
+								<p style="text-align: left; margin-bottom: 5px;">投入資金</p>
+								<input type="number" name="expense" id="investment" min="0" placeholder="投入資金" />
+								<p style="text-align: right; margin-bottom:5px;">活動點 — 帳面餘額： </p>		
+								<p style="text-align: right; margin-bottom:5px;">活動點 — 可用餘額： </p>												
+							</div>
+							<br>
+
+							<!-- Break -->
+							<div class="12u$">
+								<ul class="actions">
+									<li><input type="reset" value="重填資料" class="alt" /></li>
+									<li><input type="submit" onclick="return CheckFunc();" value="新增活動" /></li>
+								</ul>
+							</div>
+
+							<script language="javascript" type="text/javascript">
+								function CheckFunc()
+								{
+									msg = "";
+									if(document.forms[0].eventName.value == "")
+									{
+										msg = "請輸入活動名稱";
+									}
+									else if(document.forms[0].location.value == "")
+									{
+										msg = "請輸入活動地點";
+									}
+									else if(document.forms[0].event_link.value == "")
+									{
+										msg = "請輸入活動連結";
+									}
+									else if(document.forms[0].start_time.value == "")
+									{
+										msg = "請輸入開始時間";
+									}
+									else if(document.forms[0].end_time.value == "")
+									{
+										msg = "請輸入結束時間";
+									}
+									else if(document.forms[0].points.value == "")
+									{
+										msg = "請輸入投入資金";
+									}
+									else
+									{
+										return true;
+									}
+									alert(msg);
+									return false;
+								}
+							</script>
+
+						</div>
+					</form>
+					<div align='center'>
+						<input type="button" value="上一步" onclick="location.href='http://localhost:3000/admin/events/createevent_first'" /></li>
+					</div>
+					</div>
+			</section>
+
+<%-include('../root/footer')-%>

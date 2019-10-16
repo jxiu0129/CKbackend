@@ -1,0 +1,50 @@
+<%-include('header')-%>
+
+
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<header class="align-center">
+						<h1>新增活動—第一步</h1>
+					</header>
+
+					<!-- Form -->
+
+					<form method="post" action="/admin/events/createevent_first">
+						<!--<div class="row uniform">-->
+						<div align="center">
+
+						    <div class="6u 12u$(xsmall)">
+                                <p style="text-align: left; margin-bottom: 5px;" >贊助商Email</p>
+                                <input type="text" name="email" id="sponsorEmail" value="" placeholder="贊助商Email" />
+                            </div>
+                            <br>
+							<!-- Break -->
+							<div class="12u$">
+								<ul class="actions">
+									<li><input type="submit" onclick="return CheckFunc();" value="下一步" /></li>
+								</ul>
+							</div>
+
+							<script language="javascript" type="text/javascript">
+								function CheckFunc()
+								{
+									msg = "";
+									if(document.forms[0].email.value == "")
+									{
+										msg = "請輸入贊助商Email";
+									}else
+									{
+										return true;
+									}
+									alert(msg);
+									return false;
+								}
+							</script>
+
+						</div>
+					</form>
+					</div>
+			</section>
+
+<%-include('../root/footer')-%>

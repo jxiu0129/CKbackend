@@ -1,49 +1,48 @@
-<%-include('../root/header')-%>
+<%-include('header')-%>
 
 		<!-- Main -->
 			<section id="main" class="wrapper">
 				<div class="inner">
 					<header class="align-center">
 						<h1>活動列表</h1>
-						<p>以下活動都是與我們共同創造雙贏局面的活動喔！</p>
 					</header>
 
 					<form method="post" action="#">
 						<div class="row uniform">
 							<div class="9u 12u$(small)">
-								<input type="text" name="query" id="query" value="" style="height: 3em" placeholder="輸入活動名稱" />
+								<input type="text" name="query" id="query" value="" style="height: 3em" placeholder="輸入活動id" />
 							</div>
 							<div class="3u$ 12u$(small)">
-								<input type="submit" value="搜尋" class="fit" style="height: 3em; line-height: 3em"/>
+								<input type="submit" value="搜尋" class="fit" style="height: 3em; line-height: 3em" />
 							</div>
 						</div>
 					</form>
 
+					
 					<div class="table-wrapper">
 						<table>
 							<thead>
 							<tr>
-								<th>活動名稱/ID<br>(將滑鼠移至活動名稱即可檢視ID)</th>
+                                <th>活動ID</th>
+								<th>活動名稱</th>
 								<th>活動日期</th>
 								<th>活動地點</th>
-								<th>投資點數</th>
 								<th>承辦單位</th>
-								<th>報名連結</th>
+                                <th>修改/刪除</th>
+                                <th>活動狀態</th>
 							</tr>
 							</thead>
 							<tbody>
 							<% for(let i = 0 ; i < _event.length; i++){ %>
 
 							<tr>
-								<td title="<%=_event[i].shortid%>" width="300px" style= "word-break:break-all"><%=_event[i].name%></td>
+                                <td width="150px" style= "word-break:break-all"><%=_event[i].shortid%></td>
+								<td width="250px" style= "word-break:break-all"><%=_event[i].name%></td>
 								<td width="250px" style= "word-break:break-all"><%=Time[i]%> 開始
 									<br><%= endTime[i] %> 結束</td>
 
 								<td width="150px" style= "word-break:break-all"><%=_event[i].location%></td>
-								<td width="150px" style= "word-break:break-all">
-									<img src="../images/piggy-bank.png" height="20" width="20"/>
-									<%=_event[i].expense%>
-								</td>
+
 								<%if (_event[i].holder != undefined){%>
 									<td width="150px" style= "word-break:break-all"><a href="" data-toggle="modal" data-target="#sponsorInfo<%= i %>"><%=_event[i].holder.name%></a></td>
 									<!-- Modal -->
@@ -59,7 +58,7 @@
 												<div class="modal-body">
 														<h3 class="inline">承辦單位名稱：</h3><p class="inline"><%=_event[i].holder.name%></p>
 														<br>
-														<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline"><%=_event[i].holder.phone%><%=_event[i].holder.phone%></p>
+														<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline"><%=_event[i].holder.phone%></p>
 														<br>
 														<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><a href="<%=_event[i].holder.email%>"><%=_event[i].holder.email%></a></p>
 														<br>
@@ -74,13 +73,18 @@
 									<td></td>
 								<%}%>
 								
-								<%if(_event[i].ncculink != undefined) {%>
-									<td width="100px" style= "word-break:break-all"><a href="<%=_event[i].ncculink%>" style="font-weight: bold">我要報名</a></td>
-								<%}else{%>
-									<td>無</td>
-								<%}%>
+                                <td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
+                                    <a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
+                               
+                                <%if(_event[i].status == 'willhold'){%>
+                                    <td>尚未開始</td>
+                                <%}else if(_event[i].status == 'holding'){%>
+                                    <td>正在進行</td>
 
-							</tr>
+                                <%}else if(_event[i].status == 'finish'){%>
+                                    <td>活動已結束</td>
+                                <%}%>
+                                </tr>
 							<%}%>
 							</tbody>
 
@@ -91,13 +95,11 @@
 
 						</table>
 					</div>
-					<header class="align-center">
-						<p>再來舉辦一場活動吧！</p>
-					</header>
 
 					<!--button-->
 					<ul class="actions fit">
-						<li><a href="addevent.html" class="button fit">新增活動</a></li>
+						<li><a href="/admin/events/createevent_first" class="button fit">新增活動</a></li>
+
 					</ul>
 					</div>
 			</section>

@@ -174,9 +174,9 @@ exports.login_index = function(req, res){
     req.session.API_LoginCode = req.query.code;
     if(!req.session.API_LoginCode){
         console.log('wrong dude');
-        res.redirect("http://localhost:3000/");
+        res.redirect("http://attend.nccu.edu.tw/");
     }else{
-        rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
+        rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://attend.nccu.edu.tw/login_index&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
         })
         .catch(() => {
@@ -211,9 +211,9 @@ exports.login_index_new = function(req, res){
     req.session.API_LoginCode = req.query.code;
     if(!req.session.API_LoginCode){
         console.log('wrong dude');
-        res.redirect("http://localhost:3000/");
+        res.redirect("http://attend.nccu.edu.tw/");
     }else{
-        rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
+        rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://attend.nccu.edu.tw/login_index&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
         })
         .catch(async () => {

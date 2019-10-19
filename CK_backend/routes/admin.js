@@ -17,6 +17,8 @@ router.get('/admin/events/createevent_second/:userid',admin_controller.create_ev
 
 router.post('/admin/events/createevent_second/:userid',admin_controller.create_event_second_post);
 
+router.post('/admin/events/delete',admin_controller.event_delete_post);
+
 // GET request for creating a check in or check out of users.
 router.get('/admin/checks/create', admin_controller.check_create_get);
 

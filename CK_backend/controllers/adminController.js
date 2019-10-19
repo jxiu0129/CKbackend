@@ -284,6 +284,91 @@ exports.create_event_second_post = [
     }
 ];
 
+exports.event_delete_post = async (req,res,next) => {
+  async.parallel({
+      user : function(callback){
+          User.findById(req.query.userid)
+          .exec(callback);
+      },
+      event : function(callback){
+          Event.findById(req.query.eventid)
+          .exec(callback);
+      },
+      attendance: function(callback){
+          Attendance.findOne({event_id:req.query.eventid})
+          .exec(callback);
+      },    
+  },
+  async (err,results)=>{
+      console.log("query U:"+req.query.userid);
+      console.log("query E:"+req.query.eventid);
+      let theevt = results.event;
+      let theuser = results.user;
+      let theatd = results.attendance;
+      let _spendedAmount = Number(theuser.spendedAmount) - Number(theevt.expense);
+      console.log("AAAA"+_spendedAmount);
+      
+      Event.findByIdAndRemove(req.query.eventid, function deleteEvent(err,evt) {
+          if (err) { return next(err); }
+          console.log("Successfully Delete Event");
+      });
+
+      if (theatd != null){
+          let ATD = theatd.list.map(x => x.email);
+
+          for (let i =0 ;i < ATD.length ; i++){
+              await User.findOne({email:ATD[i]},'attend')
+              .exec(async(err,us)=>{
+                  
+                  let US = us.attend.map(x => x.event_id).indexOf(req.query.eventid);
+  
+                  if (US == -1){
+                      console.log("return");
+                      return;
+                  }else{
+                      us.attend.splice(US,1);
+                      await User.findByIdAndUpdate(us._id,{attend : us.attend});
+                  }
+              });            
+          }
+          console.log("Successfully Update User.attend");
+  
+          Attendance.findOneAndRemove({event_id:req.query.eventid},(err,theAtd)=>{
+              if(err){console.log(err);}
+              else{console.log("Successfully Delete Attendance");}
+          });
+      }
+
+      if (theuser.hold.holded_events.indexOf(req.query.eventid) != -1){
+          let _holdedEvents = theuser.hold.holded_events;
+          
+          _holdedEvents.splice(_holdedEvents.indexOf(req.query.eventid),1);
+          
+          if(_holdedEvents.length == 0){
+              User.findByIdAndUpdate(theuser._id, {spendedAmount:_spendedAmount,hold: { isHolder : false, holded_events : _holdedEvents}})
+              .exec(res.redirect('./'));
+              console.log("Successfully Update User.hold (false)");    
+          }else if (_holdedEvents.length > 0){
+              User.findByIdAndUpdate(theuser._id, {spendedAmount:_spendedAmount,hold: { isHolder : true, holded_events : _holdedEvents}})
+              .exec(res.redirect('./'));    
+              console.log("Successfully Update User.hold (true)");    
+          }
+      }
+      else {res.redirect('./');}
+
+      fs.unlink('./public/images/QRcode/qrcode_' +req.query.eventid+'_in.jpg',(err)=>{
+          if(err){console.log(err)}
+          else{console.log("Successfully Delete QRcode_in.jpg")}
+      });
+
+      fs.unlink('./public/images/QRcode/qrcode_' +req.query.eventid+'_out.jpg',(err)=>{
+          if(err){console.log(err)}
+          else{console.log("Successfully Delete QRcode_out.jpg")}
+      } );
+
+  });
+};
+
 exports.check_create_get= function(req,res){
     res.render('index' , { title : "新增簽到/刷退"});
 };

@@ -18,6 +18,8 @@ const EventSchema = new Schema({
    amount : Number,       //參加人數
    //活動狀態依序分為：尚未開始，正在進行，活動結束(名單送出)
    status : {type: String, required : true , enum :['willhold','holding','finish'], default: 'willhold'},
+   //活動發點數條件：只要簽到、只要刷退、簽到+刷退(一般情況)
+   signCondition : {type: String, required : true , enum :['onlyIn','onlyOut','bothSign'], default: 'bothSign'},
    ncculink : String,
    SendPoint : Number,    //此活動發送出去一個人拿的點數，為整數，即expense / amount 的商數
    

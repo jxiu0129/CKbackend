@@ -145,7 +145,7 @@ exports.sponsor_events= async(req,res,next) =>{
     .exec(async (err,_user)=>{
         if (err) { return next(err); }
         
-        Event.find({_id:_user.hold.holded_events},'_id shortid name time endtime location expense amount status')
+        Event.find({_id:_user.hold.holded_events})
         .sort([['status','descending']])
         .exec(async (err,list_event) => {
             if (err) { return next(err); }
@@ -242,6 +242,7 @@ exports.sponsor_create_post = [
             expense : req.body.expense,      //投資點數
             amount : 0,
             ncculink : req.body.event_link,
+            signCondition : req.body.signCondition,
         });
         if (event.time -  Date.now() <= 3600000){
             event.status = 'holding';
@@ -439,7 +440,32 @@ exports.events_attendancelist = function(req,res,next){
             // Successful, so render.
             console.log(theevt);
             console.log(thisattnd);
-            res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+
+            if(theevt.signCondition == 'bothSign'){
+                res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+            }else if (theevt.signCondition == 'onlyIn'){
+                let timeinArray;
+                let timeinlength;
+
+                if(thisattnd != null){
+                    timeinArray = thisattnd.list.map(x => x.time_in);
+                    timeinlength = timeinArray.filter((value)=>{
+                        return value != null;
+                    });
+                }                
+                res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+            }else if (theevt.signCondition == 'onlyOut'){
+                let timeoutArray;
+                let timeoutlength;
+
+                if(thisattnd != null){
+                    timeoutArray = thisattnd.list.map(x => x.time_out);
+                    timeoutlength = timeoutArray.filter((value)=>{
+                        return value != null;
+                    });
+                }
+                res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+            }
         });
     });
     
@@ -569,7 +595,8 @@ exports.SignIn_create_post= [
                     amount : results.event.amount,
                     _id : results.event._id,
                     status : results.event.status,
-                    ncculink : results.event.ncculink
+                    ncculink : results.event.ncculink,
+                    signCondition : results.event.signCondition
                 });
                 // results.event.AttendanceList._id = _newSignIn._id
 
@@ -818,7 +845,9 @@ exports.SignOut_create_post= [
                     amount : results.event.amount,
                     _id : results.event._id,
                     status : results.event.status,
-                    ncculink : results.event.ncculink
+                    ncculink : results.event.ncculink,
+                    signCondition : results.event.signCondition
+
                 });
                 // results.event.AttendanceList._id = _newSignOut._id
 
@@ -1064,7 +1093,8 @@ exports.SignBoth_create_post= [
                     _id : results.event._id,
                     amount : 1,
                     status : results.event.status,
-                    ncculink : results.event.ncculink
+                    ncculink : results.event.ncculink,
+                    signCondition : results.event.signCondition
 
                 });
                 // results.event.AttendanceList._id = _newSignOut._id

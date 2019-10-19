@@ -66,18 +66,34 @@
 															<span aria-hidden="true">&times;</span>
 														</button>
 													</div>
-													<div class="modal-body">
-														
-														<a href="#" onclick="check_link('check_in_code<%=i%>')"><h3>簽到條碼</h3></a>
-														<div id="check_in_code<%=i%>" style="display:none;">
-															<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_in.jpg" /></span>
+													<%if (list_event[i].signCondition == 'onlyIn'){%>
+														<div class="modal-body">														
+															<a href="#" onclick="check_link('check_in_code<%=i%>')"><h3>簽到條碼</h3></a>
+															<div id="check_in_code<%=i%>" style="display:none;">
+																<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_in.jpg" /></span>
+															</div>	
 														</div>	
-
-														<a href="#" onclick="check_link('check_out_code<%=i%>')"><h3>刷退條碼</h3></a>
-														<div id="check_out_code<%=i%>" style="display:none;">
-															<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
+													<%}else if (list_event[i].signCondition == 'onlyOut'){%>
+														<div class="modal-body">
+															<a href="#" onclick="check_link('check_out_code<%=i%>')"><h3>刷退條碼</h3></a>
+															<div id="check_out_code<%=i%>" style="display:none;">
+																<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
+															</div>
 														</div>
-													</div>
+													<%}else{%>
+														<div class="modal-body">
+														
+															<a href="#" onclick="check_link('check_in_code<%=i%>')"><h3>簽到條碼</h3></a>
+															<div id="check_in_code<%=i%>" style="display:none;">
+																<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_in.jpg" /></span>
+															</div>	
+
+															<a href="#" onclick="check_link('check_out_code<%=i%>')"><h3>刷退條碼</h3></a>
+															<div id="check_out_code<%=i%>" style="display:none;">
+																<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
+															</div>
+														</div>
+													<%}%>
 
 													<div class="modal-footer">
 														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close<%=i%></button>
@@ -87,7 +103,7 @@
 		
 										</div>
 									<%}else{%>
-										<td>QRcode <%=list_event[i].status%></td>
+										<td>QRcode</td>
 									<%}%>
 
 
@@ -240,46 +256,7 @@
 
 					<!--button-->
 					<ul class="actions fit">
-						<!-- <li><a href="#" class="button special fit">錢包查詢餘額</a></li> -->
 						<li><a href="/sponsor/events/createevent" class="button fit">新增活動</a></li>
-                        <!-- <li><a href="#" class="button alt fit" data-toggle="modal" data-target="#bar_line_chart">投資報酬率</a></li>
-
-                        <div class="modal fade" id="bar_line_chart" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h3 class="modal-title" id="return_on_investment">投資報酬率</h3>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-
-                                    <div class="modal-body" style="text-align: left">
-
-                                        <h3 class="inline">活動名稱：</h3><p class="inline">活動5</p>
-                                        <div class="6u 12u$(xsmall) inline">
-                                            <input type="text" name="name" id="event-editName" value="" placeholder="修改活動名稱" />
-                                        </div>
-                                        <br>
-                                        <h3 class="inline">活動日期：</h3><p class="inline">時間5</p>
-                                        <br>
-                                        <input type="datetime-local" id="event-editDateTime" value="2018-06-10T19:30">
-                                        <br>
-                                        <br>
-                                        <h3 class="inline">活動地點：</h3><p class="inline">地點5</p>
-                                        <div class="6u 12u$(xsmall) inline">
-                                            <input type="text" name="name" id="event-editLocation" value="" placeholder="修改活動地點" />
-                                        </div>
-                                        <br>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <input type="submit" class="btn btn-primary" value="Save"/>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
 					</ul>
 					</div>
 			</section>

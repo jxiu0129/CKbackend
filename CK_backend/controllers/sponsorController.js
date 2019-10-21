@@ -415,7 +415,9 @@ exports.sponsor_update_post= [
             name : req.body.name,
             location : req.body.location
         };
-
+        if (req.body.time - Date.now() <= 3600000){
+            event.status = 'holding';
+        }
             // Data from form is valid. Update the record.
             Event.findByIdAndUpdate(req.params.eventid, event, {}, function (err, theevent) {
                 if (err) { return next(err); }
@@ -567,14 +569,26 @@ exports.SignIn_create_post= [
             if(err){return next(err);}
 
             else if (_atnd == null){
-
-                let _newSignIn = new Attendance({
-                    event_id : req.params.eventid,
-                    list : [{
-                        email : _stdId,
-                        time_in : _timein
-                    }]
-                });
+                
+                let _newSignIn;
+                if(results.event.signCondition == 'onlyIn'){
+                    _newSignIn = new Attendance({
+                        event_id : req.params.eventid,
+                        list : [{
+                            email : _stdId,
+                            time_in : _timein,
+                            reward : true
+                        }]
+                    });    
+                }else{
+                    _newSignIn = new Attendance({
+                        event_id : req.params.eventid,
+                        list : [{
+                            email : _stdId,
+                            time_in : _timein
+                        }]
+                    });    
+                }
 
                 _SignIn = _newSignIn;
 
@@ -585,20 +599,34 @@ exports.SignIn_create_post= [
 
                 });
                 
-                
-                let thisevent = new Event({
-                    name : results.event.name,
-                    time : results.event.time,
-                    expense : results.event.expense,
-                    location : results.event.location,
-                    AttendanceList : _newSignIn,
-                    amount : results.event.amount,
-                    _id : results.event._id,
-                    status : results.event.status,
-                    ncculink : results.event.ncculink,
-                    signCondition : results.event.signCondition
-                });
-                // results.event.AttendanceList._id = _newSignIn._id
+                let thisevent;
+                if(results.event.signCondition == 'onlyIn'){
+                    thisevent = new Event({
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSignIn,
+                        amount : results.event.amount + 1,
+                        _id : results.event._id,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition
+                    });    
+                }else{
+                    thisevent = new Event({
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSignIn,
+                        amount : results.event.amount,
+                        _id : results.event._id,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition
+                    });    
+                }
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
                     if(err) { return next(err);}
@@ -621,11 +649,19 @@ exports.SignIn_create_post= [
         
             else{
                 let _atndList = results.list.list;
-                if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
-                    _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
-                        email : _stdId,
-                        time_in : _timein
-                    });
+                if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄 =>把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+                    if (results.event.signCondition == 'onlyIn'){
+                        _atndList.push({                   
+                            email : _stdId,
+                            time_in : _timein,
+                            reward :true
+                        });    
+                    }else{
+                        _atndList.push({                   
+                            email : _stdId,
+                            time_in : _timein
+                        });    
+                    }
 
                     _SignIn = {
                         event_id : req.params.eventid,
@@ -662,10 +698,18 @@ exports.SignIn_create_post= [
                         if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
                             else{
-                                _atndList.push({
-                                    email : _stdId,
-                                    time_in : _timein
-                                });
+                                if(results.event.signCondition == 'onlyIn'){
+                                    _atndList.push({
+                                        email : _stdId,
+                                        time_in : _timein,
+                                        reward: true
+                                    });    
+                                }else{
+                                    _atndList.push({
+                                        email : _stdId,
+                                        time_in : _timein
+                                    });    
+                                }
 
                                 _SignIn = {
                                     event_id : req.params.eventid,
@@ -743,7 +787,8 @@ exports.SignIn_create_post= [
                         _id : results.event._id,
                         amount : _rwd,
                         status : results.event.status,
-                        ncculink : results.event.ncculink    
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition
                     };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
@@ -818,14 +863,25 @@ exports.SignOut_create_post= [
             if(err){return next(err);}
 
             else if (_atnd == null){
-
-                let _newSignOut = new Attendance({
-                    event_id : req.params.eventid,
-                    list : [{
-                        email : _stdId,
-                        time_out : _timeout
-                    }]
-                });
+                let _newSignOut;
+                if(results.event.signCondition == 'onlyOut'){
+                    _newSignOut = new Attendance({
+                        event_id : req.params.eventid,
+                        list : [{
+                            email : _stdId,
+                            time_out : _timeout,
+                            reward : true
+                        }]
+                    });    
+                }else{
+                    _newSignOut = new Attendance({
+                        event_id : req.params.eventid,
+                        list : [{
+                            email : _stdId,
+                            time_out : _timeout
+                        }]
+                    });    
+                }
 
                 _SignOut = _newSignOut;
 
@@ -835,21 +891,34 @@ exports.SignOut_create_post= [
                     console.log("Successfully Create SignOut");
 
                 });
-                
-                let thisevent = new Event({
-                    name : results.event.name,
-                    time : results.event.time,
-                    expense : results.event.expense,
-                    location : results.event.location,
-                    AttendanceList : _newSignOut,
-                    amount : results.event.amount,
-                    _id : results.event._id,
-                    status : results.event.status,
-                    ncculink : results.event.ncculink,
-                    signCondition : results.event.signCondition
-
-                });
-                // results.event.AttendanceList._id = _newSignOut._id
+                let thisevent;
+                if(results.event.signCondition == 'onlyOut'){
+                    thisevent = new Event({
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSignOut,
+                        amount : results.event.amount + 1,
+                        _id : results.event._id,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition
+                    });    
+                }else{
+                    thisevent = new Event({
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSignOut,
+                        amount : results.event.amount,
+                        _id : results.event._id,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition
+                    });    
+                }
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
                     if(err) { return next(err);}
@@ -874,10 +943,19 @@ exports.SignOut_create_post= [
             else{
                 let _atndList = results.list.list;
                 if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
-                    _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
-                        email : _stdId,
-                        time_out : _timeout
-                    });
+                    if (results.event.signCondition == 'onlyOut'){
+                        _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+                            email : _stdId,
+                            time_out : _timeout,
+                            reward: true
+                        });    
+                    }else{
+                        _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+                            email : _stdId,
+                            time_out : _timeout
+                        });    
+                    }
+
                     _SignOut = {
                         event_id : req.params.eventid,
                         list : _atndList,
@@ -913,10 +991,18 @@ exports.SignOut_create_post= [
                         if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
                             else{
-                                _atndList.push({
-                                    email : _stdId,
-                                    time_out : _timeout
-                                });
+                                if(results.event.signCondition == 'onlyOut'){
+                                    _atndList.push({
+                                        email : _stdId,
+                                        time_out : _timeout,
+                                        reward:true
+                                    });
+                                }else{
+                                    _atndList.push({
+                                        email : _stdId,
+                                        time_out : _timeout
+                                    });
+                                }    
 
                                 _SignOut = {
                                     event_id : req.params.eventid,
@@ -992,7 +1078,8 @@ exports.SignOut_create_post= [
                         _id : results.event._id,
                         amount : _rwd,
                         status : results.event.status,
-                        ncculink : results.event.ncculink    
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition   
                     };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
@@ -1001,7 +1088,7 @@ exports.SignOut_create_post= [
                     });                
                 }
             }
-        })
+        });
     }       
 ];
 

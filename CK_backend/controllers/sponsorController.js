@@ -577,9 +577,9 @@ exports.SignIn_create_post= [
                         list : [{
                             email : _stdId,
                             time_in : _timein,
-                            reward : true
+                            reward:true
                         }]
-                    });    
+                    });
                 }else{
                     _newSignIn = new Attendance({
                         event_id : req.params.eventid,
@@ -587,7 +587,7 @@ exports.SignIn_create_post= [
                             email : _stdId,
                             time_in : _timein
                         }]
-                    });    
+                    });
                 }
 
                 _SignIn = _newSignIn;

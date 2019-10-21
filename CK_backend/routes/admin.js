@@ -7,6 +7,18 @@ const admin_controller = require('../controllers/adminController');
 // GET admin page
 router.get('/admin', admin_controller.admin);
 
+router.get('/admin/events', admin_controller.event_list);
+
+router.get('/admin/events/createevent_first',admin_controller.create_event_first_get);
+
+router.post('/admin/events/createevent_first',admin_controller.create_event_first_post);
+
+router.get('/admin/events/createevent_second/:userid',admin_controller.create_event_second_get);
+
+router.post('/admin/events/createevent_second/:userid',admin_controller.create_event_second_post);
+
+router.post('/admin/events/delete',admin_controller.event_delete_post);
+
 // GET request for creating a check in or check out of users.
 router.get('/admin/checks/create', admin_controller.check_create_get);
 

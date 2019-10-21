@@ -26,6 +26,7 @@
 								<th>活動名稱/ID<br>(將滑鼠移至活動名稱即可檢視ID)</th>
 								<th>活動日期</th>
 								<th>活動地點</th>
+								<th>投資點數</th>
 								<th>承辦單位</th>
 								<th>報名連結</th>
 							</tr>
@@ -39,7 +40,10 @@
 									<br><%= endTime[i] %> 結束</td>
 
 								<td width="150px" style= "word-break:break-all"><%=_event[i].location%></td>
-
+								<td width="150px" style= "word-break:break-all">
+									<img src="../images/piggy-bank.png" height="20" width="20"/>
+									<%=_event[i].expense%>
+								</td>
 								<%if (_event[i].holder != undefined){%>
 									<td width="150px" style= "word-break:break-all"><a href="" data-toggle="modal" data-target="#sponsorInfo<%= i %>"><%=_event[i].holder.name%></a></td>
 									<!-- Modal -->
@@ -55,7 +59,7 @@
 												<div class="modal-body">
 														<h3 class="inline">承辦單位名稱：</h3><p class="inline"><%=_event[i].holder.name%></p>
 														<br>
-														<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline">(02)23108312</p>
+														<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline"><%=_event[i].holder.phone%><%=_event[i].holder.phone%></p>
 														<br>
 														<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><a href="<%=_event[i].holder.email%>"><%=_event[i].holder.email%></a></p>
 														<br>

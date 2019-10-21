@@ -10,17 +10,17 @@
 				<div class="table-wrapper">
 					<table>
 						<tbody>
-						<tr>
+						<!-- <tr>
 							<td width="400px" style= "word-break:break-all">會員id</td>
 							<td width="600px" style= "word-break:break-all"><%=user._id%></td>
-						</tr>
+						</tr> -->
 						<tr>
-							<td>會員姓名</td>
-							<td><%=user.name%></td>
+							<td width="400px" style= "word-break:break-all">會員姓名</td>
+							<td width="600px" style= "word-break:break-all"><%=user.name%></td>
 						</tr>
 						<tr>
 							<td>會員電話</td>
-							<td>0911020200</td>
+							<td><%=user.phone%></td>
 						</tr>
 						<tr>
 							<td>會員email</td>
@@ -52,7 +52,7 @@
 
 						<!--button-->
 						<ul class="actions fit">
-							<li><a href="edit_member_info.html" class="button fit">編輯個人資料</a></li>
+							<li><a href="./edit_info" class="button fit">編輯個人資料</a></li>
 						</ul>
 
 					</div>

@@ -16,6 +16,31 @@
 	<h3 style="text-align: center">活動名稱： <%=ev.name%></h3>
 	<section id="three" class="wrapper">
 		<div class="inner flex flex-3">
+			<%if (ev.signCondition == 'onlyIn'){%>
+				<div class="content">
+				
+
+					<button onclick="check_button('check_in_code<%=ev.shortid%>')">簽到條碼</button>
+	
+					<div id="check_in_code<%=ev.shortid%>" style="display:none;">
+						<div class="image fit">
+							<img src="../images/QRcode/qrcode_<%= ev._id %>_in.jpg"/>
+						</div>
+					</div>
+				</div>		
+			<%}else if (ev.signCondition == 'onlyOut'){%>	
+				<div class="content">
+				
+					<button onclick="check_button('check_out_code<%=ev.shortid%>')">刷退條碼</button>
+	
+					<div id="check_out_code<%=ev.shortid%>" style="display:none;">
+						<div class="image fit">
+								<img src="../images/QRcode/qrcode_<%= ev._id %>_out.jpg" />
+						</div>
+					</div>
+				</div>
+			<%}else {%>
+
 			<div class="content">
 				
 
@@ -37,6 +62,7 @@
 					</div>
 				</div>
 			</div>
+			<%}%>
 		</div>
 	</section>
 	<hr>

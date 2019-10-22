@@ -3,8 +3,8 @@
 			<section id="main" class="wrapper">
 				<div class="inner">
 					<header class="align-center">
-						<h1> <u><%=event.name%></u> 的活動出席表 </h1>
-						<h4> 發點數條件：簽到與刷退</h4>
+                        <h1> <u><%=event.name%></u> 的活動出席表 </h1>
+                        <h4> 發點數條件：只要簽到</h4>
 					</header>
 
 					<!-- <hr> -->
@@ -24,27 +24,22 @@
 							<thead>
 							<tr>
 								<th>參與者email</th>
-								<th>報到時間</th>
-								<th>刷退時間</th>
+								<th>簽到時間</th>
 							</tr>
 							</thead>
 							<tbody>
-                            <%if(thisattnd == null){ %>
-								<h1>此活動尚未有任何簽到/刷退紀錄</h1>
+                            <%if(timeinlength == undefined){ %>           <!--完全沒有任何出席紀錄，attendance還沒建立-->
+                                <h1>此活動尚未有任何簽到紀錄</h1>
+                            <% }else if (timeinlength.length == 0 ){ %>    <!--有簽到記錄，但沒有刷退紀錄-->
+                                <h1>此活動尚未有任何簽到紀錄</h1>
 							<% }else{ %>
 								<% for(let i = 0;i < thisattnd.list.length; i++){ %>
 								<tr>
-									<td width="200px" style= "word-break:break-all"><%= thisattnd.list[i].email  %></td>
-									<% if(thisattnd.list[i].time_in == undefined) {%>
-										<td width="200px" style= "word-break:break-all"><%= thisattnd.list[i].time_in  %></td>
-									<% } else { %>
+									<% if(thisattnd.list[i].time_in == undefined) {%>  <!--若沒有刷退紀錄就直接跳過-->
+                                        <% continue %>
+                                    <% } else { %>
+                                        <td width="200px" style= "word-break:break-all"><%= thisattnd.list[i].email  %></td>
 										<td width="200px" style= "word-break:break-all"><%= thisattnd.list[i].time_in.toLocaleString()  %></td>
-									<% } %>
-
-									<% if(thisattnd.list[i].time_out == undefined) {%>
-										<td width="200px" style= "word-break:break-all"><%= thisattnd.list[i].time_out  %></td>
-									<% } else { %>
-										<td width="200px" style= "word-break:break-all"><%= thisattnd.list[i].time_out.toLocaleString()  %></td>
 									<% } %>
 								</tr>
 								<% } %>

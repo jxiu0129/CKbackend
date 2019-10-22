@@ -145,12 +145,12 @@ exports.sponsor_events= async(req,res,next) =>{
     .exec(async (err,_user)=>{
         if (err) { return next(err); }
         
-        Event.find({_id:_user.hold.holded_events},'_id shortid name time endtime location expense amount status')
+        Event.find({_id:_user.hold.holded_events})
         .sort([['status','descending']])
         .exec(async (err,list_event) => {
             if (err) { return next(err); }
             if (list_event.length == 0){
-                res.render('sponsor/myevents_noevent', { username: req.session.user_info.user_info.name});
+                res.render('sponsor/myevents_noevent', { username: req.session.user_info.user_info.name, url:req.session.API_LoginCode});
             }else{
                 let timeArray = [];
                 let endtimeArray = [];
@@ -163,7 +163,8 @@ exports.sponsor_events= async(req,res,next) =>{
                     title: 'My Events | NCCU Attendance',
                     list_event:  list_event,
                     Time : timeArray,
-                    endTime : endtimeArray
+                    endTime : endtimeArray, 
+                    url:req.session.API_LoginCode
                 });
             }
 
@@ -178,6 +179,7 @@ exports.sponsor_create_get= function(req, res,){
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{
         res.render('sponsor/addevents' , { username: req.session.user_info.user_info.name , 
+            url:req.session.API_LoginCode,
             title : "Add Events | NCCU Attendance",
             balance : req.session.user_info.user_info.sponsor_point,
             realBalance : req.session.user_info.user_info.sponsor_point - _user.spendedAmount,
@@ -242,6 +244,7 @@ exports.sponsor_create_post = [
             expense : req.body.expense,      //投資點數
             amount : 0,
             ncculink : req.body.event_link,
+            signCondition : req.body.signCondition,
         });
         if (event.time -  Date.now() <= 3600000){
             event.status = 'holding';
@@ -249,7 +252,7 @@ exports.sponsor_create_post = [
 
         if (!errors.isEmpty()) {
             // There are errors. Render the form again with sanitized values/error messages.
-            res.render('sponsor/addevents', { username: req.session.user_info.user_info.name,title: 'Add Events | NCCU Attendance', balance : 'defined your mother' , errors: errors.array()});
+            res.render('sponsor/addevents', { username: req.session.user_info.user_info.name,title: 'Add Events | NCCU Attendance', balance : 'defined your mother' , errors: errors.array(), url:req.session.API_LoginCode});
             // Test
             console.log("Error : "+errors);
         return;
@@ -414,7 +417,9 @@ exports.sponsor_update_post= [
             name : req.body.name,
             location : req.body.location
         };
-
+        if (req.body.time - Date.now() <= 3600000){
+            event.status = 'holding';
+        }
             // Data from form is valid. Update the record.
             Event.findByIdAndUpdate(req.params.eventid, event, {}, function (err, theevent) {
                 if (err) { return next(err); }
@@ -439,7 +444,32 @@ exports.events_attendancelist = function(req,res,next){
             // Successful, so render.
             console.log(theevt);
             console.log(thisattnd);
-            res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+
+            if(theevt.signCondition == 'bothSign'){
+                res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+            }else if (theevt.signCondition == 'onlyIn'){
+                let timeinArray;
+                let timeinlength;
+
+                if(thisattnd != null){
+                    timeinArray = thisattnd.list.map(x => x.time_in);
+                    timeinlength = timeinArray.filter((value)=>{
+                        return value != null;
+                    });
+                }                
+                res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+            }else if (theevt.signCondition == 'onlyOut'){
+                let timeoutArray;
+                let timeoutlength;
+
+                if(thisattnd != null){
+                    timeoutArray = thisattnd.list.map(x => x.time_out);
+                    timeoutlength = timeoutArray.filter((value)=>{
+                        return value != null;
+                    });
+                }
+                res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+            }
         });
     });
     
@@ -457,14 +487,14 @@ exports.events_attendancelist_record = function(req,res,next){
             // Successful, so render.
             console.log(theevt);
             console.log(thisattnd);
-            res.render('sponsor/attendancelist_record', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+            res.render('sponsor/attendancelist_record', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
         });
     });
     
 };
 
 exports.SignIn_create_get= function(req,res){
-    res.render('sponsor/add_checkin_record' , { username: req.session.user_info.user_info.name,title : "Create Sign In | NCCU Attendance"});
+    res.render('sponsor/add_checkin_record' , { username: req.session.user_info.user_info.name,title : "Create Sign In | NCCU Attendance", url:req.session.API_LoginCode});
 };
 
 exports.SignIn_create_post= [
@@ -541,14 +571,26 @@ exports.SignIn_create_post= [
             if(err){return next(err);}
 
             else if (_atnd == null){
-
-                let _newSignIn = new Attendance({
-                    event_id : req.params.eventid,
-                    list : [{
-                        email : _stdId,
-                        time_in : _timein
-                    }]
-                });
+                
+                let _newSignIn;
+                if(results.event.signCondition == 'onlyIn'){
+                    _newSignIn = new Attendance({
+                        event_id : req.params.eventid,
+                        list : [{
+                            email : _stdId,
+                            time_in : _timein,
+                            reward:true
+                        }]
+                    });
+                }else{
+                    _newSignIn = new Attendance({
+                        event_id : req.params.eventid,
+                        list : [{
+                            email : _stdId,
+                            time_in : _timein
+                        }]
+                    });
+                }
 
                 _SignIn = _newSignIn;
 
@@ -559,19 +601,34 @@ exports.SignIn_create_post= [
 
                 });
                 
-                
-                let thisevent = new Event({
-                    name : results.event.name,
-                    time : results.event.time,
-                    expense : results.event.expense,
-                    location : results.event.location,
-                    AttendanceList : _newSignIn,
-                    amount : results.event.amount,
-                    _id : results.event._id,
-                    status : results.event.status,
-                    ncculink : results.event.ncculink
-                });
-                // results.event.AttendanceList._id = _newSignIn._id
+                let thisevent;
+                if(results.event.signCondition == 'onlyIn'){
+                    thisevent = new Event({
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSignIn,
+                        amount : results.event.amount + 1,
+                        _id : results.event._id,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition
+                    });    
+                }else{
+                    thisevent = new Event({
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSignIn,
+                        amount : results.event.amount,
+                        _id : results.event._id,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition
+                    });    
+                }
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
                     if(err) { return next(err);}
@@ -594,11 +651,19 @@ exports.SignIn_create_post= [
         
             else{
                 let _atndList = results.list.list;
-                if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
-                    _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
-                        email : _stdId,
-                        time_in : _timein
-                    });
+                if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄 =>把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+                    if (results.event.signCondition == 'onlyIn'){
+                        _atndList.push({                   
+                            email : _stdId,
+                            time_in : _timein,
+                            reward :true
+                        });    
+                    }else{
+                        _atndList.push({                   
+                            email : _stdId,
+                            time_in : _timein
+                        });    
+                    }
 
                     _SignIn = {
                         event_id : req.params.eventid,
@@ -635,10 +700,18 @@ exports.SignIn_create_post= [
                         if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
                             else{
-                                _atndList.push({
-                                    email : _stdId,
-                                    time_in : _timein
-                                });
+                                if(results.event.signCondition == 'onlyIn'){
+                                    _atndList.push({
+                                        email : _stdId,
+                                        time_in : _timein,
+                                        reward: true
+                                    });    
+                                }else{
+                                    _atndList.push({
+                                        email : _stdId,
+                                        time_in : _timein
+                                    });    
+                                }
 
                                 _SignIn = {
                                     event_id : req.params.eventid,
@@ -716,7 +789,8 @@ exports.SignIn_create_post= [
                         _id : results.event._id,
                         amount : _rwd,
                         status : results.event.status,
-                        ncculink : results.event.ncculink    
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition
                     };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
@@ -731,7 +805,7 @@ exports.SignIn_create_post= [
 ];
 
 exports.SignOut_create_get= function(req,res){
-    res.render('sponsor/add_checkout_record' , { username: req.session.user_info.user_info.name,title : "Create Sign Out | NCCU Attendance"});
+    res.render('sponsor/add_checkout_record' , { username: req.session.user_info.user_info.name,title : "Create Sign Out | NCCU Attendance", url:req.session.API_LoginCode});
 };
 
 exports.SignOut_create_post= [
@@ -791,14 +865,25 @@ exports.SignOut_create_post= [
             if(err){return next(err);}
 
             else if (_atnd == null){
-
-                let _newSignOut = new Attendance({
-                    event_id : req.params.eventid,
-                    list : [{
-                        email : _stdId,
-                        time_out : _timeout
-                    }]
-                });
+                let _newSignOut;
+                if(results.event.signCondition == 'onlyOut'){
+                    _newSignOut = new Attendance({
+                        event_id : req.params.eventid,
+                        list : [{
+                            email : _stdId,
+                            time_out : _timeout,
+                            reward : true
+                        }]
+                    });    
+                }else{
+                    _newSignOut = new Attendance({
+                        event_id : req.params.eventid,
+                        list : [{
+                            email : _stdId,
+                            time_out : _timeout
+                        }]
+                    });    
+                }
 
                 _SignOut = _newSignOut;
 
@@ -808,19 +893,34 @@ exports.SignOut_create_post= [
                     console.log("Successfully Create SignOut");
 
                 });
-                
-                let thisevent = new Event({
-                    name : results.event.name,
-                    time : results.event.time,
-                    expense : results.event.expense,
-                    location : results.event.location,
-                    AttendanceList : _newSignOut,
-                    amount : results.event.amount,
-                    _id : results.event._id,
-                    status : results.event.status,
-                    ncculink : results.event.ncculink
-                });
-                // results.event.AttendanceList._id = _newSignOut._id
+                let thisevent;
+                if(results.event.signCondition == 'onlyOut'){
+                    thisevent = new Event({
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSignOut,
+                        amount : results.event.amount + 1,
+                        _id : results.event._id,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition
+                    });    
+                }else{
+                    thisevent = new Event({
+                        name : results.event.name,
+                        time : results.event.time,
+                        expense : results.event.expense,
+                        location : results.event.location,
+                        AttendanceList : _newSignOut,
+                        amount : results.event.amount,
+                        _id : results.event._id,
+                        status : results.event.status,
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition
+                    });    
+                }
 
                 Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
                     if(err) { return next(err);}
@@ -845,10 +945,19 @@ exports.SignOut_create_post= [
             else{
                 let _atndList = results.list.list;
                 if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
-                    _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
-                        email : _stdId,
-                        time_out : _timeout
-                    });
+                    if (results.event.signCondition == 'onlyOut'){
+                        _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+                            email : _stdId,
+                            time_out : _timeout,
+                            reward: true
+                        });    
+                    }else{
+                        _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+                            email : _stdId,
+                            time_out : _timeout
+                        });    
+                    }
+
                     _SignOut = {
                         event_id : req.params.eventid,
                         list : _atndList,
@@ -884,10 +993,18 @@ exports.SignOut_create_post= [
                         if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
                             else{
-                                _atndList.push({
-                                    email : _stdId,
-                                    time_out : _timeout
-                                });
+                                if(results.event.signCondition == 'onlyOut'){
+                                    _atndList.push({
+                                        email : _stdId,
+                                        time_out : _timeout,
+                                        reward:true
+                                    });
+                                }else{
+                                    _atndList.push({
+                                        email : _stdId,
+                                        time_out : _timeout
+                                    });
+                                }    
 
                                 _SignOut = {
                                     event_id : req.params.eventid,
@@ -963,7 +1080,8 @@ exports.SignOut_create_post= [
                         _id : results.event._id,
                         amount : _rwd,
                         status : results.event.status,
-                        ncculink : results.event.ncculink    
+                        ncculink : results.event.ncculink,
+                        signCondition : results.event.signCondition   
                     };
                     
                     Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
@@ -972,12 +1090,12 @@ exports.SignOut_create_post= [
                     });                
                 }
             }
-        })
+        });
     }       
 ];
 
 exports.SignBoth_create_get= function(req,res){
-    res.render('sponsor/add_checkinandout_record' , { username: req.session.user_info.user_info.name,title : "Create Sign In / Sign Out | NCCU Attendance"});
+    res.render('sponsor/add_checkinandout_record' , { username: req.session.user_info.user_info.name,title : "Create Sign In / Sign Out | NCCU Attendance", url:req.session.API_LoginCode});
 };
 
 exports.SignBoth_create_post= [
@@ -1064,7 +1182,8 @@ exports.SignBoth_create_post= [
                     _id : results.event._id,
                     amount : 1,
                     status : results.event.status,
-                    ncculink : results.event.ncculink
+                    ncculink : results.event.ncculink,
+                    signCondition : results.event.signCondition
 
                 });
                 // results.event.AttendanceList._id = _newSignOut._id

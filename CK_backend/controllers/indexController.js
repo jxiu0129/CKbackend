@@ -160,6 +160,7 @@ exports.getUserInfoOutSide = (req, access_token_input) => {
         req.session.user_info = API_User;
         req.session.API_Access = API_Access;
         req.session.API_RefreshClock = Date.now();
+
         req.session.save();
     }).catch((err) => {
         console.log('Fail to get userinfo because of :');
@@ -193,6 +194,7 @@ exports.login_index = async function(req, res){
                 req.session.user_info = API_User;
                 req.session.API_Access = API_Access;
                 req.session.API_RefreshClock = Date.now();
+                req.session.API_LoginCode = API_LoginCode;
                 req.session.save();
     
                 console.log(req.session.user_info);
@@ -200,7 +202,8 @@ exports.login_index = async function(req, res){
             .catch(() =>{
                 console.log('fail');
             });
-            res.render('root/login_index', { username : API_User.user_info.name});
+            console.log(req.session.API_LoginCode);
+            res.render('root/login_index', { username : API_User.user_info.name, url:req.session.API_LoginCode});
         });
     }
 };
@@ -248,7 +251,7 @@ exports.profile_user = async function(req, res){
     req.session.reload();
     User.findOne({email:req.session.user_info.user_info.email})
     .exec((err,theuser)=>{
-        res.render('root/profile',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser});
+        res.render('root/profile',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser, url:req.session.API_LoginCode });
     });
 };
 
@@ -256,7 +259,7 @@ exports.edit_info_get = (req,res,next)=>{
     req.session.reload();
     User.findOne({email:req.session.user_info.user_info.email})
     .exec((err,theuser)=>{
-        res.render('root/edit_member_info',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser});
+        res.render('root/edit_member_info',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser, url:req.session.API_LoginCode});
     });
 };
 
@@ -275,7 +278,7 @@ exports.edit_info_first_get = (req,res,next)=>{
     req.session.reload();
     User.findOne({email:req.session.user_info.user_info.email})
     .exec((err,theuser)=>{
-        res.render('root/edit_member_info(first)',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser});
+        res.render('root/edit_member_info(first)',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser, url:req.session.API_LoginCode});
     });
 };
 
@@ -392,7 +395,8 @@ exports.event_list = (req,res)=>{
             title: 'Event List | NCCU Attendance', 
             _event:  _event,
             Time :timeArray,
-            endTime : endtimeArray
+            endTime : endtimeArray,
+            url:req.session.API_LoginCode
         });
     });
 };

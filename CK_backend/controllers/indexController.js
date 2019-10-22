@@ -401,6 +401,31 @@ exports.event_list = (req,res)=>{
     });
 };
 
+// 登入前活動列表
+exports.event_list_bli = (req, res) => {
+    req.session.reload();
+    Event.find({ $or : [{status : 'willhold'},{status : 'holding'}] })
+    .populate('holder')
+    .sort([['time','descending']])
+    .exec((err,_event)=>{
+
+        let timeArray = [];
+        let endtimeArray = [];
+        for(let i =0 ; i< _event.length;i++){
+            timeArray.push(moment(_event[i].time).format('LLL'));
+            endtimeArray.push(moment(_event[i].endtime).format('LLL'));
+        }
+        console.log( req.session.user_info.user_info.username);
+
+        res.render('root/eventlistBLI', {
+            title: 'Event List | NCCU Attendance', 
+            _event:  _event,
+            Time :timeArray,
+            endTime : endtimeArray,
+        });
+    });
+};
+
 exports.grant_new_token = (req, res) => {
     req.session.reload();
     rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)

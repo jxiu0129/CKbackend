@@ -18,7 +18,7 @@ const User = require("../models/user");
 router.get('/testSignIn/:eventid',async (req,res,next)=>{
     req.session.reload();
     if(req.session.user_info == undefined){
-        res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'Please Log in',msg:'請先登入'});
+        res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'Please Log in',msg:'請先登入',url:req.session.API_LoginCode});
     }else{
         
         async.parallel({
@@ -57,7 +57,7 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
 
             if(err){return next(err);}
             else if (String(results.event.holder) == String(_user._id)) {
-                res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'',msg:'贊助商不可參加自己舉辦的活動'});
+                res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'',msg:'贊助商不可參加自己舉辦的活動', url:req.session.API_LoginCode});
             }
             else if (_atnd == null){
                 let _newSignIn;
@@ -344,7 +344,7 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
 
             if(err){return next(err);}
             else if (String(results.event.holder) == String(_user._id)) {
-                res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'',msg:'贊助商不可參加自己舉辦的活動'});
+                res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'',msg:'贊助商不可參加自己舉辦的活動', url:req.session.API_LoginCode});
             }
             else if (_atnd == null){
                 let _newSignOut;
@@ -610,6 +610,7 @@ router.get('/qrcodelist', (req,res,next)=>{
         if (thisuser.hold.isHolder == false){
             res.render('qrcode/alertmessage',{title:'No Event',msg:thisuser.name+' ,您還沒有舉辦過任何活動哦！',
             username : req.session.user_info.user_info.name,
+            url:req.session.API_LoginCode
         });
         }else{
             
@@ -620,10 +621,12 @@ router.get('/qrcodelist', (req,res,next)=>{
                 if( EV[0] == null ){
                     res.render('qrcode/alertmessage',{title:'Not Yet',msg:'目前沒有即將進行的活動哦！\n (活動前一小時才會產生QRcode)',
                     username : req.session.user_info.user_info.name,
+                    url:req.session.API_LoginCode
                 });
                 }else{
                     res.render('qrcode/qrcodelist',{EV : EV,
                         username : req.session.user_info.user_info.name,
+                        url:req.session.API_LoginCode
                     });
                 }
             });

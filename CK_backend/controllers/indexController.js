@@ -131,7 +131,7 @@ exports.logout_but = (req, res) => {
 }
 
 let getUserInfo = (req, access_token_input) => {
-    rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+    rp.get('https://points.nccu.edu.tw/openapi/user_info', {
         'auth': {
             'bearer': access_token_input
         }
@@ -150,7 +150,7 @@ let getUserInfo = (req, access_token_input) => {
 };
 
 exports.getUserInfoOutSide = (req, access_token_input) => {
-    rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+    rp.get('https://points.nccu.edu.tw/openapi/user_info', {
         'auth': {
             'bearer': access_token_input
         }
@@ -176,13 +176,13 @@ exports.login_index = async function(req, res){
         console.log('wrong dude');
         res.redirect("./");
     }else{
-        rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://attend.nccu.edu.tw/login_index&code=' + API_LoginCode, function(req,res, body){
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://attend.nccu.edu.tw/login_index&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
         })
         .catch(async () => {
             console.log('wrong');
             console.log(API_Access);
-            await rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+            await rp.get('https://points.nccu.edu.tw/openapi/user_info', {
                 'auth': {
                     'bearer': API_Access.access_token
                 }
@@ -213,7 +213,7 @@ exports.login_index_new = function(req, res){
         console.log('wrong dude');
         res.redirect("http://attend.nccu.edu.tw/");
     }else{
-        rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://attend.nccu.edu.tw/login_index&code=' + API_LoginCode, function(req,res, body){
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://attend.nccu.edu.tw/login_index&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
         })
         .catch(async () => {
@@ -293,7 +293,7 @@ exports.edit_info_first_post = [
 
 let multipoint = {
     method: 'POST',
-    uri: 'http://wm.nccu.edu.tw:3001/openapi/send_point',
+    uri: 'https://points.nccu.edu.tw/openapi/send_point',
     auth: {
         'bearer' : ''
     },
@@ -399,7 +399,7 @@ exports.event_list = (req,res)=>{
 
 exports.grant_new_token = (req, res) => {
     req.session.reload();
-    rp.post("http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
+    rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
     .then((data)=>{
         console.log(data);
     })
@@ -410,7 +410,7 @@ exports.grant_new_token = (req, res) => {
 
 exports.grant_new_token = (req, res) => {
     req.session.reload();
-    rp.post("http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
+    rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
     .then((data)=>{
         console.log(data);
     })

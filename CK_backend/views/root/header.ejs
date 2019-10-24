@@ -25,7 +25,11 @@
 				<script type="text/javascript">
 				    //alert('location.code' + location.search);
 				</script>
-				<a href="http://localhost:3000/login_index/" class="logo">NCCU Attendance</a>
+				<%let urlL = 'http://localhost:3000/login_index/?code=' %>
+				<%let urlR = '&state=123' %>
+				<%var url; url=='undefined'?'undefined':url%>
+				<a href=<%=urlL +url+ urlR%> class="logo">NCCU Attendance</a>
+				
 				<nav class="right">
 					<a href="./" class="button alt">Log out</a>
 				</nav>
@@ -43,7 +47,4 @@
 					<li><a href="http://localhost:3000/qrcodelist">QRCode</a></li>
 					<li><a href="http://localhost:3000/">前往錢包首頁</a></li>
 				</ul>
-				<!--<ul class="actions vertical">
-					<li><a href="#" class="button fit">Login</a></li>
-				</ul>-->
 			</nav>

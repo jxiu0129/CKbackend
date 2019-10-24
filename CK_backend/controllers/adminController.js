@@ -145,7 +145,8 @@ exports.event_list = function(req,res){
         res.render('admin/eventlist', {
             _event:  _event,
             Time :timeArray,
-            endTime : endtimeArray
+            endTime : endtimeArray,
+            url:req.session.API_LoginCode
         });
     });
 };

@@ -150,7 +150,7 @@ exports.sponsor_events= async(req,res,next) =>{
         .exec(async (err,list_event) => {
             if (err) { return next(err); }
             if (list_event.length == 0){
-                res.render('sponsor/myevents_noevent', { username: req.session.user_info.user_info.name});
+                res.render('sponsor/myevents_noevent', { username: req.session.user_info.user_info.name, url:req.session.API_LoginCode});
             }else{
                 let timeArray = [];
                 let endtimeArray = [];
@@ -163,7 +163,8 @@ exports.sponsor_events= async(req,res,next) =>{
                     title: 'My Events | NCCU Attendance',
                     list_event:  list_event,
                     Time : timeArray,
-                    endTime : endtimeArray
+                    endTime : endtimeArray, 
+                    url:req.session.API_LoginCode
                 });
             }
 
@@ -178,6 +179,7 @@ exports.sponsor_create_get= function(req, res,){
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{
         res.render('sponsor/addevents' , { username: req.session.user_info.user_info.name , 
+            url:req.session.API_LoginCode,
             title : "Add Events | NCCU Attendance",
             balance : req.session.user_info.user_info.sponsor_point,
             realBalance : req.session.user_info.user_info.sponsor_point - _user.spendedAmount,
@@ -250,7 +252,7 @@ exports.sponsor_create_post = [
 
         if (!errors.isEmpty()) {
             // There are errors. Render the form again with sanitized values/error messages.
-            res.render('sponsor/addevents', { username: req.session.user_info.user_info.name,title: 'Add Events | NCCU Attendance', balance : 'defined your mother' , errors: errors.array()});
+            res.render('sponsor/addevents', { username: req.session.user_info.user_info.name,title: 'Add Events | NCCU Attendance', balance : 'defined your mother' , errors: errors.array(), url:req.session.API_LoginCode});
             // Test
             console.log("Error : "+errors);
         return;
@@ -444,7 +446,7 @@ exports.events_attendancelist = function(req,res,next){
             console.log(thisattnd);
 
             if(theevt.signCondition == 'bothSign'){
-                res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+                res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
             }else if (theevt.signCondition == 'onlyIn'){
                 let timeinArray;
                 let timeinlength;
@@ -455,7 +457,7 @@ exports.events_attendancelist = function(req,res,next){
                         return value != null;
                     });
                 }                
-                res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+                res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
             }else if (theevt.signCondition == 'onlyOut'){
                 let timeoutArray;
                 let timeoutlength;
@@ -466,7 +468,7 @@ exports.events_attendancelist = function(req,res,next){
                         return value != null;
                     });
                 }
-                res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+                res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
             }
         });
     });
@@ -485,14 +487,14 @@ exports.events_attendancelist_record = function(req,res,next){
             // Successful, so render.
             console.log(theevt);
             console.log(thisattnd);
-            res.render('sponsor/attendancelist_record', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt } );
+            res.render('sponsor/attendancelist_record', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
         });
     });
     
 };
 
 exports.SignIn_create_get= function(req,res){
-    res.render('sponsor/add_checkin_record' , { username: req.session.user_info.user_info.name,title : "Create Sign In | NCCU Attendance"});
+    res.render('sponsor/add_checkin_record' , { username: req.session.user_info.user_info.name,title : "Create Sign In | NCCU Attendance", url:req.session.API_LoginCode});
 };
 
 exports.SignIn_create_post= [
@@ -803,7 +805,7 @@ exports.SignIn_create_post= [
 ];
 
 exports.SignOut_create_get= function(req,res){
-    res.render('sponsor/add_checkout_record' , { username: req.session.user_info.user_info.name,title : "Create Sign Out | NCCU Attendance"});
+    res.render('sponsor/add_checkout_record' , { username: req.session.user_info.user_info.name,title : "Create Sign Out | NCCU Attendance", url:req.session.API_LoginCode});
 };
 
 exports.SignOut_create_post= [
@@ -1093,7 +1095,7 @@ exports.SignOut_create_post= [
 ];
 
 exports.SignBoth_create_get= function(req,res){
-    res.render('sponsor/add_checkinandout_record' , { username: req.session.user_info.user_info.name,title : "Create Sign In / Sign Out | NCCU Attendance"});
+    res.render('sponsor/add_checkinandout_record' , { username: req.session.user_info.user_info.name,title : "Create Sign In / Sign Out | NCCU Attendance", url:req.session.API_LoginCode});
 };
 
 exports.SignBoth_create_post= [

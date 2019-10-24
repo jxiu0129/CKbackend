@@ -61,6 +61,7 @@ router.get('/login_index',index_controller.login_index);
 
 // GET event list
 router.get('/eventslist',index_controller.event_list);
+router.get('/eventslistBLI', index_controller.event_list_bli);
 
 router.get('/user_profile', index_controller.profile_user);
 

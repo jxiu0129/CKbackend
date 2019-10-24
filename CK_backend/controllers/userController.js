@@ -30,7 +30,7 @@ exports.user_record = (req, res, next) => {
         }
 
 
-        res.render('user/myrecords', {event_info: data.attend, username: req.session.user_info.user_info.name});
+        res.render('user/myrecords', {event_info: data.attend, username: req.session.user_info.user_info.name, url:req.session.API_LoginCode});
         // res.send('fuck');
         // res.send(req.session);
     });

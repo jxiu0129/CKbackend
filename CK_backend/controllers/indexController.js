@@ -131,7 +131,7 @@ exports.logout_but = (req, res) => {
 }
 
 let getUserInfo = (req, access_token_input) => {
-    rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+    rp.get('https://points.nccu.edu.tw/openapi/user_info', {
         'auth': {
             'bearer': access_token_input
         }
@@ -150,7 +150,7 @@ let getUserInfo = (req, access_token_input) => {
 };
 
 exports.getUserInfoOutSide = (req, access_token_input) => {
-    rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+    rp.get('https://wm.nccu.edu.tw/openapi/user_info', {
         'auth': {
             'bearer': access_token_input
         }
@@ -160,6 +160,7 @@ exports.getUserInfoOutSide = (req, access_token_input) => {
         req.session.user_info = API_User;
         req.session.API_Access = API_Access;
         req.session.API_RefreshClock = Date.now();
+
         req.session.save();
     }).catch((err) => {
         console.log('Fail to get userinfo because of :');
@@ -176,13 +177,13 @@ exports.login_index = async function(req, res){
         console.log('wrong dude');
         res.redirect("./");
     }else{
-        rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
         })
         .catch(async () => {
             console.log('wrong');
             console.log(API_Access);
-            await rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+            await rp.get('https://points.nccu.edu.tw/openapi/user_info', {
                 'auth': {
                     'bearer': API_Access.access_token
                 }
@@ -193,6 +194,7 @@ exports.login_index = async function(req, res){
                 req.session.user_info = API_User;
                 req.session.API_Access = API_Access;
                 req.session.API_RefreshClock = Date.now();
+                req.session.API_LoginCode = API_LoginCode;
                 req.session.save();
     
                 console.log(req.session.user_info);
@@ -200,7 +202,8 @@ exports.login_index = async function(req, res){
             .catch(() =>{
                 console.log('fail');
             });
-            res.render('root/login_index', { username : API_User.user_info.name});
+            console.log(req.session.API_LoginCode);
+            res.render('root/login_index', { username : API_User.user_info.name, url:req.session.API_LoginCode});
         });
     }
 };
@@ -213,7 +216,7 @@ exports.login_index_new = function(req, res){
         console.log('wrong dude');
         res.redirect("http://localhost:3000/");
     }else{
-        rp.get('http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
         })
         .catch(async () => {
@@ -248,7 +251,7 @@ exports.profile_user = async function(req, res){
     req.session.reload();
     User.findOne({email:req.session.user_info.user_info.email})
     .exec((err,theuser)=>{
-        res.render('root/profile',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser});
+        res.render('root/profile',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser, url:req.session.API_LoginCode });
     });
 };
 
@@ -256,7 +259,7 @@ exports.edit_info_get = (req,res,next)=>{
     req.session.reload();
     User.findOne({email:req.session.user_info.user_info.email})
     .exec((err,theuser)=>{
-        res.render('root/edit_member_info',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser});
+        res.render('root/edit_member_info',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser, url:req.session.API_LoginCode});
     });
 };
 
@@ -275,7 +278,7 @@ exports.edit_info_first_get = (req,res,next)=>{
     req.session.reload();
     User.findOne({email:req.session.user_info.user_info.email})
     .exec((err,theuser)=>{
-        res.render('root/edit_member_info(first)',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser});
+        res.render('root/edit_member_info(first)',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser, url:req.session.API_LoginCode});
     });
 };
 
@@ -293,7 +296,7 @@ exports.edit_info_first_post = [
 
 let multipoint = {
     method: 'POST',
-    uri: 'http://wm.nccu.edu.tw:3001/openapi/send_point',
+    uri: 'https://points.nccu.edu.tw/openapi/send_point',
     auth: {
         'bearer' : ''
     },
@@ -392,14 +395,40 @@ exports.event_list = (req,res)=>{
             title: 'Event List | NCCU Attendance', 
             _event:  _event,
             Time :timeArray,
-            endTime : endtimeArray
+            endTime : endtimeArray,
+            url:req.session.API_LoginCode
+        });
+    });
+};
+
+// 登入前活動列表
+exports.event_list_bli = (req, res) => {
+    req.session.reload();
+    Event.find({ $or : [{status : 'willhold'},{status : 'holding'}] })
+    .populate('holder')
+    .sort([['time','descending']])
+    .exec((err,_event)=>{
+
+        let timeArray = [];
+        let endtimeArray = [];
+        for(let i =0 ; i< _event.length;i++){
+            timeArray.push(moment(_event[i].time).format('LLL'));
+            endtimeArray.push(moment(_event[i].endtime).format('LLL'));
+        }
+        console.log( req.session.user_info.user_info.username);
+
+        res.render('root/eventlistBLI', {
+            title: 'Event List | NCCU Attendance', 
+            _event:  _event,
+            Time :timeArray,
+            endTime : endtimeArray,
         });
     });
 };
 
 exports.grant_new_token = (req, res) => {
     req.session.reload();
-    rp.post("http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
+    rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
     .then((data)=>{
         console.log(data);
     })
@@ -410,7 +439,7 @@ exports.grant_new_token = (req, res) => {
 
 exports.grant_new_token = (req, res) => {
     req.session.reload();
-    rp.post("http://wm.nccu.edu.tw:3001/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
+    rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
     .then((data)=>{
         console.log(data);
     })

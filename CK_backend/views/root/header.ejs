@@ -22,16 +22,9 @@
 				<nav class="left">
 					<a href="#menu"><span>Menu</span></a>
 				</nav>
-				<script type="text/javascript">
-				    //alert('location.code' + location.search);
-				</script>
-				<%let urlL = 'http://localhost:3000/login_index/?code=' %>
-				<%let urlR = '&state=123' %>
-				<%var url; url=='undefined'?'undefined':url%>
-				<a href=<%=urlL +url+ urlR%> class="logo"><img src="images/logo.png" height="36.65" width="26.6"/>      NCCU Attendance</a>
-				
+				<a href='http://localhost:3000' class="logo"><img src="images/logo.png" height="36.65" width="26.6"/>      NCCU Attendance</a>
 				<nav class="right">
-					<a href="./" class="button alt">Log out</a>
+					<p class="button alt" onclick="logOut()">Log out</p>
 				</nav>
 			</header>
 

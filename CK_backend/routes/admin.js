@@ -19,31 +19,32 @@ router.post('/admin/events/createevent_second/:userid',admin_controller.create_e
 
 router.post('/admin/events/delete',admin_controller.event_delete_post);
 
-// GET request for creating a check in or check out of users.
-router.get('/admin/checks/create', admin_controller.check_create_get);
+router.post('/admin/events/update',admin_controller.event_update_post);
+
+router.get('/admin/events/:eventid/attendancelist', admin_controller.event_attendancelist);
+
+router.get('/admin/events/:eventid/SigninCreate', admin_controller.Signin_create_get);
+router.get('/admin/events/:eventid/SignoutCreate', admin_controller.Signout_create_get);
+router.get('/admin/events/:eventid/SignbothCreate', admin_controller.Signboth_create_get);
 
 // POST request for creating a check in or check out of users.
-router.post('/admin/checks/create', admin_controller.check_create_post);
+router.post('/admin/events/:eventid/SigninCreate', admin_controller.Signin_create_post);
+router.post('/admin/events/:eventid/SignoutCreate', admin_controller.Signout_create_post);
+router.post('/admin/events/:eventid/SignbothCreate', admin_controller.Signboth_create_post);
 
-// GET request to delete checks.
-router.get('/admin/checks/delete', admin_controller.check_delete_get);
+// // GET request to delete checks.
+// router.get('/admin/checks/delete', admin_controller.check_delete_get);
 
-// POST request to delete checks.
-router.post('/admin/checks/delete', admin_controller.check_delete_post);
+// // POST request to delete checks.
+// router.post('/admin/checks/delete', admin_controller.check_delete_post);
 
-// GET request to update checks.
-router.get('/admin/checks/update', admin_controller.check_update_get);
+// // GET user information
+// router.get('/admin/user',admin_controller.user_events);
 
-// POST request to update checks.
-router.post('/admin/checks/update', admin_controller.check_update_post);
+// // GET sponsor information
+// router.get('/admin/sponsor',admin_controller.sponsor_events);
 
-// GET user information
-router.get('/admin/user',admin_controller.user_events);
-
-// GET sponsor information
-router.get('/admin/sponsor',admin_controller.sponsor_events);
-
-// GET events information
-router.get('/admin/events',admin_controller.all_events);
+// // GET events information
+// router.get('/admin/events',admin_controller.all_events);
 
 module.exports = router;

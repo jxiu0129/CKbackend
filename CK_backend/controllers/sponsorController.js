@@ -411,11 +411,12 @@ exports.sponsor_update_post= [
         // Create Author object with escaped and trimmed data (and the old id!)
         let event = {
             // _id : req.params._id, 
-            endtime : req.body.endtime,
-            ncculink : req.body.link,
-            time : req.body.time,
             name : req.body.name,
-            location : req.body.location
+            time : req.body.time,
+            endtime : req.body.endtime,
+            location : req.body.location,
+            ncculink : req.body.link,
+            signCondition : req.body.signCondition,
         };
         if (req.body.time - Date.now() <= 3600000){
             event.status = 'holding';
@@ -426,7 +427,7 @@ exports.sponsor_update_post= [
                 // Successful - redirect to genre detail page.
                 console.log('Successfully Update');
                 // ?????
-                res.redirect("#");
+                res.redirect("http://localhost:3000/sponsor/events");
             });
         
     }
@@ -571,17 +572,28 @@ exports.SignIn_create_post= [
             if(err){return next(err);}
 
             else if (_atnd == null){
-                
                 let _newSignIn;
                 if(results.event.signCondition == 'onlyIn'){
-                    _newSignIn = new Attendance({
-                        event_id : req.params.eventid,
-                        list : [{
-                            email : _stdId,
-                            time_in : _timein,
-                            reward:true
-                        }]
+                  _newSignIn = new Attendance({
+                      event_id : req.params.eventid,
+                      list : [{
+                          email : _stdId,
+                          time_in : _timein,
+                          reward:true
+                      }]
                     });
+  
+                  _newSignIn.save(function(err){
+                    if(err) {return next(err);}
+                    console.log("1.Successfully Create SignIn");
+                  });
+                  
+                  let _newSigin = _newSignIn;   //in In
+  
+                  Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount + 1,AttendanceList:_newSigin},{},function(err,theevent){
+                    if(err) { return next(err);}
+                    console.log("2.Succesfully update event.attendancelist");
+                  });
                 }else{
                     _newSignIn = new Attendance({
                         event_id : req.params.eventid,
@@ -590,64 +602,35 @@ exports.SignIn_create_post= [
                             time_in : _timein
                         }]
                     });
+  
+                    _newSignIn.save(function(err){
+                      if(err) {return next(err);}
+                      console.log("1.Successfully Create SignIn");
+                  });
+  
+                  let _newSignin = _newSignIn;
+                  
+                  Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount ,AttendanceList:_newSignin},{},function(err,theevent){
+                      if(err) { return next(err);}
+                      console.log("2.Succesfully update event.attendancelist");
+                  });
                 }
-
-                _SignIn = _newSignIn;
-
-                _newSignIn.save(function(err){
-
-                    if(err) {return next(err);}
-                    console.log("Successfully Create SignIn");
-
-                });
-                
-                let thisevent;
-                if(results.event.signCondition == 'onlyIn'){
-                    thisevent = new Event({
-                        name : results.event.name,
-                        time : results.event.time,
-                        expense : results.event.expense,
-                        location : results.event.location,
-                        AttendanceList : _newSignIn,
-                        amount : results.event.amount + 1,
-                        _id : results.event._id,
-                        status : results.event.status,
-                        ncculink : results.event.ncculink,
-                        signCondition : results.event.signCondition
-                    });    
-                }else{
-                    thisevent = new Event({
-                        name : results.event.name,
-                        time : results.event.time,
-                        expense : results.event.expense,
-                        location : results.event.location,
-                        AttendanceList : _newSignIn,
-                        amount : results.event.amount,
-                        _id : results.event._id,
-                        status : results.event.status,
-                        ncculink : results.event.ncculink,
-                        signCondition : results.event.signCondition
-                    });    
-                }
-
-                Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
-                    if(err) { return next(err);}
-                });
-                
+                             
                 let user_atnd = {
                     event_id : req.params.eventid,
                     signin : _timein
                 };
-
+  
                 _user.attend.push(user_atnd);
-
+  
                 User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
                     if(err) { return next(err);}
                     res.redirect("./attendancelist");
+                    console.log("here!!!"+theuser);
                 });
-                console.log("here!!!"+theuser);
-
+  
             }
+        
         
             else{
                 let _atndList = results.list.list;
@@ -780,20 +763,7 @@ exports.SignIn_create_post= [
 
                     console.log(_rwd);
 
-                    let theevent = {
-                        name : results.event.name,
-                        time : results.event.time,
-                        expense : results.event.expense,
-                        location : results.event.location,
-                        AttendanceList : _atnd._id,
-                        _id : results.event._id,
-                        amount : _rwd,
-                        status : results.event.status,
-                        ncculink : results.event.ncculink,
-                        signCondition : results.event.signCondition
-                    };
-                    
-                    Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
+                    Event.findByIdAndUpdate(req.params.eventid,{AttendanceList:_atnd._id ,amount : _rwd,},{},function(err,theevent){
                         if(err) { return next(err);}
                         res.redirect("./attendancelist");
                      });
@@ -1173,24 +1143,9 @@ exports.SignBoth_create_post= [
 
                 });
                 
-                let thisevent = new Event({
-                    name : results.event.name,
-                    time : results.event.time,
-                    expense : results.event.expense,
-                    location : results.event.location,
-                    AttendanceList : _newSign,
-                    _id : results.event._id,
-                    amount : 1,
-                    status : results.event.status,
-                    ncculink : results.event.ncculink,
-                    signCondition : results.event.signCondition
-
-                });
-                // results.event.AttendanceList._id = _newSignOut._id
-
-                Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
+                Event.findByIdAndUpdate(req.params.eventid,{amount:1,AttendanceList:_newSign},{},function(err,theevent){
                     if(err) { return next(err);}
-                });
+                });  
                 
                 let user_atnd = {
                     event_id : req.params.eventid,
@@ -1225,16 +1180,6 @@ exports.SignBoth_create_post= [
                     Attendance.findByIdAndUpdate(_atnd._id,_Sign,{},function(err){
                         console.log("Successfully Create SignIn and SignOut");
                     });
-                    let thisevent = new Event({
-                        name : results.event.name,
-                        time : results.event.time,
-                        expense : results.event.expense,
-                        location : results.event.location,
-                        AttendanceList : _newSign,
-                        _id : results.event._id,
-                        amount : 1
-                    });
-                    // results.event.AttendanceList._id = _newSignOut._id
                                                 
                     let user_atnd = {
                         event_id : req.params.eventid,
@@ -1250,7 +1195,7 @@ exports.SignBoth_create_post= [
 
                     console.log("here!!!"+theuser);
 
-                    Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
+                    Event.findByIdAndUpdate(req.params.eventid,{amount:1,AttendanceList:_atnd._id},{},function(err,theevent){
                         if(err) { return next(err);}
                         res.redirect("./attendancelist");
 
@@ -1336,19 +1281,7 @@ exports.SignBoth_create_post= [
 
                     console.log(_rwd);
                     
-                    let theevent = {
-                        name : results.event.name,
-                        time : results.event.time,
-                        expense : results.event.expense,
-                        location : results.event.location,
-                        AttendanceList : _atnd._id,
-                        _id : results.event._id,
-                        amount : _rwd,
-                        status : results.event.status,
-                        ncculink : results.event.ncculink    
-                    };
-                    
-                    Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
+                    Event.findByIdAndUpdate(req.params.eventid,{amount: _rwd,AttendanceList:_atnd._id},{},function(err,theevent){
                         if(err) { return next(err);}
                         res.redirect("./attendancelist");
                      });

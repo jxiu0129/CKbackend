@@ -1,6 +1,7 @@
 const Attendance = require("../models/attendance");
 const Event = require("../models/event");
 const User = require("../models/user");
+const indexController = require("../controllers/indexController");
 
 let API_LoginCode;
 let API_Access;
@@ -161,7 +162,12 @@ exports.create_event_first_post =[
         User.findOne({email:email})
         .exec((err,theuser)=>{
             if (err) { return next(err); }
-            res.redirect('/admin/events/createevent_second/'+theuser._id);
+            if(theuser == undefined | theuser == null){
+              console.log("err: "+theuser);
+              res.redirect('http://localhost:3000/admin/events/createevent_first');
+            }else{
+              res.redirect('/admin/events/createevent_second/'+theuser._id);
+            }
         });
     }
 ];
@@ -230,6 +236,7 @@ exports.create_event_second_post = [
             expense : req.body.expense,      //投資點數
             amount : 0,
             ncculink : req.body.event_link,
+            signCondition : req.body.signCondition,
         });
         if (event.time -  Date.now() <= 3600000){
             event.status = 'holding';
@@ -370,13 +377,806 @@ exports.event_delete_post = async (req,res,next) => {
   });
 };
 
-exports.check_create_get= function(req,res){
-    res.render('index' , { title : "新增簽到/刷退"});
+exports.event_update_post= [
+
+  // //Validate
+  // body('name', 'Name is required').isLength({ min: 1 }).trim(),
+  // body('time',  'Invalid date').optional({ checkFalsy: true}).isISO8601(),
+  // body('endtime',  'Invalid date').optional({ checkFalsy: true}).isISO8601(),
+  // body('location', 'Name is required').isLength({ min: 1 }).trim(),
+  // body('expense','Expense is required').isInt({ min : 0 ,allow_leading_zeroes: false}),
+
+  // // Sanitize (trim) the name field.
+  // sanitizeBody('name').escape(),
+  // sanitizeBody('time').escape().toDate(),
+  // sanitizeBody('endtime').escape().toDate(),
+  // sanitizeBody('location').escape(),
+  // sanitizeBody('Expense').escape(),
+
+  // Process request after validation and sanitization.
+  (req, res, next) => {
+
+      // Extract the validation errors from a request.
+      const errors = validationResult(req);
+
+      // Create Author object with escaped and trimmed data (and the old id!)
+      let event = {
+          // _id : req.params._id, 
+          name : req.body.name,
+          time : req.body.time,
+          endtime : req.body.endtime,
+          location : req.body.location,
+          ncculink : req.body.link,
+          signCondition : req.body.signCondition,
+      };
+      if (req.body.time - Date.now() <= 3600000){
+          event.status = 'holding';
+      }
+          // Data from form is valid. Update the record.
+          Event.findByIdAndUpdate(req.query.eventid, event, {}, function (err, theevent) {
+              if (err) { return next(err); }
+              // Successful - redirect to genre detail page.
+              console.log('Successfully Update');
+              // ?????
+              res.redirect("http://localhost:3000/admin/events");
+          });
+      
+  }
+];
+
+exports.event_attendancelist = function(req,res,next){
+
+  Event.findById(req.params.eventid)
+  .populate('holder')
+  .exec((err,theevt) =>{
+      Attendance.findOne({event_id : req.params.eventid},'list')
+      // .sort([['email','descending']])
+      .exec(function (err, thisattnd){
+          if (err) { return next(err); }
+
+          res.render('admin/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+      });
+  });
+  
 };
 
-exports.check_create_post= function(req,res){
-    res.render('index' , { title : "新增簽到/刷退"});
+exports.Signin_create_get= function(req,res){
+  res.render('admin/add_checkin' , { username: req.session.user_info.user_info.name,title : "Create Sign In | NCCU Attendance", url:req.session.API_LoginCode});
 };
+
+exports.Signin_create_post= [
+
+  (req,res,next) =>{
+      body('time',  'Invalid date').isISO8601().custom((value) => {
+          if (value < Date.now()){
+              throw new Error('Cannot hold event in past!');
+          }
+          return true;
+      });
+
+
+      async.parallel({
+          user : function(callback){
+              User.findOne({email:req.body.email})
+              .exec(callback);
+          },
+          event: function(callback){
+              Event.findById(req.params.eventid)
+              .exec(callback);
+          },
+
+          attendance: function(callback){
+              Attendance.findOne({event_id:req.params.eventid})
+              .exec(callback);
+
+          },
+
+          list : function(callback){
+              Attendance.findOne({event_id:req.params.eventid},'list')
+              .exec(callback);
+
+          }
+      },
+      
+      async (err,results) => {
+
+          body('time',  'Invalid date').isISO8601().custom((value) => {
+              if (value < Date.now()){
+                  throw new Error('Cannot hold event in past!');
+              }
+              return true;
+          });
+
+          if(results.user == undefined){
+              res.redirect('./SignInCreate');
+              throw new Error("results.user is not defined");
+          }
+          let _stdId = req.body.email;
+          let _timein = req.body.time;
+          let _atnd = results.attendance;
+          let _user = results.user;
+          let U_atnd;
+          let _SignIn;
+
+
+          if(err){return next(err);}
+
+          else if (_atnd == null){
+              let _newSignIn;
+              if(results.event.signCondition == 'onlyIn'){
+                _newSignIn = new Attendance({
+                    event_id : req.params.eventid,
+                    list : [{
+                        email : _stdId,
+                        time_in : _timein,
+                        reward:true
+                    }]
+                  });
+
+                _newSignIn.save(function(err){
+                  if(err) {return next(err);}
+                  console.log("1.Successfully Create SignIn");
+                });
+                
+                let _newSigin = _newSignIn;   //in In
+
+                Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount + 1,AttendanceList:_newSigin},{},function(err,theevent){
+                  if(err) { return next(err);}
+                  console.log("2.Succesfully update event.attendancelist");
+                });
+              }else{
+                  _newSignIn = new Attendance({
+                      event_id : req.params.eventid,
+                      list : [{
+                          email : _stdId,
+                          time_in : _timein
+                      }]
+                  });
+
+                  _newSignIn.save(function(err){
+                    if(err) {return next(err);}
+                    console.log("1.Successfully Create SignIn");
+                });
+
+                let _newSignin = _newSignIn;
+                
+                Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount ,AttendanceList:_newSignin},{},function(err,theevent){
+                    if(err) { return next(err);}
+                    console.log("2.Succesfully update event.attendancelist");
+                });
+              }
+                           
+              let user_atnd = {
+                  event_id : req.params.eventid,
+                  signin : _timein
+              };
+
+              _user.attend.push(user_atnd);
+
+              User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                  if(err) { return next(err);}
+                  res.redirect("./attendancelist");
+                  console.log("here!!!"+theuser);
+              });
+
+          }
+      
+          else{
+              let _atndList = results.list.list;
+              if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄 =>把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+                  if (results.event.signCondition == 'onlyIn'){
+                      _atndList.push({                   
+                          email : _stdId,
+                          time_in : _timein,
+                          reward :true
+                      });    
+                  }else{
+                      _atndList.push({                   
+                          email : _stdId,
+                          time_in : _timein
+                      });    
+                  }
+
+                  _SignIn = {
+                      event_id : req.params.eventid,
+                      list : _atndList,
+                  };
+
+                  Attendance.findByIdAndUpdate(_atnd._id,_SignIn,{},function(err){
+                      console.log("3. Successfully Create SignIn 671");
+                  });
+                  
+              let user_atnd = {
+                  event_id : req.params.eventid,
+                  signin : _timein
+              };
+
+              _user.attend.push(user_atnd);
+
+              User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                  if(err) { return next(err);}
+                  res.redirect("./attendancelist");
+              });
+              console.log("here!!!"+theuser);
+
+          }
+
+
+              else{
+
+                  for(let i = 0; i < _atndList.length; i++){
+                      console.log("i:  "+i);
+                      console.log(_atndList[i].email);
+
+
+                      if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
+                          if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
+                          else{
+                              if(results.event.signCondition == 'onlyIn'){
+                                  _atndList.push({
+                                      email : _stdId,
+                                      time_in : _timein,
+                                      reward: true
+                                  });    
+                              }else{
+                                  _atndList.push({
+                                      email : _stdId,
+                                      time_in : _timein
+                                  });    
+                              }
+
+                              _SignIn = {
+                                  event_id : req.params.eventid,
+                                  list : _atndList,
+                              };
+
+                              U_atnd ={
+                                  event_id : req.params.eventid,
+                                  signin : _timein
+                              };
+
+                              _user.attend.push(U_atnd);
+
+                              break;
+                          }
+                      }
+                      
+                      
+                      
+                      else if (_stdId == _atndList[i].email){                    //如果輸入的使用者id已經存在於紀錄中
+                          if (_atndList[i].time_in == undefined){                          //則檢查timein有沒有輸入過
+                              _atndList[i].time_in = _timein;
+                              _atndList[i].reward = true;
+                              _SignIn = {
+                                  event_id : req.params.eventid,
+                                  list : _atndList,
+                              };
+
+                              let _ind =_user.attend.map(x => x.event_id).indexOf(results.event._id);
+                              _user.attend[_ind].signin= _timein;
+
+                              break;
+
+                          }else{
+                              console.log("This User Has Already Signed In");
+                              res.redirect('./SigninCreate');
+                              return;
+                          }
+                      }else{
+                          console.log("?");
+                          break;
+                      }
+                  }
+                  
+                  console.log(_SignIn);
+
+                  await Attendance.findByIdAndUpdate(results.attendance._id,_SignIn,{},function(err,theAtd){
+                      if(err){return next(err);}
+                      console.log("3. Successfully Create SignIn");
+                  });
+
+                  await User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function (err,theuser) {
+                      if(err){return next(err);}
+                      console.log("4. Successfully Update User attend");
+                  });
+
+
+                  const theAtd = await Attendance.findOne({event_id:req.params.eventid});
+
+                  let _rwd = 0;
+                  for ( let j = 0; j < theAtd.list.length;j++){
+                      if(theAtd.list[j].reward == true){
+                           _rwd ++;
+                      }
+                  }
+
+                  console.log(_rwd);
+                  
+                  Event.findByIdAndUpdate(req.params.eventid,{AttendanceList:_atnd._id ,amount : _rwd,},{},function(err,theevent){
+                      if(err) { return next(err);}
+                      res.redirect("./attendancelist");
+                   });
+
+              }
+          }
+      });        
+  }       
+];
+
+exports.Signout_create_get= function(req,res){
+  res.render('admin/add_checkout' , { username: req.session.user_info.user_info.name,title : "Create Sign In | NCCU Attendance", url:req.session.API_LoginCode});
+};
+
+exports.Signout_create_post= [
+
+  // Validate fields.
+  body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim().custom((value, {req}) => {
+      if(req.session.user_info.user_info.email == value){
+
+      }
+  }),
+
+  // Sanitize fields.
+  sanitizeBody('*').escape(),
+
+  // Process request after validation and sanitization.
+  (req,res,next) =>{
+
+      async.parallel({
+          user : function(callback){
+              User.findOne({email:req.body.email})
+              .exec(callback);
+          },
+          event: function(callback){
+              Event.findById(req.params.eventid)
+              .exec(callback)
+          },
+
+          attendance: function(callback){
+              Attendance.findOne({event_id:req.params.eventid})
+              .exec(callback)
+
+          },
+
+          list : function(callback){
+              Attendance.findOne({event_id:req.params.eventid},'list')
+              .exec(callback)
+
+          }
+      },
+      
+      async (err,results) => {
+          if(results.user == undefined){
+              res.redirect('./SignOutCreate');
+              throw new Error("results.user is not defined");
+          }
+
+          let _stdId = req.body.email;
+          let _timeout = req.body.time;
+          let _atnd = results.attendance;
+          let _user = results.user;
+          let U_atnd;
+          let _SignOut;
+
+          if(err){return next(err);}
+
+          else if (_atnd == null){
+              let _newSignOut;
+              if(results.event.signCondition == 'onlyOut'){
+                  _newSignOut = new Attendance({
+                      event_id : req.params.eventid,
+                      list : [{
+                          email : _stdId,
+                          time_out : _timeout,
+                          reward : true
+                      }]
+                  });  
+                  
+                  _newSignOut.save(function(err){
+                    if(err) {return next(err);}
+                    console.log("1.Successfully Create SignOut");
+                  });
+                  
+                  let _newSigout = _newSignOut;   //out Out
+  
+                  Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount + 1,AttendanceList:_newSigout},{},function(err,theevent){
+                    if(err) { return next(err);}
+                    console.log("2.Succesfully update event.attendancelist");
+                  });
+              }else{
+                  _newSignOut = new Attendance({
+                      event_id : req.params.eventid,
+                      list : [{
+                          email : _stdId,
+                          time_out : _timeout
+                      }]
+                  });    
+                 
+                  _newSignOut.save(function(err){
+                    if(err) {return next(err);}
+                    console.log("1.Successfully Create SignOut");
+                });
+
+                let _newSignout = _newSignOut;
+                
+                Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount ,AttendanceList:_newSignout},{},function(err,theevent){
+                    if(err) { return next(err);}
+                    console.log("2.Succesfully update event.attendancelist");
+                });
+              }
+
+              let user_atnd = {
+                  event_id : req.params.eventid,
+                  signout : _timeout
+              };
+
+              _user.attend.push(user_atnd);
+
+              User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                  if(err) { return next(err);}
+                  res.redirect("./attendancelist");
+                  console.log("here!!!"+theuser);
+              });
+
+          }
+      
+          else{
+              let _atndList = results.list.list;
+              if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
+                  if (results.event.signCondition == 'onlyOut'){
+                      _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+                          email : _stdId,
+                          time_out : _timeout,
+                          reward: true
+                      });    
+                  }else{
+                      _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+                          email : _stdId,
+                          time_out : _timeout
+                      });    
+                  }
+
+                  _SignOut = {
+                      event_id : req.params.eventid,
+                      list : _atndList,
+                  };
+
+                  Attendance.findByIdAndUpdate(_atnd._id,_SignOut,{},function(err){
+                      console.log("Successfully Create SignOut");
+                  });
+                      
+              let user_atnd = {
+                  event_id : req.params.eventid,
+                  signout : _timeout
+              };
+
+              _user.attend.push(user_atnd);
+
+              User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                  if(err) { return next(err);}
+                  res.redirect("./attendancelist");
+              });
+              console.log("here!!!"+theuser);
+
+              }
+
+
+              else{
+
+                  for(let i = 0; i < _atndList.length; i++){
+                      console.log("i:  "+i);
+                      console.log(_atndList[i].email);
+
+
+                      if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
+                          if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
+                          else{
+                              if(results.event.signCondition == 'onlyOut'){
+                                  _atndList.push({
+                                      email : _stdId,
+                                      time_out : _timeout,
+                                      reward:true
+                                  });
+                              }else{
+                                  _atndList.push({
+                                      email : _stdId,
+                                      time_out : _timeout
+                                  });
+                              }    
+
+                              _SignOut = {
+                                  event_id : req.params.eventid,
+                                  list : _atndList,
+                              };
+
+                              U_atnd ={
+                                  event_id : req.params.eventid,
+                                  signout : _timeout
+                              };
+                              _user.attend.push(U_atnd);
+
+                              break;
+                          }
+                      }
+                      
+                      
+                      
+                      else if (_stdId == _atndList[i].email){                    //如果輸入的使用者id已經存在於紀錄中
+                          if (_atndList[i].time_out == undefined){                          //則檢查timeout有沒有輸入過
+                              _atndList[i].time_out = _timeout;
+                              _atndList[i].reward = true;
+                              _SignOut = {
+                                  event_id : req.params.eventid,
+                                  list : _atndList,
+                              };
+                              
+                              let _ind =_user.attend.map(x => x.event_id).indexOf(results.event._id);
+                              _user.attend[_ind].signout= _timeout;
+
+                              break;
+                              
+                          }else{
+                              console.log("This User Has Already Signed Out");
+                              res.redirect('./SignOutCreate');
+                              return;
+                          }
+                      }else{
+                          console.log("?");
+                          break;
+                      }
+                  }
+                  
+                  console.log(_SignOut);
+                  
+                  await Attendance.findByIdAndUpdate(results.attendance._id,_SignOut,{},function(err,theAtd){
+                      if(err){return next(err);}
+                      console.log("Successfully Create SignOut");
+                  });
+
+                  await User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function (err,theuser) {
+                      if(err){return next(err);}
+                      console.log("Successfully Update User attend");
+                  });
+
+                  const theAtd = await Attendance.findOne({event_id:req.params.eventid});
+
+                  let _rwd = 0;
+                  for (let j = 0; j < theAtd.list.length;j++){
+                      if(theAtd.list[j].reward == true){
+                          _rwd ++;
+                      }
+                  }
+                  
+                  console.log(_rwd);
+
+                  Event.findByIdAndUpdate(req.params.eventid,{AttendanceList:_atnd._id ,amount : _rwd,},{},function(err,theevent){
+                      if(err) { return next(err);}
+                      res.redirect("./attendancelist");    
+                  });                
+              }
+          }
+      });
+  }       
+];
+
+exports.Signboth_create_get= function(req,res){
+  res.render('admin/add_checkinandout' , { username: req.session.user_info.user_info.name,title : "Create Sign In | NCCU Attendance", url:req.session.API_LoginCode});
+};
+
+exports.Signboth_create_post= [
+
+  // Validate fields.
+  // body('userid', 'User Id must not be empty.').isLength({ min: 1 }).trim(),
+
+  // Sanitize fields.
+  // sanitizeBody('*').escape(),
+
+  // Process request after validation and sanitization.
+  (req,res,next) =>{
+      async.parallel({
+          user : function(callback){
+              User.findOne({email:req.body.email})
+              .exec(callback);
+          },
+          event: function(callback){
+              Event.findById(req.params.eventid)
+              .exec(callback)
+          },
+
+          attendance: function(callback){
+              Attendance.findOne({event_id:req.params.eventid})
+              .exec(callback)
+
+          },
+
+          list : function(callback){
+              Attendance.findOne({event_id:req.params.eventid},'list')
+              .exec(callback)
+
+          }
+      },
+      
+      async(err,results) => {
+          if(results.user == undefined){
+              res.redirect('./SignBothCreate');
+              throw new Error("results.user is not defined");
+          }
+
+          let _stdId = req.body.email;
+          let _timein = req.body.check_in_time;
+          let _timeout = req.body.check_out_time;
+          let _atnd = results.attendance;
+          let _user = results.user;
+          let U_atnd;
+          let _Sign;
+
+
+          if(err){return next(err);}
+
+          else if (_atnd == null){
+
+              let _newSign = new Attendance({
+                  event_id : req.params.eventid,
+                  list : [{
+                      email : _stdId,
+                      time_in : _timein,
+                      time_out : _timeout,
+                      reward : true
+                  }]
+              });
+
+              _newSign.save(function(err){
+                  if(err) {return next(err);}
+                  console.log("Successfully Create SignIn and SignOut");
+              });
+              
+              Event.findByIdAndUpdate(req.params.eventid,{amount:1,AttendanceList:_newSign},{},function(err,theevent){
+                  if(err) { return next(err);}
+              });
+              
+              let user_atnd = {
+                  event_id : req.params.eventid,
+                  signin : _timein,
+                  signout : _timeout
+              };
+
+              _user.attend.push(user_atnd);
+
+              User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                  if(err) { return next(err);}
+                  res.redirect("./attendancelist");
+                  console.log("here!!!"+theuser);
+              });
+              
+          }
+      
+          else{
+              let _atndList = results.list.list;
+              if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
+                  _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
+                      email : _stdId,
+                      time_in : _timein,
+                      time_out : _timeout,
+                      reward : true
+                  });
+                  _Sign = {
+                      event_id : req.params.eventid,
+                      list : _atndList,
+                  };
+
+                  Attendance.findByIdAndUpdate(_atnd._id,_Sign,{},function(err){
+                      console.log("Successfully Create SignIn and SignOut");
+                  });
+                                                              
+                  let user_atnd = {
+                      event_id : req.params.eventid,
+                      signin : _timein,
+                      signout : _timeout
+                  };
+
+                  _user.attend.push(user_atnd);
+
+                  User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                      if(err) { return next(err);}
+                      console.log("here!!!"+theuser);
+                  });
+
+                  Event.findByIdAndUpdate(req.params.eventid,{amount:1,AttendanceList:_atnd._id},{},function(err,theevent){
+                      if(err) { return next(err);}
+                      res.redirect("./attendancelist");
+
+                  });
+              }
+
+
+              else{
+
+                  for(let i = 0; i < _atndList.length; i++){
+                      console.log("i:  "+i);
+                      console.log(_atndList[i].email);
+
+
+                      if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
+                          if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
+                          else{
+                              _atndList.push({
+                                  email : _stdId,
+                                  time_in : _timein,
+                                  time_out : _timeout,
+                                  reward : true
+                              });
+
+                              _Sign = {
+                                  event_id : req.params.eventid,
+                                  list : _atndList,
+                              };
+
+                              U_atnd ={
+                                  event_id : req.params.eventid,
+                                  signin : _timein,
+                                  signout : _timeout
+                              };
+                              _user.attend.push(U_atnd);
+
+                              break;
+                          }
+                      }
+                      
+                      
+                      
+                      else if (_stdId == _atndList[i].email){                    //如果輸入的使用者id已經存在於紀錄中
+                          if (_atndList[i].time_out != undefined && _atndList[i].time_in != undefined){                          //如果in跟out都已經輸入了
+                              console.log("This user has already SignIn and SignOut");
+                              res.redirect('./attendancelist');
+                              return;
+                          }else if (_atndList[i].time_in != undefined){     //如果in已經輸入過
+                              console.log("This user has already SignIn ");
+                              res.redirect('./attendancelist');
+                              return;
+                          }else if(_atndList[i].time_out != undefined){     //如果out已經輸入過
+                              console.log("This user has already SignOut");
+                              res.redirect('./attendancelist');
+                              return;
+                          }
+                      }else{
+                          console.log("?");
+                          break;
+                      }
+                  }
+                  console.log(_Sign);
+
+                  await Attendance.findByIdAndUpdate(results.attendance._id,_Sign,{},function(err,theAtd){
+                      if(err){return next(err);}
+                      console.log("Successfully Create SingIn and SignOut");
+                  });
+                  
+                  await User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function (err,theuser) {
+                      if(err){return next(err);}
+                      console.log("Successfully Update User attend");
+                  });
+
+                 
+                  const theAtd = await Attendance.findOne({event_id:req.params.eventid});
+
+                  let _rwd = 0;
+                  for (let j = 0; j < theAtd.list.length;j++){
+                      if(theAtd.list[j].reward == true){
+                          _rwd ++;
+                      }
+                  }
+
+                  console.log(_rwd);
+                                   
+                  Event.findByIdAndUpdate(req.params.eventid,{amount: _rwd,AttendanceList:_atnd._id},{},function(err,theevent){
+                      if(err) { return next(err);}
+                      res.redirect("./attendancelist");
+                   });
+              }
+          }
+      });
+  }       
+];
+
 
 exports.check_delete_get= function(req,res){
     res.render('index' , { title : "刪除簽到/刷退"});
@@ -384,14 +1184,6 @@ exports.check_delete_get= function(req,res){
 
 exports.check_delete_post= function(req,res){
     res.render('index' , { title : "刪除簽到/刷退"});
-};
-
-exports.check_update_get= function(req,res){
-    res.render('index' , { title : "更改簽到/刷退"});
-};
-
-exports.check_update_post= function(req,res){
-    res.render('index' , { title : "更改簽到/刷退"});
 };
 
 exports.user_events = function(req,res){

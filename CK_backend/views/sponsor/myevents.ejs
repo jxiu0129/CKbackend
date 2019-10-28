@@ -209,6 +209,26 @@
 														<input type="datetime-local" name="endtime" id="event-editEndTime" value="2019-01-01T00:00" placeholder="2014-09-18">
 														<br>
 
+														<h3 class="inline">發點數條件：</h3>
+														<br>
+														<select name="signCondition">
+															<% if (list_event[i].signCondition == 'onlyIn'){%>
+															<option value="bothSign">必須 簽到與刷退</option>
+															<option value="onlyIn" selected="true">*只要 簽到</option>
+															<option value="onlyOut">只要 刷退</option>
+															<%} else if (list_event[i].signCondition == 'onlyOut'){%>
+															<option value="bothSign">必須 簽到與刷退</option>
+															<option value="onlyIn" >只要 簽到</option>
+															<option value="onlyOut" selected="true">*只要 刷退</option>
+															<%}else{%>
+															<option value="bothSign" selected="true">*必須 簽到與刷退</option>
+															<option value="onlyIn" >只要 簽到</option>
+															<option value="onlyOut">只要 刷退</option>	
+															<%}%>	
+														</select>
+														<br>
+															
+
 													</div>
 													<div class="modal-footer">
 														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -1,0 +1,87 @@
+<%-include('header')-%>
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<header class="align-center">
+						<h1> <u><%=event.name%></u> 的活動出席表 </h1>
+					</header>
+					<!-- <div>
+						<ul class="list=group list-group-flush">
+							<li class="list-group-item list-group-item-action align-items-center">活動名稱：<%=event.name%></li>
+							<li class="list-group-item list-group-item-action align-items-center">主辦人：<%=event.holder.name%></li>
+							<li class="list-group-item list-group-item-action align-items-center">活動地點：<%=event.location%></li> -->
+							<!-- <li class="list-group-item list-group-item-action align-items-center">簽到人數：0</li> -->
+							<!-- <li class="list-group-item list-group-item-action align-items-center">簽退人數：0</li> -->
+							<!-- <%if(event.status == 'willhold'){%>
+								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：尚未開始</li>
+							<%}else if( event.status == 'holding'){%>
+								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：正在進行</li>
+							<%}else if( event.status == 'finish'){%>
+								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：活動已結束</li>
+							<%}%>
+						</ul>
+					</div> -->
+					<!-- <hr> -->
+					<form method="post" action="#">
+						<div class="row uniform">
+							<div class="9u 12u$(small)">
+								<input type="text" name="query" id="query" value="" placeholder="輸入參與者email" />
+							</div>
+							<div class="3u$ 12u$(small)">
+								<input type="submit" value="搜尋" class="fit" />
+							</div>
+						</div>
+					</form>
+
+					<div class="table-wrapper">
+						<table>
+							<thead>
+							<tr>
+								<th>參與者email</th>
+								<th>報到時間</th>
+								<th>刷退時間</th>
+							</tr>
+							</thead>
+							<tbody>
+                            <%if(thisattnd == null){ %>
+								<h1>此活動尚未有任何簽到/刷退紀錄</h1>
+							<% }else{ %>
+								<% for(let i = 0;i < thisattnd.list.length; i++){ %>
+								<tr>
+									<td><%= thisattnd.list[i].email  %></td>
+									<% if(thisattnd.list[i].time_in == undefined) {%>
+										<td><%= thisattnd.list[i].time_in  %></td>
+									<% } else { %>
+										<td><%= thisattnd.list[i].time_in.toLocaleString()  %></td>
+									<% } %>
+
+									<% if(thisattnd.list[i].time_out == undefined) {%>
+										<td><%= thisattnd.list[i].time_out  %></td>
+									<% } else { %>
+										<td><%= thisattnd.list[i].time_out.toLocaleString()  %></td>
+									<% } %>
+								</tr>
+								<% } %>
+							<% } %>
+							</tbody>
+						</table>
+					</div>
+
+					<!--button-->
+					<ul class="actions fit">
+                        <li><a href="./SigninCreate" class="button special fit">新增報到紀錄</a></li>
+                        <li><a href="./SignoutCreate" class="button fit">新增刷退紀錄</a></li>
+                        <li><a href="./SignbothCreate" class="button alt fit">新增報到與刷退紀錄</a></li>					
+					</ul>
+
+					<!-- 活動結束跟匯出名單應該是一起? -->
+					<ul class="actions fit">
+						<li><a href="./SendMultiPoint" class="button alt fit">活動結束！</a></li>
+					</ul>
+					<!--button-->
+					<ul class="actions fit">
+						<li><a href="＃" class="button fit">匯出出席名單</a></li>
+					</ul>
+					</div>
+			</section>
+<%-include('../root/footer')-%>

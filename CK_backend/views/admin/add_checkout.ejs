@@ -1,0 +1,55 @@
+<%-include('header')-%>
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<header class="align-center">
+						<h1>新增刷退紀錄</h1>
+					</header>
+					<form method="post" action="#">
+						<!--<div class="row uniform">-->
+						<div align="center">
+							<div class="6u 12u$(xsmall)">
+								<p style="text-align: left; margin-bottom: 5px;" >參與者Email</p>
+								<input type="text" name="email" id="userID" value="" placeholder="參與者Email" />
+							</div>
+							<br>
+							<div class="6u 12u$(xsmall)">
+								<!-- <h3 class="inline">刷退時間：</h3>
+								<input class="inline" name="time" type="datetime-local" id="checkout-addDateTime"> -->
+								<p style="text-align: left; margin-bottom: 5px;" >刷退時間</p>
+								<input class="inline" type="datetime-local" name="time" id="check_out_addDateTime" />
+							</div>
+							<br>
+							<br>							
+							<!-- Break -->
+							<div class="12u$">
+								<ul class="actions">
+									<!-- <li><input type="submit" value="新增刷退紀錄" /></li> -->
+									<li><input type="submit" onclick="return CheckFunc();" value="新增刷退紀錄" /></li>
+								</ul>
+							</div>
+							<script language="javascript" type="text/javascript">
+								function CheckFunc()
+								{
+									msg = "";
+									if(document.forms[0].name.value == "")
+									{
+										msg = "請輸入參與者ID";
+									}
+									else if(document.forms[0].time.value == "")
+									{
+										msg = "請輸入刷退時間";
+									}
+									else
+									{
+										return true;
+									}
+									alert(msg);
+									return false;
+								}
+							</script>	
+						</div>
+					</form>
+				</div>
+			</section>
+<%-include('../root/footer')-%>

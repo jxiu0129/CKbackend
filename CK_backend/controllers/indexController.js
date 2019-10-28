@@ -139,6 +139,8 @@ let getUserInfo = (req, access_token_input) => {
         console.log(msg);
         API_User = msg;
         req.session.user_info = API_User;
+       
+       
         req.session.API_Access = API_Access;
         API_RefreshClock = Date.now() + 5 * 60000;
         req.session.API_RefreshClock = Date.now();
@@ -347,7 +349,6 @@ exports.Send_Multi_Point = async function(req, res){
                 sendpoint.body.to_accounts = list;
                 sendpoint.body.point = point;
                 sendpoint.body.description = event_name;
-                console.log(sendpoint);
                 rp(sendpoint)
                 .then((message) =>{
                     console.log(message);

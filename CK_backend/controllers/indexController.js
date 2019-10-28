@@ -115,20 +115,13 @@ moment.locale('zh-tw', {
     }
   });
 
-  exports.index = function(req,res){
-    // if(!req.session.code){
-    //     res.render('index');
-    // }
-    // else{
-    //     res.render('login_index');
-    // }
-    res.render('root/index');
-};
+  
 
 exports.logout_but = (req, res) => {
     console.log('log out!');
     req.session.destroy();
-}
+    res.redirect('http://attend.nccu.edu.tw');
+};
 
 let getUserInfo = (req, access_token_input) => {
     rp.get('https://points.nccu.edu.tw/openapi/user_info', {
@@ -375,30 +368,105 @@ exports.Send_Multi_Point = async function(req, res){
 
 
 //活動列表
+
 exports.event_list = (req,res)=>{
     req.session.reload();
-    Event.find({ $or : [{status : 'willhold'},{status : 'holding'}] })
-    .populate('holder')
-    .sort([['time','descending']])
-    .exec((err,_event)=>{
+    if(req.query.search != undefined){
+        console.log(req.query.search);
+        Event.find({ name: req.query.search })
+            .populate('holder')
+            .sort([['time','descending']])
+            .exec((err,_event)=>{
 
-        let timeArray = [];
-        let endtimeArray = [];
-        for(let i =0 ; i< _event.length;i++){
-            timeArray.push(moment(_event[i].time).format('LLL'));
-            endtimeArray.push(moment(_event[i].endtime).format('LLL'));
-        }
-        console.log( req.session.user_info.user_info.username);
+                let timeArray = [];
+                let endtimeArray = [];
+                for(let i =0 ; i< _event.length;i++){
+                    timeArray.push(moment(_event[i].time).format('LLL'));
+                    endtimeArray.push(moment(_event[i].endtime).format('LLL'));
+                }
 
-        res.render('root/eventlist', {
-            username : req.session.user_info.user_info.name,
-            title: 'Event List | NCCU Attendance', 
-            _event:  _event,
-            Time :timeArray,
-            endTime : endtimeArray,
-            url:req.session.API_LoginCode
+                res.render('root/eventlist', {
+                    username : req.session.user_info.user_info.name,
+                    title: 'Event List | NCCU Attendance', 
+                    _event:  _event,
+                    Time :timeArray,
+                    endTime : endtimeArray,
+                    url:req.session.API_LoginCode
+                });
+                
+            });
+    }
+    else{
+        Event.find({ $or : [{status : 'willhold'},{status : 'holding'}] })
+        .populate('holder')
+        .sort([['time','descending']])
+        .exec((err,_event)=>{
+    
+            let timeArray = [];
+            let endtimeArray = [];
+            for(let i =0 ; i< _event.length;i++){
+                timeArray.push(moment(_event[i].time).format('LLL'));
+                endtimeArray.push(moment(_event[i].endtime).format('LLL'));
+            }
+            // console.log( req.session.user_info.user_info.username);
+    
+            res.render('root/eventlist', {
+                username : req.session.user_info.user_info.name,
+                title: 'Event List | NCCU Attendance', 
+                _event:  _event,
+                Time :timeArray,
+                endTime : endtimeArray,
+                url:req.session.API_LoginCode
+            });
         });
-    });
+    }
+};
+
+// 登入前活動列表
+exports.event_list_bli = (req, res) => {
+    req.session.reload();
+    if(req.query.search != undefined){
+        console.log(req.query.search);
+        Event.find({ name: req.query.search })
+        .populate('holder')
+        .sort([['time','descending']])
+        .exec((err,_event)=>{
+
+            let timeArray = [];
+            let endtimeArray = [];
+            for(let i =0 ; i< _event.length;i++){
+                timeArray.push(moment(_event[i].time).format('LLL'));
+                endtimeArray.push(moment(_event[i].endtime).format('LLL'));
+            }
+
+            res.render('root/eventlistBLI', {
+                title: 'Event List | NCCU Attendance', 
+                _event:  _event,
+                Time :timeArray,
+                endTime : endtimeArray,
+            });
+        });
+    }else{
+        Event.find({ $or : [{status : 'willhold'},{status : 'holding'}] })
+        .populate('holder')
+        .sort([['time','descending']])
+        .exec((err,_event)=>{
+
+            let timeArray = [];
+            let endtimeArray = [];
+            for(let i =0 ; i< _event.length;i++){
+                timeArray.push(moment(_event[i].time).format('LLL'));
+                endtimeArray.push(moment(_event[i].endtime).format('LLL'));
+            }
+
+            res.render('root/eventlistBLI', {
+                title: 'Event List | NCCU Attendance', 
+                _event:  _event,
+                Time :timeArray,
+                endTime : endtimeArray,
+            });
+        });
+    }
 };
 
 exports.grant_new_token = (req, res) => {
@@ -422,3 +490,14 @@ exports.grant_new_token = (req, res) => {
         console.log(err);
     });
 }
+
+exports.index = function(req,res){
+    req.session.reload();
+    if(req.session.user_info){
+        console.log(JSON.stringify(req.session));
+        res.render('root/login_index', { username : req.session.user_info.user_info.name, url:req.session.API_LoginCode});
+        // res.redirect("attend.nccu.edu.tw/login_index");
+    }else{
+        res.render('root/index');
+    }
+};

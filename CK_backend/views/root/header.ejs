@@ -27,11 +27,11 @@
 				</script>
 				<%let urlL = 'http://attend.nccu.edu.tw/login_index/?code=' %>
 				<%let urlR = '&state=123' %>
-				<%var url; url=='undefined'?'undefined':url%>
-				<a href=<%=urlL +url+ urlR%> class="logo">NCCU Attendance</a>
+				<%var url; url=='undefined'?'undefined':url%>-->
+				<a href='http://attend.nccu.edu.tw' class="logo">NCCU Attendance</a>
 				
 				<nav class="right">
-					<a href="./" class="button alt">Log out</a>
+					<p class="button alt" onclick="logOut()">Log out</p>
 				</nav>
 			</header>
 

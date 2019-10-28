@@ -634,11 +634,10 @@ router.get('/qrcodelist', (req,res,next)=>{
     });
 });
 
-router.get('/tttest',async(req,res)=>{
-    User.findById('5d807cc11c9d440000ac87e2')
-    .exec((err,user)=>{
-        User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - 10})
-        .exec(res.render('qrcode/alertmessage',{username :req.session.user_info.user_info.username,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'}))
+var shortUrl = require('node-url-shortener');
+router.get('/tttest', (req,res)=>{
+    shortUrl.short('https://goodftagle.com', function(err, url){
+        console.log(url);
     });
 });
 

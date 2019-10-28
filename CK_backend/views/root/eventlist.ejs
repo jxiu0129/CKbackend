@@ -8,16 +8,16 @@
 						<p>以下活動都是與我們共同創造雙贏局面的活動喔！</p>
 					</header>
 
-					<form method="post" action="#">
+					<div style="margin: 20px 0px">
 						<div class="row uniform">
 							<div class="9u 12u$(small)">
 								<input type="text" name="query" id="query" value="" style="height: 3em" placeholder="輸入活動名稱" />
 							</div>
 							<div class="3u$ 12u$(small)">
-								<input type="submit" value="搜尋" class="fit" style="height: 3em; line-height: 3em"/>
+								<input type="submit" value="搜尋" class="fit" style="height: 3em; line-height: 3em" onclick="findEvent()"/>
 							</div>
 						</div>
-					</form>
+					</div>
 
 					<div class="table-wrapper">
 						<table>
@@ -101,4 +101,5 @@
 					</ul>
 					</div>
 			</section>
+			<script src="/javascripts/event.js"></script>
 <%-include('../root/footer')-%>

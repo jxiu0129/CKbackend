@@ -61,6 +61,7 @@ router.get('/login_index',index_controller.login_index);
 
 // GET event list
 router.get('/eventslist',index_controller.event_list);
+router.get('/eventslistBLI', index_controller.event_list_bli);
 
 router.get('/user_profile', index_controller.profile_user);
 
@@ -71,6 +72,8 @@ router.post('/edit_info_first', index_controller.edit_info_first_post);
 router.get('/user_profile/edit_info', index_controller.edit_info_get);
 
 router.post('/user_profile/edit_info', index_controller.edit_info_post);
+
+router.get('/logout', index_controller.logout_but);
 
 
 module.exports = router;

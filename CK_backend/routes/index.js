@@ -73,5 +73,7 @@ router.get('/user_profile/edit_info', index_controller.edit_info_get);
 
 router.post('/user_profile/edit_info', index_controller.edit_info_post);
 
+router.get('/logout', index_controller.logout_but);
+
 
 module.exports = router;

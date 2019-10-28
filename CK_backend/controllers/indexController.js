@@ -115,20 +115,13 @@ moment.locale('zh-tw', {
     }
   });
 
-  exports.index = function(req,res){
-    // if(!req.session.code){
-    //     res.render('index');
-    // }
-    // else{
-    //     res.render('login_index');
-    // }
-    res.render('root/index');
-};
+  
 
 exports.logout_but = (req, res) => {
     console.log('log out!');
     req.session.destroy();
-}
+    res.redirect('http://localhost:3000/');
+};
 
 let getUserInfo = (req, access_token_input) => {
     rp.get('https://points.nccu.edu.tw/openapi/user_info', {
@@ -415,7 +408,7 @@ exports.event_list_bli = (req, res) => {
             timeArray.push(moment(_event[i].time).format('LLL'));
             endtimeArray.push(moment(_event[i].endtime).format('LLL'));
         }
-        console.log( req.session.user_info.user_info.username);
+        // console.log( req.session.user_info.user_info.username);
 
         res.render('root/eventlistBLI', {
             title: 'Event List | NCCU Attendance', 
@@ -447,3 +440,14 @@ exports.grant_new_token = (req, res) => {
         console.log(err);
     });
 }
+
+exports.index = function(req,res){
+    req.session.reload();
+    if(req.session.user_info){
+        console.log(JSON.stringify(req.session));
+        res.render('root/login_index', { username : req.session.user_info.user_info.name, url:req.session.API_LoginCode});
+        // res.redirect("localhost:3000/login_index");
+    }else{
+        res.render('root/index');
+    }
+};

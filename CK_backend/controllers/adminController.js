@@ -250,7 +250,7 @@ exports.create_event_second_post = [
                 version: 10                                    //但別太高
             };
             
-            const qr_urlIN = 'http://attend.nccu.edu.tw/testsignin/'+event_id ;       //data的部分，此處的req.query先寫死
+            const qr_urlIN = 'https://attend.nccu.edu.tw/testsignin/'+event_id ;       //data的部分，此處的req.query先寫死
             const qr_pathIN = './public/images/QRcode/qrcode_'+event_id+"_in.jpg";
         
             QRCode.toFile(qr_pathIN, qr_urlIN, opts, (err) => {
@@ -258,7 +258,7 @@ exports.create_event_second_post = [
                 console.log('savedIN.');
             });
             
-            const qr_urlOUT = 'http://attend.nccu.edu.tw/testsignout/'+event_id;           //data的部分
+            const qr_urlOUT = 'https://attend.nccu.edu.tw/testsignout/'+event_id;           //data的部分
             const qr_pathOUT = './public/images/QRcode/qrcode_'+event_id+"_out.jpg";
         
     

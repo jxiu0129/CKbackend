@@ -120,7 +120,7 @@ moment.locale('zh-tw', {
 exports.logout_but = (req, res) => {
     console.log('log out!');
     req.session.destroy();
-    res.redirect('http://attend.nccu.edu.tw');
+    res.redirect('https://attend.nccu.edu.tw');
 };
 
 let getUserInfo = (req, access_token_input) => {
@@ -170,7 +170,7 @@ exports.login_index = async function(req, res){
         console.log('wrong dude');
         res.redirect("./");
     }else{
-        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://attend.nccu.edu.tw/login_index&code=' + API_LoginCode, function(req,res, body){
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=https://attend.nccu.edu.tw/login_index&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
         })
         .catch(async () => {
@@ -207,9 +207,9 @@ exports.login_index_new = function(req, res){
     req.session.API_LoginCode = req.query.code;
     if(!req.session.API_LoginCode){
         console.log('wrong dude');
-        res.redirect("http://attend.nccu.edu.tw/");
+        res.redirect("https://attend.nccu.edu.tw/");
     }else{
-        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://attend.nccu.edu.tw/login_index&code=' + API_LoginCode, function(req,res, body){
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=https://attend.nccu.edu.tw/login_index&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
         })
         .catch(async () => {
@@ -218,7 +218,7 @@ exports.login_index_new = function(req, res){
             console.log(API_Access);
             await getUserInfo(req ,API_Access.access_token);
             res.render('root/login_index',{username : API_User.user_info.name});
-            // rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
+            // rp.get('https://wm.nccu.edu.tw:3001/openapi/user_info', {
             //     'auth': {
             //         'bearer': API_Access.access_token
             //     }

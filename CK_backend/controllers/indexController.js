@@ -373,7 +373,7 @@ exports.event_list = (req,res)=>{
     req.session.reload();
     if(req.query.search != undefined){
         console.log(req.query.search);
-        Event.find({ name: req.query.search })
+        Event.find({ name: { $regex: req.query.search , $options: 'im'} })
             .populate('holder')
             .sort([['time','descending']])
             .exec((err,_event)=>{
@@ -427,7 +427,7 @@ exports.event_list_bli = (req, res) => {
     req.session.reload();
     if(req.query.search != undefined){
         console.log(req.query.search);
-        Event.find({ name: req.query.search })
+        Event.find({ name: { $regex: req.query.search , $options: 'im'} })
         .populate('holder')
         .sort([['time','descending']])
         .exec((err,_event)=>{

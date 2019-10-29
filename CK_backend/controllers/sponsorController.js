@@ -427,7 +427,7 @@ exports.sponsor_update_post= [
                 // Successful - redirect to genre detail page.
                 console.log('Successfully Update');
                 // ?????
-                res.redirect("http://localhost:3000/sponsor/events");
+                res.redirect("http://attend.nccu.edu.tw/sponsor/events");
             });
         
     }

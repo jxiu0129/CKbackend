@@ -164,7 +164,7 @@ exports.create_event_first_post =[
             if (err) { return next(err); }
             if(theuser == undefined | theuser == null){
               console.log("err: "+theuser);
-              res.redirect('http://localhost:3000/admin/events/createevent_first');
+              res.redirect('http://attend.nccu.edu.tw/admin/events/createevent_first');
             }else{
               res.redirect('/admin/events/createevent_second/'+theuser._id);
             }
@@ -418,7 +418,7 @@ exports.event_update_post= [
               // Successful - redirect to genre detail page.
               console.log('Successfully Update');
               // ?????
-              res.redirect("http://localhost:3000/admin/events");
+              res.redirect("http://attend.nccu.edu.tw/admin/events");
           });
       
   }

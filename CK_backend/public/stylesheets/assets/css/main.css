@@ -2793,11 +2793,31 @@
 	}
 
 	@media screen and (max-width: 480px) {
+        body {
+            padding-top: 44px;
+        }
 
-		#header {
-			min-width: 320px;
-		}
+        #header {
+            height: 44px;
+            line-height: 44px;
+            min-width: 320px;
+        }
+		#header .logo {
+            font-size: 0.25em;
+            text-align: center;
+        }
 
+        #header nav a[href="#menu"] {
+            font-size: 1.5em;
+        }
+
+        #header nav.left {
+            left: 1em;
+        }
+
+        #header nav.right {
+            display: none;
+        }
 	}
 
 /* Menu */

@@ -635,10 +635,11 @@ router.get('/qrcodelist', (req,res,next)=>{
 });
 
 var shortUrl = require('node-url-shortener');
-router.get('/tttest', (req,res)=>{
-    shortUrl.short('https://goodftagle.com', function(err, url){
-        console.log(url);
-    });
+router.get('/tttest',async (req,res)=>{
+    const atd = await Attendance.findOne({event_id:'5d9b9bbb4f3eb3086478e158'},(err)=>{
+        if (err) { return next(err); }
+    })
+    console.log(atd.list);   
 });
 
 

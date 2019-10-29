@@ -403,33 +403,80 @@ exports.sponsor_update_post= [
     sanitizeBody('Expense').escape(),
 
     // Process request after validation and sanitization.
-    (req, res, next) => {
+    async(req, res, next) => {
 
         // Extract the validation errors from a request.
         const errors = validationResult(req);
+        let attd = await Attendance.findOne({event_id:req.params.eventid},(err)=>{
+            if (err) { return next(err); }
+        });
+        let list = attd.list;
 
-        // Create Author object with escaped and trimmed data (and the old id!)
+        if(req.body.signCondition == 'onlyIn'){
+            for (let i = 0;i < list.length; i++){
+                if(list[i].time_in == undefined | list[i].time_in == null){
+                    list[i].reward = false;
+                }else{
+                    list[i].reward = true;
+                }
+            }
+        } else if (req.body.signCondition == 'onlyOut'){
+            for (let i = 0;i < list.length; i++){
+                if(list[i].time_out == undefined | list[i].time_out == null){
+                    list[i].reward = false;
+                }else{
+                    list[i].reward = true;
+                }
+            }
+        } else if (req.body.signCondition == 'bothSign'){
+            for (let i = 0;i < list.length; i++){
+                if(list[i].time_in == undefined | list[i].time_in == null | list[i].time_out == undefined | list[i].time_out == null){
+                    list[i].reward = false;
+                }else{
+                    list[i].reward = true;
+                }
+            }
+        }
+
+        await Attendance.findByIdAndUpdate(attd._id,{list:list})
+        .exec((err,atd)=>{
+            if (err) { return next(err); }
+            console.log("Successfully Update Reward in Attendancelist");
+        });
+
+
+        let rwd = 0;
+
+        for(let i =0 ; i < list.length;i++){
+            if(list[i].reward == true){
+                rwd++;
+            }
+        }
+
+        console.log("rwd: "+rwd);
+
         let event = {
-            // _id : req.params._id, 
             name : req.body.name,
             time : req.body.time,
             endtime : req.body.endtime,
             location : req.body.location,
             ncculink : req.body.link,
             signCondition : req.body.signCondition,
+            amount : rwd,
         };
         if (req.body.time - Date.now() <= 3600000){
             event.status = 'holding';
         }
-            // Data from form is valid. Update the record.
-            Event.findByIdAndUpdate(req.params.eventid, event, {}, function (err, theevent) {
-                if (err) { return next(err); }
-                // Successful - redirect to genre detail page.
-                console.log('Successfully Update');
-                // ?????
-                res.redirect("http://localhost:3000/sponsor/events");
-            });
-        
+
+        // Data from form is valid. Update the record.
+        Event.findByIdAndUpdate(req.params.eventid, event, {}, function (err, theevent) {
+            if (err) { return next(err); }
+            // Successful - redirect to genre detail page.
+            console.log('Successfully Update');
+            // ?????
+            res.redirect("http://localhost:3000/sponsor/events");
+        });
+    
     }
 ];
 

@@ -640,51 +640,63 @@ const fs = require('fs');
 const moment = require('moment');
 const json2csv = require('json2csv').parse;
 const path = require('path');
-const fields = ['email'];
+const fields = ['name','email','time_in','time_out'];
 
 router.get('/ttest',(req,res)=>{
     Attendance.findOne({event_id:'5d9d8f2e53de890b5cf82510'}, function (err, attd) {
+        console.log(attd);
         let email_in_atd = attd.list.map(x=>x.email);
         User.find({email:email_in_atd},function(err,user){
             console.log(user);
         });
     });
 });
+
 router.get('/tttest',async (req,res)=>{
 
-    Attendance.find({event_id:'5d9d8f2e53de890b5cf82510'}, function (err, attd) {
+    Attendance.findOne({event_id:'5d9d8f2e53de890b5cf82510'}, function (err, attd) {
         if (err) {
           return res.status(500).json({ err });
         }
-        // let email_in_atd = attd.list.map(x=>x.email);
-        // User.find({email:email_in_atd},function(err,user){
-        //     console.log(user);
-        // });
+
         else {
-          let csv;
-          try {
-            csv = json2csv(attd, { fields ,withBOM:true});
-          } catch (err) {
-            return res.status(500).json({ err });
-          }
-          const dateTime = moment().format('YYYYMMDDhhmmss');
-          const filePath = path.join(__dirname, "..", "public", "csv-" + dateTime + ".csv")
-          fs.writeFile(filePath, csv, function (err) {
-            if (err) {
-              return res.json(err).status(500);
-            }
-            else {
-              setTimeout(function () {
-                fs.unlinkSync(filePath); // delete this file after 30 seconds
-              }, 300000);
-              return res.json("/csv-" + dateTime + ".csv");
-            }
-          });
-    
+            let email_in_atd = attd.list.map(x=>x.email);
+                let user;
+                list = attd.list;
+                for (let i =0; i <list.length ; i++){
+                    User.findOne({email:list[i].email},(err,_user)=>{
+                        user = _user;
+                    });
+                    console.log(user);
+                    list[i] = {
+                        email : list[i].email,
+                        time_in : list[i].time_in,
+                        time_out : list[i].time_out,
+                        name : user[i].name
+                    };
+                }
+                console.log(list);
+                try {
+                  csv = json2csv(list, {fields,withBOM:true});
+                } catch (err) {
+                  return res.status(500).json({ err });
+                }
+                const dateTime = moment().format('YYYYMMDDhhmmss');
+                const filePath = path.join(__dirname, "..", "public", "csv-" + dateTime + ".csv")
+                fs.writeFile(filePath, csv, function (err) {
+                  if (err) {
+                    return res.json(err).status(500);
+                  }
+                  else {
+                    setTimeout(function () {
+                      fs.unlinkSync(filePath); // delete this file after 30 seconds
+                    }, 300000);
+                    return res.json("/csv-" + dateTime + ".csv");
+                  }
+                });      
         }
       });
     });
-
 
 router.get('/userinfo',(req,res)=>{
     req.session.reload();

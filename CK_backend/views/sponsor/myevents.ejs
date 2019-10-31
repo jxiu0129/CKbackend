@@ -1,32 +1,20 @@
 <%-include('../root/header')-%>
-		<!-- Menu -->
-		<nav id="menu">
-		<script>
-			function check_link(jpgid) {
-				var x = document.getElementById(jpgid);
-				if (x.style.display === 'none') {
-					x.style.display = 'block';
-				}else{
-					x.style.display = 'none';
-				}
+	<script>
+		function check_link(jpgid) {
+			var x = document.getElementById(jpgid);
+			if (x.style.display === 'none') {
+				x.style.display = 'block';
+			}else{
+				x.style.display = 'none';
 			}
-		</script>
-    
-                      
-			<ul class="links">
-				<li><a href="../../login_index">首頁</a></li>
-				<li><a href="../../eventslist">活動列表</a></li>
-				<li><a href="../../couponlist">電子禮券排行榜</a></li>
-				<li><a href="./events">我辦的活動</a></li>
-				<li><a href="myrecords.html">我參加的活動</a></li>
-                <li><a href="qrcodelist.html">QRCode<img src="../images/fire.png" height="25" width="25"/></a></li>				
-			</ul>
-			<!--<ul class="actions vertical">
-				<li><a href="#" class="button fit">Login</a></li>
-			</ul>-->
-		</nav>
+		}
 
-		<!-- Main -->
+		function update_alert(){
+			alert("在您修改活動資訊前，請注意： \n\n1.當活動的「開始時間」在現在時間的一小時內，活動狀態會成為「正在進行」，屆時將無法再對活動進行修改及刪除，敬請留意！\n\n2.修改活動資訊中的「開始時間」與「結束時間」預設為2020-12-31 12:00，而非活動原本的開始時間及結束時間，煩請您將「開始時間」與「結束時間」調回原本活動的時間，感謝！")
+		}
+	</script>
+
+<!-- Main -->
 			<section id="main" class="wrapper">
 				<div class="inner">
 					<header class="align-center">
@@ -96,7 +84,7 @@
 													<%}%>
 
 													<div class="modal-footer">
-														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close<%=i%></button>
+														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 													</div>
 												</div>
 											</div>
@@ -118,7 +106,7 @@
 									<td><a href="/sponsor/events/<%= list_event[i]._id %>/attendancelist"><%=list_event[i].amount%></a></td>
 									<!-- 測試用，先開放超過時間能夠修改和刪除，之後上線直接解除此處的註解並在ejs前面補齊即可  -->
 									<!-- if(list_event[i].status == 'willhold'){%> -->
-										<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
+										<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>" onclick="update_alert()">修改</a>/
 											<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
 											<!-- <else{%>
 										<td>已超過更改時間</td>
@@ -157,7 +145,7 @@
 													<p>一旦開始發放點數，活動細則及出席表將再也無法更動。</p>
 												</div>
 												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">取消<%= i %></button>
+													<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
 													<button type="button" onclick="location.href='/sponsor/events/<%= list_event[i]._id %>/SendMultiPoint'" class="btn btn-primary">活動結束</button>
 	
 												</div>
@@ -201,12 +189,12 @@
 														<h3 class="inline">開始時間：</h3>
 														<br>
 														
-														<input type="datetime-local" name="time" id="event-editDateTime" value="2019-01-01T00:00" placeholder="2014-09-18">
+														<input type="datetime-local" name="time" id="event-editDateTime" value="2020-12-31T00:00" placeholder="2014-09-18">
 														<br>
 
 														<h3 class="inline">結束時間：</h3>
 														<br>
-														<input type="datetime-local" name="endtime" id="event-editEndTime" value="2019-01-01T00:00" placeholder="2014-09-18">
+														<input type="datetime-local" name="endtime" id="event-editEndTime" value="2020-12-31T00:00" placeholder="2014-09-18">
 														<br>
 
 														<h3 class="inline">發點數條件：</h3>

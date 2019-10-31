@@ -262,10 +262,12 @@ exports.edit_info_post = [
 
     (req,res,next)=>{
         req.session.reload();
-        User.findOneAndUpdate({email:req.session.user_info.user_info.email},{phone : req.body.phone})
-        .exec((err,theuser)=>{
-            res.redirect("./");
-        });
+        if (req.body.phone != null){
+            User.findOneAndUpdate({email:req.session.user_info.user_info.email},{phone : req.body.phone,inited : true})
+            .exec((err,theuser)=>{
+                res.redirect("./");
+            });    
+        }
     }
 ];
 
@@ -281,10 +283,12 @@ exports.edit_info_first_post = [
 
     (req,res,next)=>{
         req.session.reload();
-        User.findOneAndUpdate({email:req.session.user_info.user_info.email},{phone : req.body.phone})
-        .exec((err,theuser)=>{
-            res.redirect("./");
-        });
+        if (req.body.phone != null){
+            User.findOneAndUpdate({email:req.session.user_info.user_info.email},{phone : req.body.phone,inited : true})
+            .exec((err,theuser)=>{
+                res.redirect("./");
+            });
+        }
     }
 ];
 

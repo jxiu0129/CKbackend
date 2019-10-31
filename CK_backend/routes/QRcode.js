@@ -18,7 +18,7 @@ const User = require("../models/user");
 router.get('/testSignIn/:eventid',async (req,res,next)=>{
     req.session.reload();
     if(req.session.user_info == undefined){
-        res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'Please Log in',msg:'請先登入',url:req.session.API_LoginCode});
+        res.render('qrcode/checkin_nolog',{eventid:req.params.eventid});
     }else{
         
         async.parallel({
@@ -307,7 +307,7 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
     req.session.reload();
 
     if(req.session.user_info == undefined){
-        res.render('qrcode/alertmessage',{title:'Please Log in',msg:'請先登入'});
+        res.render('qrcode/checkout_nolog',{eventid:req.params.eventid});
     }else{
         async.parallel({
             user : function(callback){
@@ -635,12 +635,55 @@ router.get('/qrcodelist', (req,res,next)=>{
 });
 
 var shortUrl = require('node-url-shortener');
-router.get('/tttest',async (req,res)=>{
-    const atd = await Attendance.findOne({event_id:'5d9b9bbb4f3eb3086478e158'},(err)=>{
-        if (err) { return next(err); }
-    })
-    console.log(atd.list);   
+
+const fs = require('fs');
+const moment = require('moment');
+const json2csv = require('json2csv').parse;
+const path = require('path');
+const fields = ['email'];
+
+router.get('/ttest',(req,res)=>{
+    Attendance.findOne({event_id:'5d9d8f2e53de890b5cf82510'}, function (err, attd) {
+        let email_in_atd = attd.list.map(x=>x.email);
+        User.find({email:email_in_atd},function(err,user){
+            console.log(user);
+        });
+    });
 });
+router.get('/tttest',async (req,res)=>{
+
+    Attendance.find({event_id:'5d9d8f2e53de890b5cf82510'}, function (err, attd) {
+        if (err) {
+          return res.status(500).json({ err });
+        }
+        // let email_in_atd = attd.list.map(x=>x.email);
+        // User.find({email:email_in_atd},function(err,user){
+        //     console.log(user);
+        // });
+        else {
+          let csv;
+          try {
+            csv = json2csv(attd, { fields ,withBOM:true});
+          } catch (err) {
+            return res.status(500).json({ err });
+          }
+          const dateTime = moment().format('YYYYMMDDhhmmss');
+          const filePath = path.join(__dirname, "..", "public", "csv-" + dateTime + ".csv")
+          fs.writeFile(filePath, csv, function (err) {
+            if (err) {
+              return res.json(err).status(500);
+            }
+            else {
+              setTimeout(function () {
+                fs.unlinkSync(filePath); // delete this file after 30 seconds
+              }, 300000);
+              return res.json("/csv-" + dateTime + ".csv");
+            }
+          });
+    
+        }
+      });
+    });
 
 
 router.get('/userinfo',(req,res)=>{

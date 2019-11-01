@@ -8,6 +8,7 @@ const request = require('request');
 const QRCode = require('qrcode');
 const schedule = require('node-schedule');
 const moment = require('moment');
+const rp = require('request-promise');
 
 
 const { body,validationResult } = require('express-validator/check');
@@ -141,6 +142,28 @@ exports.sponsor_events= async(req,res,next) =>{
 
     req.session.reload();
     
+    let RefreshToken = req.session.API_Access.refresh_token;
+    let TokenRefreshClock = req.session.API_RefreshClock;
+    console.log(RefreshToken);
+    let NewToken;
+
+    setInterval(() => {
+        if (TokenRefreshClock <= Date.now() + 5 * 60 * 1000){
+            rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type=refresh_token&refresh_token=" + RefreshToken,async function(key, res ,body) {
+                // NewToken = await JSON.parse(body);
+                NewToken = await JSON.parse(body);
+                TokenRefreshClock += 5 * 60 * 1000;
+                console.log('1 minutes pass');
+                req.session.API_RefreshClock = TokenRefreshClock;
+                req.session.API_Access = NewToken;
+                console.log(req.session.API_Access);
+                req.session.save();
+            }).catch((err) => {
+                console.log('hi this is error');
+            });
+        }
+    }, 10 * 1000);
+
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{
         if (err) { return next(err); }

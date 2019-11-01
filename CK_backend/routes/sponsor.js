@@ -4,6 +4,13 @@ const router = express.Router();
 const index_controller = require('../controllers/indexController');
 const sponsor_controller = require('../controllers/sponsorController');
 
+router.get('/a',(req,res)=>{
+    res.render('sponsor/attendancelist',{ username: 'Daniel', url:'req.session.API_LoginCode'});
+});
+
+router.get('/b',(req,res)=>{
+    res.render('user/myrecords',{ username: 'Daniel', url:'req.session.API_LoginCode'});
+});
 // GET sponsors events and show detail of events
 router.get('/sponsor/events/',sponsor_controller.sponsor_events);
 

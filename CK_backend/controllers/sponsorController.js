@@ -1452,3 +1452,42 @@ exports.sponsor_delete_post= async (req,res,next) => {
         };
 
 */
+
+exports.SignToRecord = async (req, res, eventId, Status) => { //status 是指要簽到還是簽退，所以這裡只能丟In or Out
+    console.log('location.code : ' + req.query.code);
+    req.session.reload();
+    let API_Access, API_LoginCode, API_User;
+    req.session.API_LoginCode = req.query.code;
+    if(!req.session.API_LoginCode){
+        console.log('wrong dude');
+
+    }else{
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/testSign'+ Status + '/' + eventId +'&code=' + req.session.API_LoginCode, function(req,res, body){
+            API_Access = JSON.parse(body);
+        })
+        .catch(async () => {
+            console.log(API_Access);
+            await rp.get('https://points.nccu.edu.tw/openapi/user_info', {
+                'auth': {
+                    'bearer': API_Access.access_token
+                }
+            })
+            .then((message) => {
+                console.log('True');
+                API_User = JSON.parse(message);
+                console.log(API_User.user_info.sponsor_point);
+                req.session.user_info = API_User;
+                req.session.API_Access = API_Access;
+                req.session.API_RefreshClock = Date.now();
+                req.session.API_LoginCode = req.query.code;
+                req.session.save();
+    
+                console.log(req.session.user_info);
+            })
+            .catch((err) =>{
+                console.log('fail');
+            });
+            console.log(req.session.API_LoginCode);
+        });
+    }
+};

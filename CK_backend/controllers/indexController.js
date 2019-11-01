@@ -124,6 +124,7 @@ exports.logout_but = (req, res) => {
 };
 
 let getUserInfo = (req, access_token_input) => {
+    req.session.reload();
     rp.get('https://points.nccu.edu.tw/openapi/user_info', {
         'auth': {
             'bearer': access_token_input
@@ -132,10 +133,8 @@ let getUserInfo = (req, access_token_input) => {
         console.log(msg);
         API_User = msg;
         req.session.user_info = API_User;
-       
-       
         req.session.API_Access = API_Access;
-        API_RefreshClock = Date.now() + 5 * 60000;
+        API_RefreshClock = Date.now();
         req.session.API_RefreshClock = Date.now();
         req.session.save();
     }).catch((err) => {
@@ -145,6 +144,7 @@ let getUserInfo = (req, access_token_input) => {
 };
 
 exports.getUserInfoOutSide = (req, access_token_input) => {
+    req.session.reload();
     rp.get('https://wm.nccu.edu.tw/openapi/user_info', {
         'auth': {
             'bearer': access_token_input
@@ -308,7 +308,8 @@ let multipoint = {
     json: true // Automatically stringifies the body to JSON
 };
 
-exports.Send_Multi_Point = async function(req, res){    
+exports.Send_Multi_Point = async function(req, res){
+    req.session.reload();
     let attndid;
     let list = [];
     let event_name;
@@ -316,7 +317,7 @@ exports.Send_Multi_Point = async function(req, res){
     let remainder;
     let count=0;
     await Event.findById(req.params.eventid)
-    .exec((err, data) => {
+    .exec(async(err, data) => {
         if (err) { 
             console.log(err);
         }else{
@@ -324,7 +325,7 @@ exports.Send_Multi_Point = async function(req, res){
             attndid = data.AttendanceList[0];
             event_name = data.name;
             point = data.expense;
-            Attendance.findById(attndid)
+            await Attendance.findById(attndid)
             .exec((err, data) => {
                 if (err){
                     console.log(err);
@@ -345,7 +346,7 @@ exports.Send_Multi_Point = async function(req, res){
                 sendpoint.auth.bearer = req.session.API_Access.access_token;
                 sendpoint.body.to_accounts = list;
                 sendpoint.body.point = point;
-                sendpoint.body.description = event_name;
+                sendpoint.body.description = '政大活動點-' + event_name;
                 rp(sendpoint)
                 .then((message) =>{
                     console.log(message);
@@ -353,7 +354,7 @@ exports.Send_Multi_Point = async function(req, res){
                 .catch((err) =>{
                     console.log(err);
                 });
-                                
+
                 // 按下活動結束後會更改活動的status為finsih
                 Event.findByIdAndUpdate(req.params.eventid , {status : 'finish',SendPoint : point})
                 .exec(console.log("Successfully change status to finished"));
@@ -365,12 +366,14 @@ exports.Send_Multi_Point = async function(req, res){
             User.findOne({email:req.session.user_info.user_info.email})
             .exec((err,user)=>{
                 User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - data.expense})
-                .exec(res.render('qrcode/alertmessage',{username :req.session.user_info.user_info.username,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'}))
+                .exec((err)=>{
+                    console.log(123+req.session.user_info);
+                    res.redirect('/updateUserInfo');
+                });
             });
         }
     });
 };
-
 
 //活動列表
 

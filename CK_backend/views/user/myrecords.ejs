@@ -19,76 +19,74 @@
 				</tr>
 				</thead>
 				<tbody>
-				<% for(let i = 0; i < event_info.length; i++) {%>
-				<tr>
-					<td title="活動ID: <%= event_info[i].event_id.shortid%>"><%= event_info[i].event_id.name%></td>
-					<td><%= event_info[i].event_id.time.toLocaleDateString()%></td>
-					<td><%= event_info[i].event_id.location%></td>
-					<td><%= event_info[i].event_id.expense%></td>
-
-					<%if(event_info[i].event_id.SendPoint != undefined && event_info[i].event_id.SendPoint != null){%>
-						<td><img src="../images/piggy-bank.png" height="20" width="20"/>
-							<%=event_info[i].event_id.SendPoint%></td>
-					<%}else{%>
-							<td title="活動結束才會發放點數">活動尚未結束</td>
-					<%}%>
-
-
-					<%if(event_info[i].signin != undefined && event_info[i].signin != null){%>
-						<%//console.log('刷進!進else')%>
-						<td><%=event_info[i].signin.toLocaleString({second:'numeric', hour12: false})%></td>
-					<%}else{%>
-						<%//console.log('刷進進else')%>
-							<td class="inline">尚未刷到</td>
-					<%}%>
-
-
-					<%if(event_info[i].signout != undefined && event_info[i].signout != null){%>
-						<%//console.log('刷退!進else')%>
-						<td><%=event_info[i].signout.toLocaleString({hour12: false})%></td>
-					<%}else{%>
-						<%//console.log('刷退進else')%>
-							<td>尚未刷退</td>
-					<%}%>
-
-					<!--Modal 這裡不需要了QQ-->
-					<div class="modal fade" id="record1" tabindex="-1" role="dialog" aria-labelledby="recordLabel" aria-hidden="true">
-						<div class="modal-dialog" role="document">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h3 class="modal-title" id="recordLabel">報到與刷退紀錄</h3>
-									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-										<span aria-hidden="true">&times;</span>
-									</button>
-								</div>
-
-								<div class="modal-body">
-									<%if(event_info[i].signin != undefined){%>
-										<h3 class="inline">報到時間：</h3><p class="inline"><%=event_info[i].signin.toLocaleString()%></p>
-									<%}else{%>
-											<h3 class="inline">報到時間：</h3><p class="inline">尚未刷到</p>
-									<%}%>
-
-									<br>
-
-									<%if(event_info[i].signout != undefined){%>
-										<h3 class="inline">刷退時間：</h3><p class="inline"><%=event_info[i].signout.toLocaleString()%></p>
-									<%}else{%>
-										<h3 class="inline">刷退時間：</h3><p class="inline">尚未刷退</p>
-									<%}%>
-
-									<br>
-
-								</div>
-
-								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</tr>
-				<%};%>
+					<tr>
+						<td>校園安全講座</td>
+						<td>2019/11/2 AM 11:30</td>
+						<td>大勇103</td>
+						<td>2000</td>
+						<td>200</td>
+						<td width="200px" style= "word-break:break-all">2019-11-02 AM 11:52</td>
+						<td width="200px" style= "word-break:break-all">2019-11-02 AM 13:40</td>
+					</tr>
+					<tr>
+							<td>XX銀行徵才會</td>
+							<td>2019/11/2 AM 11:30</td>
+							<td>玉山演講廳</td>
+							<td>5000</td>
+							<td>100</td>
+							<td width="200px" style= "word-break:break-all">2019-11-02 AM 11:52</td>
+							<td width="200px" style= "word-break:break-all">2019-11-02 AM 13:40</td>
+						</tr>					<tr>
+								<td>Bmazon 資訊安全說明會</td>
+								<td>2019/11/2 AM 11:30</td>
+								<td>四維堂</td>
+								<td>3000</td>
+								<td>50</td>
+								<td width="200px" style= "word-break:break-all">2019-11-02 AM 11:52</td>
+								<td width="200px" style= "word-break:break-all">2019-11-02 AM 13:40</td>
+							</tr>					<tr>
+									<td>身心靈健康講座</td>
+									<td>2019/11/2 AM 11:30</td>
+									<td>資訊306</td>
+									<td>3000</td>
+									<td>500</td>
+									<td width="200px" style= "word-break:break-all">2019-11-02 AM 11:52</td>
+									<td width="200px" style= "word-break:break-all">2019-11-02 AM 13:40</td>
+								</tr>					<tr>
+										<tr>
+												<td>校園安全講座</td>
+												<td>2019/11/2 AM 11:30</td>
+												<td>大勇103</td>
+												<td>2000</td>
+												<td>200</td>
+												<td width="200px" style= "word-break:break-all">2019-11-02 AM 11:52</td>
+												<td width="200px" style= "word-break:break-all">2019-11-02 AM 13:40</td>
+											</tr>
+											<tr>
+													<td>XX銀行徵才會</td>
+													<td>2019/11/2 AM 11:30</td>
+													<td>玉山演講廳</td>
+													<td>5000</td>
+													<td>100</td>
+													<td width="200px" style= "word-break:break-all">2019-11-02 AM 11:52</td>
+													<td width="200px" style= "word-break:break-all">2019-11-02 AM 13:40</td>
+												</tr>					<tr>
+														<td>Bmazon 資訊安全說明會</td>
+														<td>2019/11/2 AM 11:30</td>
+														<td>四維堂</td>
+														<td>3000</td>
+														<td>50</td>
+														<td width="200px" style= "word-break:break-all">2019-11-02 AM 11:52</td>
+														<td width="200px" style= "word-break:break-all">2019-11-02 AM 13:40</td>
+													</tr>					<tr>
+															<td>身心靈健康講座</td>
+															<td>2019/11/2 AM 11:30</td>
+															<td>資訊306</td>
+															<td>3000</td>
+															<td>500</td>
+															<td width="200px" style= "word-break:break-all">2019-11-02 AM 11:52</td>
+															<td width="200px" style= "word-break:break-all">2019-11-02 AM 13:40</td>
+														</tr>	
 				</tbody>
 			</table>
 		</div>

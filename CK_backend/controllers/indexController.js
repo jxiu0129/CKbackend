@@ -170,7 +170,7 @@ exports.login_index = async function(req, res){
     req.session.API_LoginCode = req.query.code;
     if(!req.session.API_LoginCode){
         console.log('wrong dude');
-        res.redirect("./");
+        res.render('root/index');
     }else{
         rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);

@@ -36,3 +36,17 @@ const findEventB = () => {
     });
     console.log(target);
 };
+
+const findUser = () => {
+    let target = $('#query').val();
+    // location.href = 'localhost:3000/eventslist?search=' + target;
+    $.ajax({
+        url: `http://localhost:3000/sponsor/events/:eventid/attendancelist?search=${target}`,
+        success: () => {
+            console.log('success find');
+            window.location.href = `http://localhost:3000/sponsor/events/:eventid/attendancelist?search=${target}`;
+        },
+        error: () => console.log('fail to find')
+    });
+    console.log(target);
+};

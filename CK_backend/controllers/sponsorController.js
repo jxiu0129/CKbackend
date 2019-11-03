@@ -505,45 +505,89 @@ exports.sponsor_update_post= [
 
 exports.events_attendancelist = function(req,res,next){
 
-    Event.findById(req.params.eventid)
-    .populate('holder')
-    .exec((err,theevt) =>{
-        Attendance.findOne({event_id : req.params.eventid},'list')
-        // .sort([['email','descending']])
-        .exec(function (err, thisattnd){
-            if (err) { return next(err); }
-            // Successful, so render.
+    if(req.query.search != undefined){
+        Event
+        .findById(req.params.eventid)
+        // .find({ email: { $regex: req.query.search , $options: 'im' }})
+        .populate('holder')
+        .exec((err,theevt) =>{
             console.log(theevt);
-            console.log(thisattnd);
-
-            if(theevt.signCondition == 'bothSign'){
-                res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
-            }else if (theevt.signCondition == 'onlyIn'){
-                let timeinArray;
-                let timeinlength;
-
-                if(thisattnd != null){
-                    timeinArray = thisattnd.list.map(x => x.time_in);
-                    timeinlength = timeinArray.filter((value)=>{
-                        return value != null;
-                    });
-                }                
-                res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
-            }else if (theevt.signCondition == 'onlyOut'){
-                let timeoutArray;
-                let timeoutlength;
-
-                if(thisattnd != null){
-                    timeoutArray = thisattnd.list.map(x => x.time_out);
-                    timeoutlength = timeoutArray.filter((value)=>{
-                        return value != null;
-                    });
-                }
-                res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
-            }
-        });
-    });
+            Attendance.findOne({event_id : req.params.eventid},'list')
+            // .sort([['email','descending']])
+            .exec(function (err, thisattnd){
+                if (err) { return next(err); }
+                // Successful, so render.
+                console.log(theevt);
+                console.log(thisattnd);
     
+                if(theevt.signCondition == 'bothSign'){
+                    res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                }else if (theevt.signCondition == 'onlyIn'){
+                    let timeinArray;
+                    let timeinlength;
+    
+                    if(thisattnd != null){
+                        timeinArray = thisattnd.list.map(x => x.time_in);
+                        timeinlength = timeinArray.filter((value)=>{
+                            return value != null;
+                        });
+                    }                
+                    res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                }else if (theevt.signCondition == 'onlyOut'){
+                    let timeoutArray;
+                    let timeoutlength;
+    
+                    if(thisattnd != null){
+                        timeoutArray = thisattnd.list.map(x => x.time_out);
+                        timeoutlength = timeoutArray.filter((value)=>{
+                            return value != null;
+                        });
+                    }
+                    res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                }
+            });
+        });
+    }
+    else{
+        Event.findById(req.params.eventid)
+        .populate('holder')
+        .exec((err,theevt) =>{
+            Attendance.findOne({event_id : req.params.eventid},'list')
+            // .sort([['email','descending']])
+            .exec(function (err, thisattnd){
+                if (err) { return next(err); }
+                // Successful, so render.
+                console.log(theevt);
+                console.log(thisattnd);
+    
+                if(theevt.signCondition == 'bothSign'){
+                    res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                }else if (theevt.signCondition == 'onlyIn'){
+                    let timeinArray;
+                    let timeinlength;
+    
+                    if(thisattnd != null){
+                        timeinArray = thisattnd.list.map(x => x.time_in);
+                        timeinlength = timeinArray.filter((value)=>{
+                            return value != null;
+                        });
+                    }                
+                    res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                }else if (theevt.signCondition == 'onlyOut'){
+                    let timeoutArray;
+                    let timeoutlength;
+    
+                    if(thisattnd != null){
+                        timeoutArray = thisattnd.list.map(x => x.time_out);
+                        timeoutlength = timeoutArray.filter((value)=>{
+                            return value != null;
+                        });
+                    }
+                    res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                }
+            });
+        });
+    }    
 };
 
 exports.events_attendancelist_record = function(req,res,next){
@@ -1347,7 +1391,7 @@ exports.SignBoth_create_post= [
                         if(theAtd.list[j].reward == true){
                             _rwd ++;
                         }
-                    };
+                    }
 
                     console.log(_rwd);
                     

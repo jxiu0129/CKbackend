@@ -123,44 +123,34 @@ exports.logout_but = (req, res) => {
     res.redirect('http://localhost:3000/');
 };
 
-let getUserInfo = (req, access_token_input) => {
-    req.session.reload();
-    rp.get('https://points.nccu.edu.tw/openapi/user_info', {
+let getUserInfo = async (access_token_input) => {
+    let returnValue = 0;
+    await rp.get('https://points.nccu.edu.tw/openapi/user_info', {
         'auth': {
             'bearer': access_token_input
         }
     }).then((msg) => {
-        console.log(msg);
-        API_User = msg;
-        req.session.user_info = API_User;
-        req.session.API_Access = API_Access;
-        API_RefreshClock = Date.now();
-        req.session.API_RefreshClock = Date.now();
-        req.session.save();
+        returnValue = JSON.parse(msg);
     }).catch((err) => {
         console.log('Fail to get userinfo because of :');
         console.log(err);
     });
+    return returnValue;
 };
 
-exports.getUserInfoOutSide = (req, access_token_input) => {
-    req.session.reload();
-    rp.get('https://wm.nccu.edu.tw/openapi/user_info', {
+exports.getUserInfoOutSide = (access_token_input) => {
+    let returnValue = 0;
+    await rp.get('https://points.nccu.edu.tw/openapi/user_info', {
         'auth': {
             'bearer': access_token_input
         }
     }).then((msg) => {
-        console.log(msg);
-        API_User = msg;
-        req.session.user_info = API_User;
-        req.session.API_Access = API_Access;
-        req.session.API_RefreshClock = Date.now();
-
-        req.session.save();
+        returnValue = JSON.parse(msg);
     }).catch((err) => {
         console.log('Fail to get userinfo because of :');
         console.log(err);
     });
+    return returnValue;
 };
 // module.exports =  getUserInfo();
 

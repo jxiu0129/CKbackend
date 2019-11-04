@@ -39,12 +39,12 @@ const findEventB = () => {
 
 const findUser = () => {
     let target = $('#query').val();
-    // location.href = 'localhost:3000/eventslist?search=' + target;
+    // location.href = 'attend.nccu.edu.tw/eventslist?search=' + target;
     $.ajax({
-        url: `http://localhost:3000/sponsor/events/:eventid/attendancelist?search=${target}`,
+        url: `http://attend.nccu.edu.tw/sponsor/events/:eventid/attendancelist?search=${target}`,
         success: () => {
             console.log('success find');
-            window.location.href = `http://localhost:3000/sponsor/events/:eventid/attendancelist?search=${target}`;
+            window.location.href = `http://attend.nccu.edu.tw/sponsor/events/:eventid/attendancelist?search=${target}`;
         },
         error: () => console.log('fail to find')
     });
@@ -55,7 +55,7 @@ const downloadCSV = (id) => {
     let btn = confirm('確定要下載嗎？');
     if(btn){ 
         $.ajax({
-            url: `http://localhost:3000/exportCSV/${id}`,
+            url: `http://attend.nccu.edu.tw/exportCSV/${id}`,
             success: () => {
                 console.log('success dld');
             },

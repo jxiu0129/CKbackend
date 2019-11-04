@@ -23,7 +23,7 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
     req.session.reload();
 
     if(req.session.user_info == undefined){
-        res.redirect('http://localhost:3000/QRin_nologin/'+req.params.eventid);
+        res.redirect('http://attend.nccu.edu.tw/QRin_nologin/'+req.params.eventid);
     }else{
         await sponsor_controller.SignToRecord(req,res,req.params.eventid,'In')
         .then(() => {
@@ -313,7 +313,7 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
     req.session.reload();
 
     if(req.session.user_info == undefined){
-        res.redirect('http://localhost:3000/QRout_nologin/'+req.params.eventid);
+        res.redirect('http://attend.nccu.edu.tw/QRout_nologin/'+req.params.eventid);
     }else{
         async.parallel({
             user : function(callback){
@@ -609,7 +609,7 @@ let login_checkin = async function(req, res, next){
         console.log('wrong dude');
         res.render('root/index');
     }else{
-        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/QRin_login/'+req.params.eventid+'&code=' + API_LoginCode, function(req,res, body){
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://attend.nccu.edu.tw/QRin_login/'+req.params.eventid+'&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
         })
         .catch(async () => {
@@ -659,7 +659,7 @@ let login_checkin = async function(req, res, next){
             });
             console.log(req.session.API_LoginCode);
             // res.redir('root/login_index', { username : API_User.user_info.name, url:req.session.API_LoginCode});
-            res.redirect('http://localhost:3000/testSignIn/'+req.params.eventid);
+            res.redirect('http://attend.nccu.edu.tw/testSignIn/'+req.params.eventid);
         });
     }
 };
@@ -673,7 +673,7 @@ let login_checkout = async function(req, res, next){
         console.log('wrong dude');
         res.render('root/index');
     }else{
-        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/QRout_login/'+req.params.eventid+'&code=' + API_LoginCode, function(req,res, body){
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://attend.nccu.edu.tw/QRout_login/'+req.params.eventid+'&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
         })
         .catch(async () => {
@@ -723,7 +723,7 @@ let login_checkout = async function(req, res, next){
             });
             console.log(req.session.API_LoginCode);
             // res.redir('root/login_index', { username : API_User.user_info.name, url:req.session.API_LoginCode});
-            res.redirect('http://localhost:3000/testSignOut/'+req.params.eventid);
+            res.redirect('http://attend.nccu.edu.tw/testSignOut/'+req.params.eventid);
         });
     }
 };

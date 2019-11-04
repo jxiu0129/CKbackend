@@ -1536,7 +1536,7 @@ exports.SignToRecord = async (req, res, eventId, Status) => { //status 是指要
         console.log('wrong dude');
 
     }else{
-        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/testSign'+ Status + '/' + eventId +'&code=' + req.session.API_LoginCode, function(req,res, body){
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://attend.nccu.edu.tw/testSign'+ Status + '/' + eventId +'&code=' + req.session.API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
         })
         .catch(async () => {

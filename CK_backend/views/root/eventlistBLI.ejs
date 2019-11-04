@@ -12,6 +12,7 @@
 		<link rel="stylesheet" href="/stylesheets/css/bootstrap.min.css">
 		<link rel="stylesheet" href="/stylesheets/assets/css/main.css" />
 		<link rel="stylesheet" href="/stylesheets/assets/css/edit.css">
+		<link rel="Icon" href="../../../images/logo.ico" />
 		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 		<script src="/javascripts/bootstrap.min.js"></script>
 	</head>
@@ -21,7 +22,7 @@
 				<nav class="left">
 					<a href="#menu"><span>Menu</span></a>
 				</nav>
-				<a href="http://attend.nccu.edu.tw" class="logo"><img src="images/logo.png" height="36.65" width="26.6"/>      NCCU Attendance</a>
+				<a href="http://attend.nccu.edu.tw" class="logo"><img src="../../../images/logo.png" class="logo_img" height="36.65" width="26.6"/>      NCCU Attendance</a>
 				<nav class="right">
 					<a href="#" class="button alt " data-toggle="modal" data-target="#exampleModal">Log in</a>
 					<!-- Modal -->
@@ -132,7 +133,7 @@
 								<%}%>
 								
 								<%if(_event[i].ncculink != undefined) {%>
-									<td width="100px" style= "word-break:break-all"><a href="<%=_event[i].ncculink%>" style="font-weight: bold">我要報名</a></td>
+									<td width="100px" style= "word-break:break-all"><a href="<%=_event[i].ncculink%>" target="_blank" style="font-weight: bold">我要報名</a></td>
 								<%}else{%>
 									<td>無</td>
 								<%}%>

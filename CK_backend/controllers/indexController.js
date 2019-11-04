@@ -123,54 +123,49 @@ exports.logout_but = (req, res) => {
     res.redirect('https://attend.nccu.edu.tw');
 };
 
-let getUserInfo = (req, access_token_input) => {
-    rp.get('https://points.nccu.edu.tw/openapi/user_info', {
+let getUserInfo = async (access_token_input) => {
+    let returnValue = 0;
+    await rp.get('https://points.nccu.edu.tw/openapi/user_info', {
         'auth': {
             'bearer': access_token_input
         }
     }).then((msg) => {
-        console.log(msg);
-        API_User = msg;
-        req.session.user_info = API_User;
-       
-       
-        req.session.API_Access = API_Access;
-        API_RefreshClock = Date.now() + 5 * 60000;
-        req.session.API_RefreshClock = Date.now();
-        req.session.save();
+        returnValue = JSON.parse(msg);
     }).catch((err) => {
         console.log('Fail to get userinfo because of :');
         console.log(err);
     });
+    return returnValue;
 };
 
+<<<<<<< HEAD
 exports.getUserInfoOutSide = (req, access_token_input) => {
     rp.get('https://points.nccu.edu.tw/openapi/user_info', {
+=======
+exports.getUserInfoOutSide = async (access_token_input) => {
+    let returnValue = 0;
+    await rp.get('https://points.nccu.edu.tw/openapi/user_info', {
+>>>>>>> develop
         'auth': {
             'bearer': access_token_input
         }
     }).then((msg) => {
-        console.log(msg);
-        API_User = msg;
-        req.session.user_info = API_User;
-        req.session.API_Access = API_Access;
-        req.session.API_RefreshClock = Date.now();
-
-        req.session.save();
+        returnValue = JSON.parse(msg);
     }).catch((err) => {
         console.log('Fail to get userinfo because of :');
         console.log(err);
     });
+    return returnValue;
 };
 // module.exports =  getUserInfo();
 
-exports.login_index = async function(req, res){
+exports.login_index = async function(req, res, next){
     console.log('location.code : ' + req.query.code);
     API_LoginCode = req.query.code;
     req.session.API_LoginCode = req.query.code;
     if(!req.session.API_LoginCode){
         console.log('wrong dude');
-        res.redirect("./");
+        res.render('root/index');
     }else{
         rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=https://attend.nccu.edu.tw/login_index&code=' + API_LoginCode, function(req,res, body){
             API_Access = JSON.parse(body);
@@ -183,7 +178,7 @@ exports.login_index = async function(req, res){
                     'bearer': API_Access.access_token
                 }
             })
-            .then((message) => {
+            .then(async(message) => {
                 API_User = JSON.parse(message);
                 console.log(API_User.user_info.sponsor_point);
                 req.session.user_info = API_User;
@@ -193,6 +188,29 @@ exports.login_index = async function(req, res){
                 req.session.save();
     
                 console.log(req.session.user_info);
+            
+                // 新用戶登入後在資料庫新增資料
+                let user = await User.findOne({email : req.session.user_info.user_info.email});
+                console.log(user);
+                if (!user) { 
+                    let _user =new User( {
+                        email : req.session.user_info.user_info.email,
+                        inited : false,
+                        name : req.session.user_info.user_info.name,
+                        hold : {
+                            isHolder : false,
+                            holded_events : [],
+                        },
+                        spendedAmount : 0,
+                        attend : [],
+                    });
+
+                    _user.save();
+
+                }else if(user){
+                    console.log('This User has already in DB of NCCU attendance');
+                }
+
             })
             .catch(() =>{
                 console.log('fail');
@@ -262,10 +280,12 @@ exports.edit_info_post = [
 
     (req,res,next)=>{
         req.session.reload();
-        User.findOneAndUpdate({email:req.session.user_info.user_info.email},{phone : req.body.phone})
-        .exec((err,theuser)=>{
-            res.redirect("./");
-        });
+        if (req.body.phone != null){
+            User.findOneAndUpdate({email:req.session.user_info.user_info.email},{phone : req.body.phone,inited : true})
+            .exec((err,theuser)=>{
+                res.redirect("./");
+            });    
+        }
     }
 ];
 
@@ -281,10 +301,12 @@ exports.edit_info_first_post = [
 
     (req,res,next)=>{
         req.session.reload();
-        User.findOneAndUpdate({email:req.session.user_info.user_info.email},{phone : req.body.phone})
-        .exec((err,theuser)=>{
-            res.redirect("./");
-        });
+        if (req.body.phone != null){
+            User.findOneAndUpdate({email:req.session.user_info.user_info.email},{phone : req.body.phone,inited : true})
+            .exec((err,theuser)=>{
+                res.redirect("/user_profile");
+            });
+        }
     }
 ];
 
@@ -304,7 +326,8 @@ let multipoint = {
     json: true // Automatically stringifies the body to JSON
 };
 
-exports.Send_Multi_Point = async function(req, res){    
+exports.Send_Multi_Point = async function(req, res){
+    req.session.reload();
     let attndid;
     let list = [];
     let event_name;
@@ -312,7 +335,7 @@ exports.Send_Multi_Point = async function(req, res){
     let remainder;
     let count=0;
     await Event.findById(req.params.eventid)
-    .exec((err, data) => {
+    .exec(async(err, data) => {
         if (err) { 
             console.log(err);
         }else{
@@ -320,7 +343,7 @@ exports.Send_Multi_Point = async function(req, res){
             attndid = data.AttendanceList[0];
             event_name = data.name;
             point = data.expense;
-            Attendance.findById(attndid)
+            await Attendance.findById(attndid)
             .exec((err, data) => {
                 if (err){
                     console.log(err);
@@ -341,7 +364,7 @@ exports.Send_Multi_Point = async function(req, res){
                 sendpoint.auth.bearer = req.session.API_Access.access_token;
                 sendpoint.body.to_accounts = list;
                 sendpoint.body.point = point;
-                sendpoint.body.description = event_name;
+                sendpoint.body.description = '政大活動點-' + event_name;
                 rp(sendpoint)
                 .then((message) =>{
                     console.log(message);
@@ -349,7 +372,7 @@ exports.Send_Multi_Point = async function(req, res){
                 .catch((err) =>{
                     console.log(err);
                 });
-                                
+
                 // 按下活動結束後會更改活動的status為finsih
                 Event.findByIdAndUpdate(req.params.eventid , {status : 'finish',SendPoint : point})
                 .exec(console.log("Successfully change status to finished"));
@@ -361,12 +384,14 @@ exports.Send_Multi_Point = async function(req, res){
             User.findOne({email:req.session.user_info.user_info.email})
             .exec((err,user)=>{
                 User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - data.expense})
-                .exec(res.render('qrcode/alertmessage',{username :req.session.user_info.user_info.username,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'}))
+                .exec((err)=>{
+                    console.log(123+req.session.user_info);
+                    res.redirect('/updateUserInfo');
+                });
             });
         }
     });
 };
-
 
 //活動列表
 

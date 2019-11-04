@@ -1,8 +1,15 @@
 <%-include('../root/header')-%>
+	<style>
+		[contenteditable=true]:empty:before{
+		content: attr(placeholder);
+		display: block; /* For Firefox */
+		}
+	</style>
+
     <script language="javascript" type="text/javascript">
         function getContent(){
             document.getElementById("submit-phone").value = document.getElementById("phone").innerHTML;
-        }
+		}
     </script>
 		<!-- Main -->
 		<section id="main" class="wrapper">
@@ -29,7 +36,7 @@
 						</tr>
 						<tr>
 							<td>會員電話（可編輯）</td>
-							<td contentEditable="true" id="phone"><%=user.phone%></td>
+							<td contentEditable="true" id="phone" placeholder="點此輸入電話"><%=user.phone%></td>
 						</tr>
 						<!-- <tr>
 							<td>會員公帳點數</td>

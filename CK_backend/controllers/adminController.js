@@ -1177,13 +1177,38 @@ exports.Signboth_create_post= [
   }       
 ];
 
+exports.check_delete_post = async(req,res,next)=>{
+    let attd = await Attendance.findOne({event_id : req.params.eventid});
+    let useremail = req.query.email;
+    let user = await User.findOne({email : useremail});
+    let event = await Event.findById(req.params.eventid);
+    let list = attd.list;
+    let user_attend = user.attend;
 
-exports.check_delete_get= function(req,res){
-    res.render('index' , { title : "刪除簽到/刷退"});
-};
+    let attd_num = list.map(x => x.email).indexOf(useremail);
+    list.splice(attd_num,1);
+    
+    let user_num = user_attend.map(x => x.event_id).indexOf(req.params.eventid);
+    user_attend.splice(user_num,1);
 
-exports.check_delete_post= function(req,res){
-    res.render('index' , { title : "刪除簽到/刷退"});
+    let amount = event.amount -1;
+    
+    Attendance.findByIdAndUpdate(attd._id,{list : list})
+    .exec((err)=>{
+        if (err){return next(err);}
+        console.log("Successfully update Attendance");
+    });
+    User.findByIdAndUpdate(user._id,{ attend: user_attend})
+    .exec((err)=>{
+        if (err){return next(err);}
+        console.log("Successfully update User");
+    });
+    Event.findByIdAndUpdate(req.params.eventid,{amount : amount})
+    .exec((err)=>{
+        if (err){return next(err);}
+        console.log("Successfully update Event");
+    });
+
 };
 
 exports.user_events = function(req,res){

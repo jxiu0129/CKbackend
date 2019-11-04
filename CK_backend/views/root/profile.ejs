@@ -37,7 +37,8 @@
 							<td>活動點—可用點數</td>
 							<td>
 								<img src="../images/piggy-bank.png" height="20" width="20"/>
-                                <%let rPoint = nPoint - user.spendedAmount%>
+								<% let rPoint = nPoint - user.spendedAmount %> 
+								%>
                                 <%= rPoint %>
 							</td>
 						</tr>
@@ -52,11 +53,11 @@
 
 						<!--button-->
 						<ul class="actions fit">
-							<li><a href="./edit_info" class="button fit">編輯個人資料</a></li>
+							<li><a href="/user_profile/edit_info" class="button fit">編輯個人資料</a></li>
 						</ul>
 
 					</div>
 				</form>
 			</div>
-		</section>
+		</section> 
 <%-include('../root/footer')-%>

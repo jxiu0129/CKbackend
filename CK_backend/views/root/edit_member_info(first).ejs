@@ -1,9 +1,16 @@
 <%-include('../root/header')-%>
-<script language="javascript" type="text/javascript">
-    function getContent(){
-        document.getElementById("submit-phone").value = document.getElementById("phone").innerHTML;
-    }
-</script>
+	<style>
+		[contenteditable=true]:empty:before{
+		content: attr(placeholder);
+		display: block; /* For Firefox */
+		}
+	</style>
+
+	<script language="javascript" type="text/javascript">
+		function getContent(){
+			document.getElementById("submit-phone").value = document.getElementById("phone").innerHTML;
+		}
+	</script>
 		<!-- Main -->
 			<section id="main" class="wrapper">
 				<div class="inner">
@@ -44,7 +51,7 @@
 							</tr> -->
 							<tr>
 								<td>會員電話</td>
-								<td contentEditable="true" id='phone' name="add_phone_number">請新增會員電話</td>
+								<td contentEditable="true" id='phone' name="add_phone_number" placeholder="點此輸入電話"></td>
 							</tr>
 							</tbody>
 						</table>

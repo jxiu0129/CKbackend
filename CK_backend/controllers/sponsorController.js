@@ -8,6 +8,7 @@ const request = require('request');
 const QRCode = require('qrcode');
 const schedule = require('node-schedule');
 const moment = require('moment');
+const rp = require('request-promise');
 
 
 const { body,validationResult } = require('express-validator/check');
@@ -141,6 +142,28 @@ exports.sponsor_events= async(req,res,next) =>{
 
     req.session.reload();
     
+    let RefreshToken = req.session.API_Access.refresh_token;
+    let TokenRefreshClock = req.session.API_RefreshClock;
+    console.log(RefreshToken);
+    let NewToken;
+
+    setInterval(() => {
+        if (TokenRefreshClock <= Date.now() + 5 * 60 * 1000){
+            rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type=refresh_token&refresh_token=" + RefreshToken,async function(key, res ,body) {
+                // NewToken = await JSON.parse(body);
+                NewToken = await JSON.parse(body);
+                TokenRefreshClock += 5 * 60 * 1000;
+                console.log('1 minutes pass');
+                req.session.API_RefreshClock = TokenRefreshClock;
+                req.session.API_Access = NewToken;
+                console.log(req.session.API_Access);
+                req.session.save();
+            }).catch((err) => {
+                console.log('hi this is error');
+            });
+        }
+    }, 10 * 1000);
+
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{
         if (err) { return next(err); }
@@ -296,7 +319,7 @@ exports.sponsor_create_post = [
                 let _holdedEvents = theuser.hold.holded_events;
                 let _spendedAmount = Number(theuser.spendedAmount) + Number(req.body.expense);
                 User.findByIdAndUpdate(theuser._id, {spendedAmount: _spendedAmount , hold: { isHolder : true, holded_events : _holdedEvents}})
-                .exec(res.redirect('./'));
+                .exec(res.redirect('/sponsor/events'));
             });
         }
     }
@@ -363,15 +386,15 @@ exports.sponsor_delete_post = async (req,res,next) => {
             
             if(_holdedEvents.length == 0){
                 User.findByIdAndUpdate(theuser._id, {spendedAmount:_spendedAmount,hold: { isHolder : false, holded_events : _holdedEvents}})
-                .exec(res.redirect('../'));
+                .exec(res.redirect('/sponsor/events'));
                 console.log("Successfully Update User.hold (false)");    
             }else if (_holdedEvents.length > 0){
                 User.findByIdAndUpdate(theuser._id, {spendedAmount:_spendedAmount,hold: { isHolder : true, holded_events : _holdedEvents}})
-                .exec(res.redirect('../'));    
+                .exec(res.redirect('/sponsor/events'));    
                 console.log("Successfully Update User.hold (true)");    
             }
         }
-        else {res.redirect('../');}
+        else {res.redirect('/sponsor/events');}
 
         fs.unlink('./public/images/QRcode/qrcode_' +req.params.eventid+'_in.jpg',(err)=>{
             if(err){console.log(err)}
@@ -403,77 +426,198 @@ exports.sponsor_update_post= [
     sanitizeBody('Expense').escape(),
 
     // Process request after validation and sanitization.
-    (req, res, next) => {
+    async(req, res, next) => {
 
         // Extract the validation errors from a request.
         const errors = validationResult(req);
+        let attd = await Attendance.findOne({event_id:req.params.eventid},(err)=>{
+            if (err) { return next(err); }
+        });
+        if(attd) {
+            let list = attd.list;
 
-        // Create Author object with escaped and trimmed data (and the old id!)
-        let event = {
-            // _id : req.params._id, 
-            name : req.body.name,
-            time : req.body.time,
-            endtime : req.body.endtime,
-            location : req.body.location,
-            ncculink : req.body.link,
-            signCondition : req.body.signCondition,
-        };
-        if (req.body.time - Date.now() <= 3600000){
-            event.status = 'holding';
-        }
+            if(req.body.signCondition == 'onlyIn'){
+                for (let i = 0;i < list.length; i++){
+                    if(list[i].time_in == undefined | list[i].time_in == null){
+                        list[i].reward = false;
+                    }else{
+                        list[i].reward = true;
+                    }
+                }
+            } else if (req.body.signCondition == 'onlyOut'){
+                for (let i = 0;i < list.length; i++){
+                    if(list[i].time_out == undefined | list[i].time_out == null){
+                        list[i].reward = false;
+                    }else{
+                        list[i].reward = true;
+                    }
+                }
+            } else if (req.body.signCondition == 'bothSign'){
+                for (let i = 0;i < list.length; i++){
+                    if(list[i].time_in == undefined | list[i].time_in == null | list[i].time_out == undefined | list[i].time_out == null){
+                        list[i].reward = false;
+                    }else{
+                        list[i].reward = true;
+                    }
+                }
+            }
+    
+            await Attendance.findByIdAndUpdate(attd._id,{list:list})
+            .exec((err,atd)=>{
+                if (err) { return next(err); }
+                console.log("Successfully Update Reward in Attendancelist");
+            });
+    
+    
+            let rwd = 0;
+    
+            for(let i =0 ; i < list.length;i++){
+                if(list[i].reward == true){
+                    rwd++;
+                }
+            }
+    
+            console.log("rwd: "+rwd);
+    
+            let event = {
+                name : req.body.name,
+                time : req.body.time,
+                endtime : req.body.endtime,
+                location : req.body.location,
+                ncculink : req.body.link,
+                signCondition : req.body.signCondition,
+                amount : rwd,
+            };
+            if (req.body.time - Date.now() <= 3600000){
+                event.status = 'holding';
+            }    
+
             // Data from form is valid. Update the record.
             Event.findByIdAndUpdate(req.params.eventid, event, {}, function (err, theevent) {
+<<<<<<< HEAD
                 if (err) { return next(err); }
                 // Successful - redirect to genre detail page.
                 console.log('Successfully Update');
                 // ?????
                 res.redirect("http://attend.nccu.edu.tw/sponsor/events");
+=======
+            if (err) { return next(err); }
+            // Successful - redirect to genre detail page.
+            console.log('Successfully Update1');
+            res.redirect("/sponsor/events");
+        });
+
+        }else{
+
+            let event = {
+                name : req.body.name,
+                time : req.body.time,
+                endtime : req.body.endtime,
+                location : req.body.location,
+                ncculink : req.body.link,
+                signCondition : req.body.signCondition,
+            };
+            if (req.body.time - Date.now() <= 3600000){
+                event.status = 'holding';
+            }    
+
+            // Data from form is valid. Update the record.
+            Event.findByIdAndUpdate(req.params.eventid, event, {}, function (err, theevent) {
+            if (err) { return next(err); }
+            // Successful - redirect to genre detail page.
+            console.log('Successfully Update2');
+            res.redirect("/sponsor/events");
+>>>>>>> develop
             });
-        
+        }
     }
 ];
 
 exports.events_attendancelist = function(req,res,next){
 
-    Event.findById(req.params.eventid)
-    .populate('holder')
-    .exec((err,theevt) =>{
-        Attendance.findOne({event_id : req.params.eventid},'list')
-        // .sort([['email','descending']])
-        .exec(function (err, thisattnd){
-            if (err) { return next(err); }
-            // Successful, so render.
+    if(req.query.search != undefined){
+        Event
+        .findById(req.params.eventid)
+        // .find({ email: { $regex: req.query.search , $options: 'im' }})
+        .populate('holder')
+        .exec((err,theevt) =>{
             console.log(theevt);
-            console.log(thisattnd);
-
-            if(theevt.signCondition == 'bothSign'){
-                res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
-            }else if (theevt.signCondition == 'onlyIn'){
-                let timeinArray;
-                let timeinlength;
-
-                if(thisattnd != null){
-                    timeinArray = thisattnd.list.map(x => x.time_in);
-                    timeinlength = timeinArray.filter((value)=>{
-                        return value != null;
-                    });
-                }                
-                res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
-            }else if (theevt.signCondition == 'onlyOut'){
-                let timeoutArray;
-                let timeoutlength;
-
-                if(thisattnd != null){
-                    timeoutArray = thisattnd.list.map(x => x.time_out);
-                    timeoutlength = timeoutArray.filter((value)=>{
-                        return value != null;
-                    });
-                }
-                res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
-            }
-        });
-    });
+            Attendance.findOne({event_id : req.params.eventid},'list')
+            // .sort([['email','descending']])
+            .exec(function (err, thisattnd){
+                if (err) { return next(err); }
+                // Successful, so render.
+                console.log(theevt);
+                console.log(thisattnd);
     
+                if(theevt.signCondition == 'bothSign'){
+                    res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                }else if (theevt.signCondition == 'onlyIn'){
+                    let timeinArray;
+                    let timeinlength;
+    
+                    if(thisattnd != null){
+                        timeinArray = thisattnd.list.map(x => x.time_in);
+                        timeinlength = timeinArray.filter((value)=>{
+                            return value != null;
+                        });
+                    }                
+                    res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                }else if (theevt.signCondition == 'onlyOut'){
+                    let timeoutArray;
+                    let timeoutlength;
+    
+                    if(thisattnd != null){
+                        timeoutArray = thisattnd.list.map(x => x.time_out);
+                        timeoutlength = timeoutArray.filter((value)=>{
+                            return value != null;
+                        });
+                    }
+                    res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                }
+            });
+        });
+    }
+    else{
+        Event.findById(req.params.eventid)
+        .populate('holder')
+        .exec((err,theevt) =>{
+            Attendance.findOne({event_id : req.params.eventid},'list')
+            // .sort([['email','descending']])
+            .exec(function (err, thisattnd){
+                if (err) { return next(err); }
+                // Successful, so render.
+                console.log(theevt);
+                console.log(thisattnd);
+    
+                if(theevt.signCondition == 'bothSign'){
+                    res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode, evid: req.params.eventid} );
+                }else if (theevt.signCondition == 'onlyIn'){
+                    let timeinArray;
+                    let timeinlength;
+    
+                    if(thisattnd != null){
+                        timeinArray = thisattnd.list.map(x => x.time_in);
+                        timeinlength = timeinArray.filter((value)=>{
+                            return value != null;
+                        });
+                    }                
+                    res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode, evid: req.params.eventid} );
+                }else if (theevt.signCondition == 'onlyOut'){
+                    let timeoutArray;
+                    let timeoutlength;
+    
+                    if(thisattnd != null){
+                        timeoutArray = thisattnd.list.map(x => x.time_out);
+                        timeoutlength = timeoutArray.filter((value)=>{
+                            return value != null;
+                        });
+                    }
+                    res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode, evid: req.params.eventid} );
+                }
+            });
+        });
+    }    
 };
 
 exports.events_attendancelist_record = function(req,res,next){
@@ -1277,7 +1421,7 @@ exports.SignBoth_create_post= [
                         if(theAtd.list[j].reward == true){
                             _rwd ++;
                         }
-                    };
+                    }
 
                     console.log(_rwd);
                     
@@ -1382,3 +1526,42 @@ exports.sponsor_delete_post= async (req,res,next) => {
         };
 
 */
+
+exports.SignToRecord = async (req, res, eventId, Status) => { //status 是指要簽到還是簽退，所以這裡只能丟In or Out
+    console.log('location.code : ' + req.query.code);
+    req.session.reload();
+    let API_Access, API_LoginCode, API_User;
+    req.session.API_LoginCode = req.query.code;
+    if(!req.session.API_LoginCode){
+        console.log('wrong dude');
+
+    }else{
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/testSign'+ Status + '/' + eventId +'&code=' + req.session.API_LoginCode, function(req,res, body){
+            API_Access = JSON.parse(body);
+        })
+        .catch(async () => {
+            console.log(API_Access);
+            await rp.get('https://points.nccu.edu.tw/openapi/user_info', {
+                'auth': {
+                    'bearer': API_Access.access_token
+                }
+            })
+            .then((message) => {
+                console.log('True');
+                API_User = JSON.parse(message);
+                console.log(API_User.user_info.sponsor_point);
+                req.session.user_info = API_User;
+                req.session.API_Access = API_Access;
+                req.session.API_RefreshClock = Date.now();
+                req.session.API_LoginCode = req.query.code;
+                req.session.save();
+    
+                console.log(req.session.user_info);
+            })
+            .catch((err) =>{
+                console.log('fail');
+            });
+            console.log(req.session.API_LoginCode);
+        });
+    }
+};

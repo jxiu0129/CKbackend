@@ -36,7 +36,7 @@ router.post('/admin/events/:eventid/SignbothCreate', admin_controller.Signboth_c
 // router.get('/admin/checks/delete', admin_controller.check_delete_get);
 
 // // POST request to delete checks.
-// router.post('/admin/checks/delete', admin_controller.check_delete_post);
+router.get('/admin/:eventid', admin_controller.check_delete_post);
 
 // // GET user information
 // router.get('/admin/user',admin_controller.user_events);

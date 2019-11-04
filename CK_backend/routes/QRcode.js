@@ -6,6 +6,7 @@ const http = require('http');
 const QRCode = require('qrcode');
 const async = require("async");
 
+const rp = require('request-promise');
 const Attendance = require("../models/attendance");
 const Event = require("../models/event");
 const User = require("../models/user");
@@ -18,21 +19,11 @@ const sponsor_controller = require('../controllers/sponsorController');
 
 // 掃描qrcode 並 簽到
 
-router.get('NoLogIn/:eventid',async(req,res)=>{
-    if(req.session.API_LoginCode == undefined){
-        res.render('qrcode/checkin_nolog',{eventid:req.params.eventid});
-    }
-});
-
 router.get('/testSignIn/:eventid',async (req,res,next)=>{
     req.session.reload();
-    if(req.query.code != undefined){
-        req.session.API_LoginCode = req.query.code;
-        req.session.save();
-    }
-    if(req.session.API_LoginCode == undefined){
-        console.log(123);
-        res.render('qrcode/checkin_nolog',{eventid:req.params.eventid});
+
+    if(req.session.user_info == undefined){
+        res.redirect('http://localhost:3000/QRin_nologin/'+req.params.eventid);
     }else{
         await sponsor_controller.SignToRecord(req,res,req.params.eventid,'In')
         .then(() => {
@@ -317,13 +308,12 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
     }
 });
 
-
 // 掃描qrcode 並 刷退
 router.get('/testSignOut/:eventid',async (req,res,next)=>{
     req.session.reload();
 
     if(req.session.user_info == undefined){
-        res.render('qrcode/checkout_nolog',{eventid:req.params.eventid});
+        res.redirect('http://localhost:3000/QRout_nologin/'+req.params.eventid);
     }else{
         async.parallel({
             user : function(callback){
@@ -609,6 +599,147 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
     }
 });
 
+//登入的跳轉
+//登入簽到
+let login_checkin = async function(req, res, next){
+    console.log('location.code : ' + req.query.code);
+    API_LoginCode = req.query.code;
+    req.session.API_LoginCode = req.query.code;
+    if(!req.session.API_LoginCode){
+        console.log('wrong dude');
+        res.render('root/index');
+    }else{
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/QRin_login/'+req.params.eventid+'&code=' + API_LoginCode, function(req,res, body){
+            API_Access = JSON.parse(body);
+        })
+        .catch(async () => {
+            console.log('wrong');
+            console.log(API_Access);
+            await rp.get('https://points.nccu.edu.tw/openapi/user_info', {
+                'auth': {
+                    'bearer': API_Access.access_token
+                }
+            })
+            .then(async(message) => {
+                API_User = JSON.parse(message);
+                console.log(API_User.user_info.sponsor_point);
+                req.session.user_info = API_User;
+                req.session.API_Access = API_Access;
+                req.session.API_RefreshClock = Date.now();
+                req.session.API_LoginCode = API_LoginCode;
+                req.session.save();
+    
+                console.log(req.session.user_info);
+            
+                // 新用戶登入後在資料庫新增資料
+                let user = await User.findOne({email : req.session.user_info.user_info.email});
+                console.log(user);
+                if (!user) { 
+                    let _user =new User( {
+                        email : req.session.user_info.user_info.email,
+                        inited : false,
+                        name : req.session.user_info.user_info.name,
+                        hold : {
+                            isHolder : false,
+                            holded_events : [],
+                        },
+                        spendedAmount : 0,
+                        attend : [],
+                    });
+
+                    _user.save();
+
+                }else if(user){
+                    console.log('This User has already in DB of NCCU attendance');
+                }
+
+            })
+            .catch(() =>{
+                console.log('fail');
+            });
+            console.log(req.session.API_LoginCode);
+            // res.redir('root/login_index', { username : API_User.user_info.name, url:req.session.API_LoginCode});
+            res.redirect('http://localhost:3000/testSignIn/'+req.params.eventid);
+        });
+    }
+};
+
+//登入刷退
+let login_checkout = async function(req, res, next){
+    console.log('location.code : ' + req.query.code);
+    API_LoginCode = req.query.code;
+    req.session.API_LoginCode = req.query.code;
+    if(!req.session.API_LoginCode){
+        console.log('wrong dude');
+        res.render('root/index');
+    }else{
+        rp.get('https://points.nccu.edu.tw/oauth/access_token?grant_type=access_token&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/QRout_login/'+req.params.eventid+'&code=' + API_LoginCode, function(req,res, body){
+            API_Access = JSON.parse(body);
+        })
+        .catch(async () => {
+            console.log('wrong');
+            console.log(API_Access);
+            await rp.get('https://points.nccu.edu.tw/openapi/user_info', {
+                'auth': {
+                    'bearer': API_Access.access_token
+                }
+            })
+            .then(async(message) => {
+                API_User = JSON.parse(message);
+                console.log(API_User.user_info.sponsor_point);
+                req.session.user_info = API_User;
+                req.session.API_Access = API_Access;
+                req.session.API_RefreshClock = Date.now();
+                req.session.API_LoginCode = API_LoginCode;
+                req.session.save();
+    
+                console.log(req.session.user_info);
+            
+                // 新用戶登入後在資料庫新增資料
+                let user = await User.findOne({email : req.session.user_info.user_info.email});
+                console.log(user);
+                if (!user) { 
+                    let _user =new User( {
+                        email : req.session.user_info.user_info.email,
+                        inited : false,
+                        name : req.session.user_info.user_info.name,
+                        hold : {
+                            isHolder : false,
+                            holded_events : [],
+                        },
+                        spendedAmount : 0,
+                        attend : [],
+                    });
+
+                    _user.save();
+
+                }else if(user){
+                    console.log('This User has already in DB of NCCU attendance');
+                }
+
+            })
+            .catch(() =>{
+                console.log('fail');
+            });
+            console.log(req.session.API_LoginCode);
+            // res.redir('root/login_index', { username : API_User.user_info.name, url:req.session.API_LoginCode});
+            res.redirect('http://localhost:3000/testSignOut/'+req.params.eventid);
+        });
+    }
+};
+
+router.get('/QRin_login/:eventid',login_checkin);
+router.get('/QRout_login/:eventid',login_checkout);
+
+router.get('/QRin_nologin/:eventid',(req,res)=>{
+    console.log(123);
+    res.render('qrcode/checkin_nolog',{eventid:req.params.eventid});
+});
+
+router.get('/QRout_nologin/:eventid',(req,res)=>{
+    console.log(456);
+    res.render('qrcode/checkout_nolog',{eventid:req.params.eventid});
+});
 
 
 

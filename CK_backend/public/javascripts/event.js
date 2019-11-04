@@ -50,3 +50,17 @@ const findUser = () => {
     });
     console.log(target);
 };
+
+const downloadCSV = (id) => {
+    let btn = confirm('確定要下載嗎？');
+    if(btn){ 
+        $.ajax({
+            url: `http://localhost:3000/exportCSV/${id}`,
+            success: () => {
+                console.log('success dld');
+            },
+            error: () => console.log('fail to dld')
+        });
+
+    }
+};

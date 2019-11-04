@@ -138,7 +138,7 @@ let getUserInfo = async (access_token_input) => {
     return returnValue;
 };
 
-exports.getUserInfoOutSide = (access_token_input) => {
+exports.getUserInfoOutSide = async (access_token_input) => {
     let returnValue = 0;
     await rp.get('https://points.nccu.edu.tw/openapi/user_info', {
         'auth': {

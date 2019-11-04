@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var request = require('request');
+const http = require('http');
 
 const QRCode = require('qrcode');
 const async = require("async");
@@ -655,7 +656,7 @@ const fs = require('fs');
 const moment = require('moment');
 const json2csv = require('json2csv').parse;
 const path = require('path');
-const fields = ['name','email','time_in','time_out'];
+// const fields = ['name','email','time_in','time_out'];
 
 router.get('/ttest',(req,res)=>{
     Attendance.findOne({event_id:'5d9d8f2e53de890b5cf82510'}, function (err, attd) {
@@ -669,7 +670,7 @@ router.get('/ttest',(req,res)=>{
 
 router.get('/tttest',async (req,res)=>{
 
-    Attendance.findOne({event_id:'5d9d8f2e53de890b5cf82510'}, function (err, attd) {
+    Attendance.findOne({event_id:'5dbff4b7d1352a36488c805d'}, function (err, attd) {
         if (err) {
           return res.status(500).json({ err });
         }
@@ -712,6 +713,43 @@ router.get('/tttest',async (req,res)=>{
         }
       });
     });
+
+const fields = ['email', 'time_in','time_out'];
+    
+router.get('/exportCSV/:eventid', function (req, res) {
+    Attendance.findOne({event_id:req.params.eventid}, async (err, attd) => {
+    if (err) {
+        return res.status(500).json({ err });
+    }
+    else {
+        let csv;
+        let list = attd.list;
+        try {
+        csv = json2csv(list, { fields });
+        } 
+        catch (err) {
+        return res.status(500).json({ err });
+        }
+        const dateTime = moment().format('YYYYMMDDhhmmss');
+        const filePath = path.join(__dirname, "..", "public", "csv-" + dateTime + ".csv");
+
+        await fs.writeFile(filePath, csv, (err) => {
+        if (err) {
+            return res.json(err).status(500);
+        }
+        else {
+            setTimeout(() => {
+                fs.unlinkSync(filePath); // delete this file after 30 seconds
+            }, 30000);
+            // res.json("/exports/csv-" + dateTime + ".csv");
+            res.download(filePath, () => {console.log('success download');});
+        }
+        });
+
+    }
+    });
+});
+
 
 router.get('/userinfo',(req,res)=>{
     req.session.reload();

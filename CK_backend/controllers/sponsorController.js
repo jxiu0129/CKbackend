@@ -583,7 +583,7 @@ exports.events_attendancelist = function(req,res,next){
                 console.log(thisattnd);
     
                 if(theevt.signCondition == 'bothSign'){
-                    res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                    res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode, evid: req.params.eventid} );
                 }else if (theevt.signCondition == 'onlyIn'){
                     let timeinArray;
                     let timeinlength;
@@ -594,7 +594,7 @@ exports.events_attendancelist = function(req,res,next){
                             return value != null;
                         });
                     }                
-                    res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                    res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode, evid: req.params.eventid} );
                 }else if (theevt.signCondition == 'onlyOut'){
                     let timeoutArray;
                     let timeoutlength;
@@ -605,7 +605,7 @@ exports.events_attendancelist = function(req,res,next){
                             return value != null;
                         });
                     }
-                    res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                    res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode, evid: req.params.eventid} );
                 }
             });
         });

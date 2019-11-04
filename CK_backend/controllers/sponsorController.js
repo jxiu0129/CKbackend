@@ -494,13 +494,6 @@ exports.sponsor_update_post= [
 
             // Data from form is valid. Update the record.
             Event.findByIdAndUpdate(req.params.eventid, event, {}, function (err, theevent) {
-<<<<<<< HEAD
-                if (err) { return next(err); }
-                // Successful - redirect to genre detail page.
-                console.log('Successfully Update');
-                // ?????
-                res.redirect("http://attend.nccu.edu.tw/sponsor/events");
-=======
             if (err) { return next(err); }
             // Successful - redirect to genre detail page.
             console.log('Successfully Update1');
@@ -527,7 +520,6 @@ exports.sponsor_update_post= [
             // Successful - redirect to genre detail page.
             console.log('Successfully Update2');
             res.redirect("/sponsor/events");
->>>>>>> develop
             });
         }
     }

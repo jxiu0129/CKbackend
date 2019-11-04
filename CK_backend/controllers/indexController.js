@@ -164,7 +164,7 @@ exports.getUserInfoOutSide = (req, access_token_input) => {
 };
 // module.exports =  getUserInfo();
 
-exports.login_index = async function(req, res){
+exports.login_index = async function(req, res, next){
     console.log('location.code : ' + req.query.code);
     API_LoginCode = req.query.code;
     req.session.API_LoginCode = req.query.code;
@@ -183,7 +183,7 @@ exports.login_index = async function(req, res){
                     'bearer': API_Access.access_token
                 }
             })
-            .then((message) => {
+            .then(async(message) => {
                 API_User = JSON.parse(message);
                 console.log(API_User.user_info.sponsor_point);
                 req.session.user_info = API_User;
@@ -193,6 +193,29 @@ exports.login_index = async function(req, res){
                 req.session.save();
     
                 console.log(req.session.user_info);
+            
+                // 新用戶登入後在資料庫新增資料
+                let user = await User.findOne({email : req.session.user_info.user_info.email});
+                console.log(user);
+                if (!user) { 
+                    let _user =new User( {
+                        email : req.session.user_info.user_info.email,
+                        inited : false,
+                        name : req.session.user_info.user_info.name,
+                        hold : {
+                            isHolder : false,
+                            holded_events : [],
+                        },
+                        spendedAmount : 0,
+                        attend : [],
+                    });
+
+                    _user.save();
+
+                }else if(user){
+                    console.log('This User has already in DB of NCCU attendance');
+                }
+
             })
             .catch(() =>{
                 console.log('fail');
@@ -286,7 +309,7 @@ exports.edit_info_first_post = [
         if (req.body.phone != null){
             User.findOneAndUpdate({email:req.session.user_info.user_info.email},{phone : req.body.phone,inited : true})
             .exec((err,theuser)=>{
-                res.redirect("./");
+                res.redirect("/user_profile");
             });
         }
     }

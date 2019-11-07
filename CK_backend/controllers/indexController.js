@@ -208,7 +208,7 @@ exports.login_index_new = function(req, res){
             req.session.reload();
             console.log('wrong');
             console.log(API_Access);
-            await getUserInfo(req ,API_Access.access_token);
+            await getUserInfo(API_Access.access_token);
             res.render('root/login_index',{username : API_User.user_info.name});
             // rp.get('http://wm.nccu.edu.tw:3001/openapi/user_info', {
             //     'auth': {

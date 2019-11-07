@@ -490,27 +490,26 @@ exports.event_list_bli = (req, res) => {
     }
 };
 
-exports.grant_new_token = (req, res) => {
-    req.session.reload();
-    rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
-    .then((data)=>{
-        console.log(data);
-    })
-    .catch((err) =>{
-        console.log(err);
+const grant_new_token = async (OldRefreshToken) => {
+    let NewToken;
+    await rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type=refresh_token&refresh_token=" + OldRefreshToken, async function(req, res, body){
+        NewToken = JSON.parse(body);
     });
+    console.log(NewToken);
+    return NewToken;
 };
 
-exports.grant_new_token = (req, res) => {
-    req.session.reload();
-    rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
-    .then((data)=>{
-        console.log(data);
-    })
-    .catch((err) =>{
-        console.log(err);
+exports.grant_new_token = async (OldRefreshToken) => {
+    let NewToken;
+    await rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type=refresh_token&refresh_token=" + OldRefreshToken, async function(req, res, body){
+        NewToken = JSON.parse(body);
+    }).then((data) => {
+        console.log("yes");
+    }).catch((err) => {
+        console.log("no");
     });
-}
+    return NewToken;
+};
 
 exports.index = function(req,res){
     req.session.reload();

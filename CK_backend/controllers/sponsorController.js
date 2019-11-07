@@ -319,7 +319,7 @@ exports.sponsor_create_post = [
                 let _holdedEvents = theuser.hold.holded_events;
                 let _spendedAmount = Number(theuser.spendedAmount) + Number(req.body.expense);
                 User.findByIdAndUpdate(theuser._id, {spendedAmount: _spendedAmount , hold: { isHolder : true, holded_events : _holdedEvents}})
-                .exec(res.redirect('./'));
+                .exec(res.redirect('/sponsor/events'));
             });
         }
     }
@@ -386,15 +386,15 @@ exports.sponsor_delete_post = async (req,res,next) => {
             
             if(_holdedEvents.length == 0){
                 User.findByIdAndUpdate(theuser._id, {spendedAmount:_spendedAmount,hold: { isHolder : false, holded_events : _holdedEvents}})
-                .exec(res.redirect('../'));
+                .exec(res.redirect('/sponsor/events'));
                 console.log("Successfully Update User.hold (false)");    
             }else if (_holdedEvents.length > 0){
                 User.findByIdAndUpdate(theuser._id, {spendedAmount:_spendedAmount,hold: { isHolder : true, holded_events : _holdedEvents}})
-                .exec(res.redirect('../'));    
+                .exec(res.redirect('/sponsor/events'));    
                 console.log("Successfully Update User.hold (true)");    
             }
         }
-        else {res.redirect('../');}
+        else {res.redirect('/sponsor/events');}
 
         fs.unlink('./public/images/QRcode/qrcode_' +req.params.eventid+'_in.jpg',(err)=>{
             if(err){console.log(err)}
@@ -433,73 +433,95 @@ exports.sponsor_update_post= [
         let attd = await Attendance.findOne({event_id:req.params.eventid},(err)=>{
             if (err) { return next(err); }
         });
-        let list = attd.list;
+        if(attd) {
+            let list = attd.list;
 
-        if(req.body.signCondition == 'onlyIn'){
-            for (let i = 0;i < list.length; i++){
-                if(list[i].time_in == undefined | list[i].time_in == null){
-                    list[i].reward = false;
-                }else{
-                    list[i].reward = true;
+            if(req.body.signCondition == 'onlyIn'){
+                for (let i = 0;i < list.length; i++){
+                    if(list[i].time_in == undefined | list[i].time_in == null){
+                        list[i].reward = false;
+                    }else{
+                        list[i].reward = true;
+                    }
+                }
+            } else if (req.body.signCondition == 'onlyOut'){
+                for (let i = 0;i < list.length; i++){
+                    if(list[i].time_out == undefined | list[i].time_out == null){
+                        list[i].reward = false;
+                    }else{
+                        list[i].reward = true;
+                    }
+                }
+            } else if (req.body.signCondition == 'bothSign'){
+                for (let i = 0;i < list.length; i++){
+                    if(list[i].time_in == undefined | list[i].time_in == null | list[i].time_out == undefined | list[i].time_out == null){
+                        list[i].reward = false;
+                    }else{
+                        list[i].reward = true;
+                    }
                 }
             }
-        } else if (req.body.signCondition == 'onlyOut'){
-            for (let i = 0;i < list.length; i++){
-                if(list[i].time_out == undefined | list[i].time_out == null){
-                    list[i].reward = false;
-                }else{
-                    list[i].reward = true;
+    
+            await Attendance.findByIdAndUpdate(attd._id,{list:list})
+            .exec((err,atd)=>{
+                if (err) { return next(err); }
+                console.log("Successfully Update Reward in Attendancelist");
+            });
+    
+    
+            let rwd = 0;
+    
+            for(let i =0 ; i < list.length;i++){
+                if(list[i].reward == true){
+                    rwd++;
                 }
             }
-        } else if (req.body.signCondition == 'bothSign'){
-            for (let i = 0;i < list.length; i++){
-                if(list[i].time_in == undefined | list[i].time_in == null | list[i].time_out == undefined | list[i].time_out == null){
-                    list[i].reward = false;
-                }else{
-                    list[i].reward = true;
-                }
-            }
-        }
+    
+            console.log("rwd: "+rwd);
+    
+            let event = {
+                name : req.body.name,
+                time : req.body.time,
+                endtime : req.body.endtime,
+                location : req.body.location,
+                ncculink : req.body.link,
+                signCondition : req.body.signCondition,
+                amount : rwd,
+            };
+            if (req.body.time - Date.now() <= 3600000){
+                event.status = 'holding';
+            }    
 
-        await Attendance.findByIdAndUpdate(attd._id,{list:list})
-        .exec((err,atd)=>{
-            if (err) { return next(err); }
-            console.log("Successfully Update Reward in Attendancelist");
-        });
-
-
-        let rwd = 0;
-
-        for(let i =0 ; i < list.length;i++){
-            if(list[i].reward == true){
-                rwd++;
-            }
-        }
-
-        console.log("rwd: "+rwd);
-
-        let event = {
-            name : req.body.name,
-            time : req.body.time,
-            endtime : req.body.endtime,
-            location : req.body.location,
-            ncculink : req.body.link,
-            signCondition : req.body.signCondition,
-            amount : rwd,
-        };
-        if (req.body.time - Date.now() <= 3600000){
-            event.status = 'holding';
-        }
-
-        // Data from form is valid. Update the record.
-        Event.findByIdAndUpdate(req.params.eventid, event, {}, function (err, theevent) {
+            // Data from form is valid. Update the record.
+            Event.findByIdAndUpdate(req.params.eventid, event, {}, function (err, theevent) {
             if (err) { return next(err); }
             // Successful - redirect to genre detail page.
-            console.log('Successfully Update');
-            // ?????
-            res.redirect("http://localhost:3000/sponsor/events");
+            console.log('Successfully Update1');
+            res.redirect("/sponsor/events");
         });
-    
+
+        }else{
+
+            let event = {
+                name : req.body.name,
+                time : req.body.time,
+                endtime : req.body.endtime,
+                location : req.body.location,
+                ncculink : req.body.link,
+                signCondition : req.body.signCondition,
+            };
+            if (req.body.time - Date.now() <= 3600000){
+                event.status = 'holding';
+            }    
+
+            // Data from form is valid. Update the record.
+            Event.findByIdAndUpdate(req.params.eventid, event, {}, function (err, theevent) {
+            if (err) { return next(err); }
+            // Successful - redirect to genre detail page.
+            console.log('Successfully Update2');
+            res.redirect("/sponsor/events");
+            });
+        }
     }
 ];
 
@@ -561,7 +583,7 @@ exports.events_attendancelist = function(req,res,next){
                 console.log(thisattnd);
     
                 if(theevt.signCondition == 'bothSign'){
-                    res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                    res.render('sponsor/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode, evid: req.params.eventid} );
                 }else if (theevt.signCondition == 'onlyIn'){
                     let timeinArray;
                     let timeinlength;
@@ -572,7 +594,7 @@ exports.events_attendancelist = function(req,res,next){
                             return value != null;
                         });
                     }                
-                    res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                    res.render('sponsor/attendancelist_onlyin', { timeinlength:timeinlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode, evid: req.params.eventid} );
                 }else if (theevt.signCondition == 'onlyOut'){
                     let timeoutArray;
                     let timeoutlength;
@@ -583,7 +605,7 @@ exports.events_attendancelist = function(req,res,next){
                             return value != null;
                         });
                     }
-                    res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+                    res.render('sponsor/attendancelist_onlyout', { timeoutlength:timeoutlength , username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode, evid: req.params.eventid} );
                 }
             });
         });

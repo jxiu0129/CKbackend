@@ -105,12 +105,12 @@
 									</td>
 									<td><a href="/sponsor/events/<%= list_event[i]._id %>/attendancelist"><%=list_event[i].amount%></a></td>
 									<!-- 測試用，先開放超過時間能夠修改和刪除，之後上線直接解除此處的註解並在ejs前面補齊即可  -->
-									<!-- if(list_event[i].status == 'willhold'){%> -->
+									<% if(list_event[i].status == 'willhold'){%>
 										<td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>" onclick="update_alert()">修改</a>/
 											<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
-											<!-- <else{%>
+									<%<else{%>
 										<td>已超過更改時間</td>
-									}%> -->
+									<%}%>
 									
 									<%if(list_event[i].status == 'willhold'){%>
 										<td>尚未開始</td>

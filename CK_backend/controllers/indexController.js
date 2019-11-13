@@ -492,6 +492,19 @@ exports.event_list_bli = (req, res) => {
     }
 };
 
+//Q&A
+exports.qapage_get = (req,res)=>{
+    req.session.reload();
+    res.render('root/QApage',{
+        url:req.session.API_LoginCode,
+        username : req.session.user_info.user_info.name,
+    });
+};
+
+//Q&A 登入前
+exports.qapageBLI_get = (req,res)=>{
+    res.render('root/QApageBLI');
+};
 const grant_new_token = async (OldRefreshToken) => {
     let NewToken;
     await rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type=refresh_token&refresh_token=" + OldRefreshToken, async function(req, res, body){

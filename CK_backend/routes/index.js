@@ -63,6 +63,9 @@ router.get('/login_index',index_controller.login_index);
 router.get('/eventslist',index_controller.event_list);
 router.get('/eventslistBLI', index_controller.event_list_bli);
 
+router.get('/QApage',index_controller.qapage_get);
+router.get('/QApageBLI', index_controller.qapageBLI_get);
+
 router.get('/user_profile', index_controller.profile_user);
 
 router.get('/edit_info_first', index_controller.edit_info_first_get);

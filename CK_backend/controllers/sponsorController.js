@@ -150,8 +150,8 @@ exports.sponsor_events= async(req,res,next) =>{
 
     setInterval(async () => {
         if (TokenRefreshClock <= Date.now() + 5 * 60 * 1000){
-            console.log("30 seconds passed");
-            console.log(req.session.API_Access);
+            // console.log("30 seconds passed");
+            // console.log(req.session.API_Access);
             NewToken = await indexController.grant_new_token(RefreshToken);
             req.session.API_Access = NewToken;
             req.session.save();

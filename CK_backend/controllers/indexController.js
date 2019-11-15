@@ -365,25 +365,27 @@ exports.Send_Multi_Point = async function(req, res){
                 rp(sendpoint)
                 .then((message) =>{
                     console.log(message);
+                    if(message.status == false){
+                        res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動無法結束',msg:'發生錯誤，請洽詢政大活動點工作人員'});
+                    }else{
+                        // 按下活動結束後會更改活動的status為finsih
+                        Event.findByIdAndUpdate(req.params.eventid , {status : 'finish',SendPoint : point})
+                        .exec(console.log("Successfully change status to finished"));
+    
+                        // 活動結束後將spendedAmount扣回
+                        // Event.findById
+                        User.findOne({email:req.session.user_info.user_info.email})
+                        .exec((err,user)=>{
+                            User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - data.expense})
+                            .exec((err)=>{
+                                console.log(req.session.user_info);
+                                res.redirect('/updateUserInfo');
+                            });
+                        });   
+                    }
                 })
                 .catch((err) =>{
                     console.log(err);
-                });
-
-                // 按下活動結束後會更改活動的status為finsih
-                Event.findByIdAndUpdate(req.params.eventid , {status : 'finish',SendPoint : point})
-                .exec(console.log("Successfully change status to finished"));
-
-                // 活動結束後將spendedAmount扣回
-                // Event.findById
-                
-            });
-            User.findOne({email:req.session.user_info.user_info.email})
-            .exec((err,user)=>{
-                User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - data.expense})
-                .exec((err)=>{
-                    console.log(123+req.session.user_info);
-                    res.redirect('/updateUserInfo');
                 });
             });
         }
@@ -492,12 +494,25 @@ exports.event_list_bli = (req, res) => {
     }
 };
 
+//Q&A
+exports.qapage_get = (req,res)=>{
+    req.session.reload();
+    res.render('root/QApage',{
+        url:req.session.API_LoginCode,
+        username : req.session.user_info.user_info.name,
+    });
+};
+
+//Q&A 登入前
+exports.qapageBLI_get = (req,res)=>{
+    res.render('root/QApageBLI');
+};
 const grant_new_token = async (OldRefreshToken) => {
     let NewToken;
     await rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type=refresh_token&refresh_token=" + OldRefreshToken, async function(req, res, body){
         NewToken = JSON.parse(body);
     });
-    console.log(NewToken);
+    // console.log(NewToken);
     return NewToken;
 };
 

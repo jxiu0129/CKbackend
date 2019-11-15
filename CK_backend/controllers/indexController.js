@@ -257,6 +257,8 @@ exports.login_index_new = function(req, res){
 
 exports.profile_user = async function(req, res){
     req.session.reload();
+    req.session.user_info = await getUserInfo(req.session.API_Access.access_token);
+    req.session.save();
     User.findOne({email:req.session.user_info.user_info.email})
     .exec((err,theuser)=>{
         res.render('root/profile',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser, url:req.session.API_LoginCode });

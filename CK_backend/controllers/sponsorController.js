@@ -157,7 +157,7 @@ exports.sponsor_events= async(req,res,next) =>{
             req.session.save();
             console.log(req.session.API_Access);
         }
-    }, 1 * 1000);
+    }, 30 * 1000);
 
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{

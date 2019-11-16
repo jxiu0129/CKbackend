@@ -150,8 +150,6 @@ exports.sponsor_events= async(req,res,next) =>{
 
     setInterval(async () => {
         if (TokenRefreshClock <= Date.now() + 5 * 60 * 1000){
-            // console.log("30 seconds passed");
-            // console.log(req.session.API_Access);
             NewToken = await indexController.grant_new_token(RefreshToken);
             req.session.API_Access = NewToken;
             req.session.save();
@@ -191,15 +189,23 @@ exports.sponsor_events= async(req,res,next) =>{
     });    
 };
 
-exports.sponsor_create_get= function(req, res,){
+exports.sponsor_create_get= async function(req, res,){
     req.session.reload();
-    console.log(req.session.user_info.user_info.sponsor_point);
+    let point;
+    await indexController.getUserInfoOutSide(req.session.API_Access.access_token)
+    .then((msg) => {
+        point = msg;
+        console.log(req.session.user_info.user_info.sponsor_point);
+        console.log(point);
+        req.session.user_info = point;
+        req.session.save();
+    });
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{
         res.render('sponsor/addevents' , { username: req.session.user_info.user_info.name , 
             url:req.session.API_LoginCode,
             title : "Add Events | NCCU Attendance",
-            balance : req.session.user_info.user_info.sponsor_point,
+            balance : point.user_info.sponsor_point,
             realBalance : req.session.user_info.user_info.sponsor_point - _user.spendedAmount,
         });
     });

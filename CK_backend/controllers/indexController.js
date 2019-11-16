@@ -257,11 +257,15 @@ exports.login_index_new = function(req, res){
 
 exports.profile_user = async function(req, res){
     req.session.reload();
-    req.session.user_info = await getUserInfo(req.session.API_Access.access_token);
-    req.session.save();
+    console.log(req.session.API_Access.access_token);
+    let hello;
+    hello = await getUserInfo(req.session.API_Access.access_token);
+    console.log(hello);
+    req.session.user_info = await hello;
+    await req.session.save();
     User.findOne({email:req.session.user_info.user_info.email})
     .exec((err,theuser)=>{
-        res.render('root/profile',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser, url:req.session.API_LoginCode });
+        res.render('root/profile',{username : theuser.name ,nPoint:hello.user_info.sponsor_point ,user : theuser, url:req.session.API_LoginCode });
     });
 };
 
@@ -379,7 +383,7 @@ exports.Send_Multi_Point = async function(req, res){
                             User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - data.expense})
                             .exec((err)=>{
                                 console.log(req.session.user_info);
-                                res.redirect('/updateUserInfo');
+                                res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'});
                             });
                         });   
                     }
@@ -507,21 +511,11 @@ exports.qapage_get = (req,res)=>{
 exports.qapageBLI_get = (req,res)=>{
     res.render('root/QApageBLI');
 };
-const grant_new_token = async (OldRefreshToken) => {
-    let NewToken;
-    await rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type=refresh_token&refresh_token=" + OldRefreshToken, async function(req, res, body){
-        NewToken = JSON.parse(body);
-    });
-    // console.log(NewToken);
-    return NewToken;
-};
 
 exports.grant_new_token = async (OldRefreshToken) => {
     let NewToken;
     await rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type=refresh_token&refresh_token=" + OldRefreshToken, async function(req, res, body){
         NewToken = JSON.parse(body);
-    }).then((data) => {
-        console.log("yes");
     }).catch((err) => {
         console.log("no");
     });

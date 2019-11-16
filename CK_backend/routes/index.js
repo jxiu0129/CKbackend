@@ -78,9 +78,9 @@ router.post('/user_profile/edit_info', index_controller.edit_info_post);
 
 router.get('/logout', index_controller.logout_but);
 
-router.get('/updateUserInfo',(req, res, redirectUri) => {
-  index_controller.getUserInfoOutSide(req, req.session.API_Access.access_token, redirectUri);
-  res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'});
-});
+// router.get('/updateUserInfo',(req, res, redirectUri) => {
+//   index_controller.getUserInfoOutSide(req, req.session.API_Access.access_token, redirectUri);
+//   res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'});
+// });
 
 module.exports = router;

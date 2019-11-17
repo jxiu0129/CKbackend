@@ -231,7 +231,7 @@ exports.login_index_new = function(req, res){
             req.session.reload();
             console.log('wrong');
             console.log(API_Access);
-            await getUserInfo(req ,API_Access.access_token);
+            await getUserInfo(API_Access.access_token);
             res.render('root/login_index',{username : API_User.user_info.name});
             // rp.get('https://wm.nccu.edu.tw:3001/openapi/user_info', {
             //     'auth': {
@@ -257,9 +257,15 @@ exports.login_index_new = function(req, res){
 
 exports.profile_user = async function(req, res){
     req.session.reload();
+    console.log(req.session.API_Access.access_token);
+    let hello;
+    hello = await getUserInfo(req.session.API_Access.access_token);
+    console.log(hello);
+    req.session.user_info = await hello;
+    await req.session.save();
     User.findOne({email:req.session.user_info.user_info.email})
     .exec((err,theuser)=>{
-        res.render('root/profile',{username : theuser.name ,nPoint:req.session.user_info.user_info.sponsor_point ,user : theuser, url:req.session.API_LoginCode });
+        res.render('root/profile',{username : theuser.name ,nPoint:hello.user_info.sponsor_point ,user : theuser, url:req.session.API_LoginCode });
     });
 };
 
@@ -363,25 +369,27 @@ exports.Send_Multi_Point = async function(req, res){
                 rp(sendpoint)
                 .then((message) =>{
                     console.log(message);
+                    if(message.status == false){
+                        res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動無法結束',msg:'發生錯誤，請洽詢政大活動點工作人員'});
+                    }else{
+                        // 按下活動結束後會更改活動的status為finsih
+                        Event.findByIdAndUpdate(req.params.eventid , {status : 'finish',SendPoint : point})
+                        .exec(console.log("Successfully change status to finished"));
+    
+                        // 活動結束後將spendedAmount扣回
+                        // Event.findById
+                        User.findOne({email:req.session.user_info.user_info.email})
+                        .exec((err,user)=>{
+                            User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - data.expense})
+                            .exec((err)=>{
+                                console.log(req.session.user_info);
+                                res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'});
+                            });
+                        });   
+                    }
                 })
                 .catch((err) =>{
                     console.log(err);
-                });
-
-                // 按下活動結束後會更改活動的status為finsih
-                Event.findByIdAndUpdate(req.params.eventid , {status : 'finish',SendPoint : point})
-                .exec(console.log("Successfully change status to finished"));
-
-                // 活動結束後將spendedAmount扣回
-                // Event.findById
-                
-            });
-            User.findOne({email:req.session.user_info.user_info.email})
-            .exec((err,user)=>{
-                User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - data.expense})
-                .exec((err)=>{
-                    console.log(123+req.session.user_info);
-                    res.redirect('/updateUserInfo');
                 });
             });
         }
@@ -490,27 +498,29 @@ exports.event_list_bli = (req, res) => {
     }
 };
 
-exports.grant_new_token = (req, res) => {
+//Q&A
+exports.qapage_get = (req,res)=>{
     req.session.reload();
-    rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
-    .then((data)=>{
-        console.log(data);
-    })
-    .catch((err) =>{
-        console.log(err);
+    res.render('root/QApage',{
+        url:req.session.API_LoginCode,
+        username : req.session.user_info.user_info.name,
     });
 };
 
-exports.grant_new_token = (req, res) => {
-    req.session.reload();
-    rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type='refresh_token'&refresh_token=" + req.session.API_Access.refresh_token)
-    .then((data)=>{
-        console.log(data);
-    })
-    .catch((err) =>{
-        console.log(err);
+//Q&A 登入前
+exports.qapageBLI_get = (req,res)=>{
+    res.render('root/QApageBLI');
+};
+
+exports.grant_new_token = async (OldRefreshToken) => {
+    let NewToken;
+    await rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type=refresh_token&refresh_token=" + OldRefreshToken, async function(req, res, body){
+        NewToken = JSON.parse(body);
+    }).catch((err) => {
+        console.log("no");
     });
-}
+    return NewToken;
+};
 
 exports.index = function(req,res){
     req.session.reload();

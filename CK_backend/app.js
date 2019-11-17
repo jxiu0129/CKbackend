@@ -15,7 +15,8 @@ const qrRouter = require('./routes/QRcode');
 
 // 设置 Mongoose 连接
 const mongoose = require('mongoose');
-const mongoDB = 'mongodb+srv://ckbackend:ckbackend@cluster0-sfo3z.mongodb.net/Jackk?retryWrites=true&w=majority';
+//const mongoDB = 'mongodb+srv://ckbackend:ckbackend@cluster0-sfo3z.mongodb.net/Jackk?retryWrites=true&w=majority';
+const mongoDB = 'mongodb://localhost:27017/ckattend';
 mongoose.connect(mongoDB,{ useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 const db = mongoose.connection;

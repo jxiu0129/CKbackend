@@ -1211,6 +1211,35 @@ exports.check_delete_post = async(req,res,next)=>{
 
 };
 
+exports.user_create_get = (req,res)=>{
+    res.render('admin/add_user' , {title : "Create Sign In | NCCU Attendance"});
+};
+
+exports.user_create_post = async (req,res)=>{
+    let user = await User.findOne({email : req.body.email}); 
+    if (!user) { 
+        let _user = new User( {
+            email : req.body.email,
+            inited : false,
+            name : req.body.name,
+            hold : {
+                isHolder : false,
+                holded_events : [],
+            },
+            spendedAmount : 0,
+            attend : [],
+        });
+
+        _user.save();
+        console.log("Successfully Create User");
+        res.redirect('../');
+
+    }else if(user){
+        console.log('This User has already in DB of NCCU attendance');
+        res.render('admin/add_user');
+    }
+};
+
 exports.user_events = function(req,res){
     res.render('index' , { title : "使用者資料"});
 };

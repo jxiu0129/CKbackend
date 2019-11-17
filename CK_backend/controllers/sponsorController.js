@@ -1,6 +1,7 @@
 const Event = require("../models/event");
 const User = require("../models/user");
 const Attendance = require("../models/attendance");
+const indexController = require('../controllers/indexController');
 
 const fs = require("fs");
 const async = require("async");
@@ -147,22 +148,14 @@ exports.sponsor_events= async(req,res,next) =>{
     console.log(RefreshToken);
     let NewToken;
 
-    setInterval(() => {
+    setInterval(async () => {
         if (TokenRefreshClock <= Date.now() + 5 * 60 * 1000){
-            rp.post("https://points.nccu.edu.tw/oauth/access_token?grant_type=refresh_token&refresh_token=" + RefreshToken,async function(key, res ,body) {
-                // NewToken = await JSON.parse(body);
-                NewToken = await JSON.parse(body);
-                TokenRefreshClock += 5 * 60 * 1000;
-                console.log('1 minutes pass');
-                req.session.API_RefreshClock = TokenRefreshClock;
-                req.session.API_Access = NewToken;
-                console.log(req.session.API_Access);
-                req.session.save();
-            }).catch((err) => {
-                console.log('hi this is error');
-            });
+            NewToken = await indexController.grant_new_token(RefreshToken);
+            req.session.API_Access = NewToken;
+            req.session.save();
+            console.log(req.session.API_Access);
         }
-    }, 10 * 1000);
+    }, 30 * 1000);
 
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{
@@ -196,15 +189,23 @@ exports.sponsor_events= async(req,res,next) =>{
     });    
 };
 
-exports.sponsor_create_get= function(req, res,){
+exports.sponsor_create_get= async function(req, res,){
     req.session.reload();
-    console.log(req.session.user_info.user_info.sponsor_point);
+    let point;
+    await indexController.getUserInfoOutSide(req.session.API_Access.access_token)
+    .then((msg) => {
+        point = msg;
+        console.log(req.session.user_info.user_info.sponsor_point);
+        console.log(point);
+        req.session.user_info = point;
+        req.session.save();
+    });
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{
         res.render('sponsor/addevents' , { username: req.session.user_info.user_info.name , 
             url:req.session.API_LoginCode,
             title : "Add Events | NCCU Attendance",
-            balance : req.session.user_info.user_info.sponsor_point,
+            balance : point.user_info.sponsor_point,
             realBalance : req.session.user_info.user_info.sponsor_point - _user.spendedAmount,
         });
     });

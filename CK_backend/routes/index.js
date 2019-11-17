@@ -63,6 +63,9 @@ router.get('/login_index',index_controller.login_index);
 router.get('/eventslist',index_controller.event_list);
 router.get('/eventslistBLI', index_controller.event_list_bli);
 
+router.get('/QApage',index_controller.qapage_get);
+router.get('/QApageBLI', index_controller.qapageBLI_get);
+
 router.get('/user_profile', index_controller.profile_user);
 
 router.get('/edit_info_first', index_controller.edit_info_first_get);
@@ -75,9 +78,9 @@ router.post('/user_profile/edit_info', index_controller.edit_info_post);
 
 router.get('/logout', index_controller.logout_but);
 
-router.get('/updateUserInfo',(req, res, redirectUri) => {
-  index_controller.getUserInfoOutSide(req, req.session.API_Access.access_token, redirectUri);
-  res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'});
-});
+// router.get('/updateUserInfo',(req, res, redirectUri) => {
+//   index_controller.getUserInfoOutSide(req, req.session.API_Access.access_token, redirectUri);
+//   res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'});
+// });
 
 module.exports = router;

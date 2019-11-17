@@ -38,8 +38,9 @@ router.post('/admin/events/:eventid/SignbothCreate', admin_controller.Signboth_c
 // // POST request to delete checks.
 router.get('/admin/:eventid', admin_controller.check_delete_post);
 
-// // GET user information
-// router.get('/admin/user',admin_controller.user_events);
+// // GET user create
+router.get('/admin/user/createUser',admin_controller.user_create_get);
+router.post('/admin/user/createUser',admin_controller.user_create_post);
 
 // // GET sponsor information
 // router.get('/admin/sponsor',admin_controller.sponsor_events);

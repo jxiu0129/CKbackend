@@ -106,7 +106,13 @@
 									<%=_event[i].expense%>
 								</td>
 								<%if (_event[i].holder != undefined){%>
-									<td width="150px" style= "word-break:break-all"><a href="" data-toggle="modal" data-target="#sponsorInfo<%= i %>"><%=_event[i].holder.name%></a></td>
+									<td width="150px" style= "word-break:break-all"><a href="" data-toggle="modal" data-target="#sponsorInfo<%= i %>">
+										<%if (_event[i].holder.name){%>
+										<%=_event[i].holder.name%>
+										<%}else{%>
+											承辦單位
+										<%}%>										
+									</a></td>
 									<!-- Modal -->
 									<div class="modal fade" id="sponsorInfo<%= i %>" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
 										<div class="modal-dialog" role="document">
@@ -118,9 +124,22 @@
 													</button>
 												</div>
 												<div class="modal-body">
-														<h3 class="inline">承辦單位名稱：</h3><p class="inline"><%=_event[i].holder.name%></p>
+														<h3 class="inline">承辦單位名稱：</h3><p class="inline">
+															<%if (_event[i].holder.name){%>
+															<%=_event[i].holder.name%>
+															<%}else{%>
+																無
+															<%}%>	
+														</p>
 														<br>
-														<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline"><%=_event[i].holder.phone%><%=_event[i].holder.phone%></p>
+														<h3 class="inline">承辦單位聯絡電話：</h3>
+														<p class="inline">
+															<%if (_event[i].holder.phone){%>
+															<%=_event[i].holder.phone%>
+															<%}else{%>
+																無
+															<%}%>
+														</p>
 														<br>
 														<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><a href="<%=_event[i].holder.email%>"><%=_event[i].holder.email%></a></p>
 														<br>
@@ -135,10 +154,10 @@
 									<td></td>
 								<%}%>
 								
-								<%if(_event[i].ncculink != undefined) {%>
+								<%if(_event[i].ncculink) {%>
 									<td width="100px" style= "word-break:break-all"><a href="<%=_event[i].ncculink%>" target="_blank" style="font-weight: bold">我要報名</a></td>
 								<%}else{%>
-									<td>無</td>
+									<td width="100px" style= "word-break:break-all">無</td>
 								<%}%>
 
 							</tr>

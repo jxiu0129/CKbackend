@@ -651,6 +651,12 @@ let login_checkin = async function(req, res, next){
 
                 }else if(user){
                     console.log('This User has already in DB of NCCU attendance');
+                    if(user.name != req.session.user_info.user_info.name){
+                        User.findByIdAndUpdate(user._id,{name:req.session.user_info.user_info.name})
+                        .exec((err)=>{
+                            console.log("Update User name");
+                        });
+                    }
                 }
 
             })
@@ -715,6 +721,12 @@ let login_checkout = async function(req, res, next){
 
                 }else if(user){
                     console.log('This User has already in DB of NCCU attendance');
+                    if(user.name != req.session.user_info.user_info.name){
+                        User.findByIdAndUpdate(user._id,{name:req.session.user_info.user_info.name})
+                        .exec((err)=>{
+                            console.log("Update User name");
+                        });
+                    }
                 }
 
             })

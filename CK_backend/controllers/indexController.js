@@ -202,10 +202,15 @@ exports.login_index = async function(req, res, next){
 
                     _user.save();
 
-                }else if(user){
+                }else if(user) {
                     console.log('This User has already in DB of NCCU attendance');
+                    if(user.name != req.session.user_info.user_info.name){
+                        User.findByIdAndUpdate(user._id,{name:req.session.user_info.user_info.name})
+                        .exec((err)=>{
+                            console.log("Update User name");
+                        });
+                    }
                 }
-
             })
             .catch(() =>{
                 console.log('fail');
@@ -344,6 +349,7 @@ exports.Send_Multi_Point = async function(req, res){
             attndid = data.AttendanceList[0];
             event_name = data.name;
             point = data.expense;
+            let eventExpense = data.expense;
             await Attendance.findById(attndid)
             .exec((err, data) => {
                 if (err){
@@ -380,7 +386,7 @@ exports.Send_Multi_Point = async function(req, res){
                         // Event.findById
                         User.findOne({email:req.session.user_info.user_info.email})
                         .exec((err,user)=>{
-                            User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - data.expense})
+                            User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - eventExpense})
                             .exec((err)=>{
                                 console.log(req.session.user_info);
                                 res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'});

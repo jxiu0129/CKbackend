@@ -202,7 +202,8 @@ exports.sponsor_create_get= async function(req, res,){
     });
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{
-        res.render('sponsor/addevents' , { username: req.session.user_info.user_info.name , 
+        res.render('sponsor/addevents' , { 
+            username: req.session.user_info.user_info.name , 
             url:req.session.API_LoginCode,
             title : "Add Events | NCCU Attendance",
             balance : point.user_info.sponsor_point,
@@ -218,33 +219,39 @@ exports.sponsor_create_post = [
     // req.session.reload();
     body('name', 'Name is required').isLength({ min: 1 }).trim(),
     body('time',  'Invalid date').isISO8601().custom((value) => {
-        if (value < Date.now()){
+        var date = new Date(value);
+        if (date.getTime() < Date.now()){
+            // console.log('NO');
             throw new Error('Cannot hold event in past!');
         }
         return true;
     }),
     body('endtime',  'Invalid date').isISO8601().custom((value) => {
-        if (value < Date.now()){
+        var date = new Date(value);
+        if (date.getTime() < Date.now()){
+            console.log('NO1');
             throw new Error('Cannot hold event in past!');
         }
         return true;
     }),
-    body('location', 'Name is required').isLength({ min: 1 }).trim(),
-    body('expense','Expense is required').isInt().custom((value, {req}) => {
-        if(value < 0){
-            console.log("Problem3");
-            throw new Error('Expense must be Positive');
-        }else if(value > req.session.user_info.user_info.sponsor_point){
-            console.log("Problem4");
-            throw new Error("You don't have enough money");
-        }
-        return true;
+    // body('location', 'Name is required').isLength({ min: 1 }).trim(),
+    body('expense','Expense is required').isInt().custom(async(value, {req}) => {
+        let user = await User.findOne({email:req.session.user_info.user_info.email});
+            if(value < 0){
+                console.log("Problem3");
+                throw new Error('Expense must be Positive');
+            }else if(value > req.session.user_info.user_info.sponsor_point - user.spendedAmount){
+                console.log("Problem4");
+                throw new Error("You don't have enough money");
+            }
+            return true;    
     }),    
+
     // Sanitize (trim) the name field.
     sanitizeBody('name').escape(),
     sanitizeBody('time').escape().toDate(),
     sanitizeBody('endtime').escape().toDate(),
-    sanitizeBody('location').escape(),
+    // sanitizeBody('location').escape(),
     sanitizeBody('expense').escape(),
     
     // Process request after validation and sanitization.
@@ -276,9 +283,17 @@ exports.sponsor_create_post = [
 
         if (!errors.isEmpty()) {
             // There are errors. Render the form again with sanitized values/error messages.
-            res.render('sponsor/addevents', { username: req.session.user_info.user_info.name,title: 'Add Events | NCCU Attendance', balance : 'defined your mother' , errors: errors.array(), url:req.session.API_LoginCode});
+            res.redirect("/sponsor/events/createevent")
+            // res.render('sponsor/addevents', { 
+            //     errors: errors.array(), 
+            //     username: req.session.user_info.user_info.name , 
+            //     url:req.session.API_LoginCode,
+            //     title : "Add Events | NCCU Attendance",
+            //     balance : point.user_info.sponsor_point,
+            //     realBalance : req.session.user_info.user_info.sponsor_point - _user.spendedAmount,});
             // Test
-            console.log("Error : "+errors);
+            console.log("errors: ");
+            console.log(errors);
         return;
         }
         else {

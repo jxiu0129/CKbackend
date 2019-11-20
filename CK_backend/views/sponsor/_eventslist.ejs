@@ -1,0 +1,188 @@
+<!DOCTYPE HTML>
+<!--
+	Intensify by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+	<head>
+		<title>Events - NCCU Attendance</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="../css/bootstrap.min.css">
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/edit.css">
+		<link rel="Icon" href="../images/logo.ico"/>
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="../js/bootstrap.min.js"></script>
+	</head>
+	<body class="subpage">
+
+		<!-- Header -->
+		<header id="header">
+			<nav class="left">
+				<a href="#menu"><span>Menu</span></a>
+			</nav>
+			<a href="index_after_login.html" class="logo">
+				<img src="../images/header.png" class="logo_img" height="50" width="323"/>
+			</a>
+			<nav class="right">
+				<a href="../index.html" class="button alt">Log out</a>
+			</nav>
+		</header>
+
+		<!-- Menu -->
+		<nav id="menu">
+			<p>您好,Ｕsername</p>
+			<ul class="links">
+				<li><a href="index_after_login.html">首頁</a></li>
+				<li><a href="member_info.html">個人資料</a></li>
+				<li><a href="eventslist_for_phone.html">活動列表</a></li>
+				<li><a href="myrecords_for_phone.html">我參加的活動</a></li>
+				<li><a href="myevents_for_phone.html">我辦的活動</a></li>
+				<li><a href="qrcodelist.html">QRCode<img src="../images/fire.png" height="25" width="25"/></a></li>
+				<li><a href="QApage_after_login.html">Ｑ＆Ａ</a></li>
+			</ul>
+		</nav>
+
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<header class="align-center">
+						<h1>活動列表</h1>
+					</header>
+
+					<form method="post" action="#">
+						<div class="row uniform">
+							<div class="9u 12u$(small)">
+								<input type="text" name="query" id="query" value="" style="height: 3em" placeholder="輸入活動名稱" />
+							</div>
+							<div class="3u$ 12u$(small)">
+								<input type="submit" value="搜尋" class="fit" style="height: 3em; line-height: 3em"/>
+							</div>
+						</div>
+					</form>
+
+					<div class="table-wrapper" >
+							<div class="event_time">活動日期：2019/11/18 10:09:21</div>
+							<div class="sponsor"><a href="" data-toggle="modal" data-target="#sponsorInfo1">處室1</a></div>
+							<table style="font-size: 12px">
+								<tbody>
+									<tr>
+										<th>活動名稱/ID<br>(將滑鼠移至活動名稱即可檢視ID)</th>
+										<th>活動地點</th>
+										<th>報名連結</th>
+									</tr>
+									<tr>
+										<td title="T2019082301" width="300px" style= "word-break:break-all">活動1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</td>
+										<td width="200px" style= "word-break:break-all">地點1</td>
+										<td width="150px" style= "word-break:break-all"><a href="" style="font-weight: bold">我要報名</a></td>
+									</tr>
+								</tbody>
+							</table>
+
+
+						<!-- Modal -->
+						<div class="modal fade" id="sponsorInfo1" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h3 class="modal-title" id="infoLabel">承辦單位聯絡資訊</h3>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">
+										<h3 class="inline">承辦單位名稱：</h3><p class="inline">處室1</p>
+										<br>
+										<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline">(02)23108312</p>
+										<br>
+										<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><a href="emailsample001@gmial.com">emailsample001@gmial.com</a></p>
+										<br>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="phone_size_box">
+							<div class="event_time">活動日期：2019/11/18 10:09:21</div>
+							<div class="sponsor"><a href="" data-toggle="modal" data-target="#sponsorInfo1">處室1</a></div>
+							<table style="font-size: 12px">
+								<tbody>
+								<tr>
+									<th>活動名稱/ID<br>(將滑鼠移至活動名稱即可檢視ID)</th>
+									<th>活動地點</th>
+									<th>報名連結</th>
+								</tr>
+								<tr>
+									<td title="T2019082301" width="300px" style= "word-break:break-all">活動1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</td>
+									<td width="200px" style= "word-break:break-all">地點1</td>
+									<td width="150px" style= "word-break:break-all"><a href="" style="font-weight: bold">我要報名</a></td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<!-- Modal -->
+						<div class="modal fade" id="sponsorInfo1" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h3 class="modal-title" id="infoLabel">承辦單位聯絡資訊</h3>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">
+										<h3 class="inline">承辦單位名稱：</h3><p class="inline">處室1</p>
+										<br>
+										<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline">(02)23108312</p>
+										<br>
+										<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><a href="emailsample001@gmial.com">emailsample001@gmial.com</a></p>
+										<br>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<header class="align-center">
+						<p>再來舉辦一場活動吧！</p>
+					</header>
+
+					<!--button-->
+					<ul class="actions fit">
+						<li><a href="addevent.html" class="button fit">新增活動</a></li>
+					</ul>
+					</div>
+			</section>
+
+		<!-- Footer -->
+		<footer id="footer">
+			<div class="inner">
+				<h2>Contact Us</h2>
+				<ul class="actions">
+					<!-- <li><span class="icon fa-phone"></span> <a href="#">(000) 000-0000</a></li> -->
+					<!--<li><span class="icon fa-map-marker"></span> 123 Somewhere Road, Nashville, TN 00000</li>-->
+					<li><span class="icon fa-envelope"></span> <a href="#">nccupoints@gmail.com</a></li>
+					<br>
+					<br>
+					<li><a href="QApage_after_login.html">常見問題</a></li>
+				</ul>
+			</div>
+		</footer>
+
+		<!-- Scripts -->
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/skel.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

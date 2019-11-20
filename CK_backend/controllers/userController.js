@@ -42,3 +42,19 @@ exports.user_events = function(req,res){
 };
 
 // connect to myrecords.ejs
+
+
+
+//Albert 
+//eventinfo_record
+exports.eventinfo_record = (req,res)=>{
+    req.session.reload();
+    Event.findById(req.params.eventid,(err,event)=>{
+        res.render('user/eventinfo_record',{
+            url:req.session.API_LoginCode,
+            username:req.session.user_info.user_info.name,
+            event : event,
+            
+        });
+    });
+};

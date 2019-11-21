@@ -149,13 +149,16 @@ exports.sponsor_events= async(req,res,next) =>{
     let NewToken;
 
     setInterval(async () => {
-        if (TokenRefreshClock <= Date.now() + 5 * 60 * 1000){
+        if (TokenRefreshClock + 5 * 60 * 1000 <= Date.now() ){
             NewToken = await indexController.grant_new_token(RefreshToken);
             req.session.API_Access = NewToken;
+            req.session.API_RefreshClock = Date.now();
+            TokenRefreshClock = Date.now();
             req.session.save();
             console.log(req.session.API_Access);
-        }
-    }, 30 * 1000);
+        };
+        console.log("Hi I'm here.");
+    },10 *1000);
 
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{

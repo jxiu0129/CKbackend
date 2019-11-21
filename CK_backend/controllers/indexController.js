@@ -344,6 +344,7 @@ exports.Send_Multi_Point = async function(req, res){
             attndid = data.AttendanceList[0];
             event_name = data.name;
             point = data.expense;
+	    let eventExpense = data.expense;
             await Attendance.findById(attndid)
             .exec((err, data) => {
                 if (err){
@@ -380,7 +381,7 @@ exports.Send_Multi_Point = async function(req, res){
                         // Event.findById
                         User.findOne({email:req.session.user_info.user_info.email})
                         .exec((err,user)=>{
-                            User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - data.expense})
+                            User.findByIdAndUpdate(user._id,{spendedAmount : user.spendedAmount - eventExpense})
                             .exec((err)=>{
                                 console.log(req.session.user_info);
                                 res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動順利結束',msg:'出席名單已成功發送給【政大錢包】'});
@@ -437,16 +438,16 @@ exports.event_list = (req,res)=>{
                 timeArray.push(moment(_event[i].time).format('LLL'));
                 endtimeArray.push(moment(_event[i].endtime).format('LLL'));
             }
-            // console.log( req.session.user_info.user_info.username);
-    
-            res.render('root/eventlist', {
+	     // console.log( req.session.user_info.user_info.username);  
+   	    
+	    res.render('root/eventlist', {
                 username : req.session.user_info.user_info.name,
-                title: 'Event List | NCCU Attendance', 
-                _event:  _event,
-                Time :timeArray,
-                endTime : endtimeArray,
-                url:req.session.API_LoginCode
-            });
+            	title: 'Event List | NCCU Attendance', 
+            	_event:  _event,
+            	Time :timeArray,
+            	endTime : endtimeArray,
+            	url:req.session.API_LoginCode
+           });
         });
     }
 };

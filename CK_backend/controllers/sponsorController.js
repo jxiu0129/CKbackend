@@ -177,7 +177,7 @@ exports.sponsor_events= async(req,res,next) =>{
                     timeArray.push(moment(list_event[i].time).format('LLL'));
                     endtimeArray.push(moment(list_event[i].endtime).format('LLL'));
                 }
-                res.render('sponsor/myevents', { 
+                res.render('sponsor/_myevents', { 
                     username: req.session.user_info.user_info.name,
                     title: 'My Events | NCCU Attendance',
                     list_event:  list_event,
@@ -543,6 +543,23 @@ exports.sponsor_update_post= [
         }
     }
 ];
+
+exports.eventinfo_sponsor = (req,res)=>{
+    req.session.reload();
+    Event.findById(req.params.eventid,(err,event)=>{
+
+            let Time = moment(event.time).format('LLL');
+            let EndTime = moment(event.endtime).format('LLL');
+
+        res.render('sponsor/eventinfo_sponsor',{
+            url:req.session.API_LoginCode,
+            username:req.session.user_info.user_info.name,
+            event : event,
+            Time : Time,
+            EndTime : EndTime,
+        });
+    });
+};
 
 exports.events_attendancelist = function(req,res,next){
 

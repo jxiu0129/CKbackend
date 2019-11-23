@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<!--
+	Intensify by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+	<head>
+		<title>NCCU Attendance</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="/stylesheets/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/stylesheets/assets/css/main.css" />
+		<link rel="stylesheet" href="/stylesheets/assets/css/edit.css">
+		<link rel="Icon" href="../../../images/logo.ico" />
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="/javascripts/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<!-- Header -->
+			<header id="header">
+				<nav class="left">
+					<a href="#menu"><span>Menu</span></a>
+				</nav>
+				<a href="http://localhost:3000/" class="logo">
+						<img src="../../../images/header.png" class="logo_img" height="50" width="323"/>    </a>
+				<nav class="right">
+					<a href="#" class="button alt " data-toggle="modal" data-target="#exampleModal">Log in</a>
+					<!-- Modal -->
+					<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h3 class="modal-title" id="exampleModalLabel">Log in</h3>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body">
+                                    <img src="images/wallet logo.png" height="200" width="200"/>
+									<ul class="actions fit">
+										<li><a href="https://points.nccu.edu.tw/oauth/authorize?response_type=code&client_id=bcdhjsbcjsdbc&redirect_uri=http://localhost:3000/login_index&state=123" class="button special fit" >以政大錢包身份登入</a></li>
+									</ul>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</nav>
+			</header>
+
+		<!-- Menu -->
+			<nav id="menu">
+				<ul class="links">
+					<li><a href="http://localhost:3000/">首頁</a></li>
+					<li><a href="http://localhost:3000/eventslistBLI">活動列表</a></li>
+					<li><a href="http://localhost:3000/QApageBLI">Q ＆ A</a></li>
+					<li><a href="https://points.nccu.edu.tw/">前往錢包首頁</a></li>
+				</ul>
+			</nav>
+
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<header class="align-center">
+						<h1>活動列表</h1>
+					</header>
+
+					<form method="post" action="#">
+						<div class="row uniform">
+							<div class="9u 12u$(small)">
+								<input type="text" name="query" id="query" value="" style="height: 3em" placeholder="輸入活動名稱" />
+							</div>
+							<div class="3u$ 12u$(small)">
+								<input type="submit" value="搜尋" class="fit" style="height: 3em; line-height: 3em"/>
+							</div>
+						</div>
+					</form>
+
+					<div class="table-wrapper" >
+							<% for(let i = 0 ; i < _event.length; i++){ %>
+
+							<div class="event_time">活動開始日期：<%=Time[i]%></div>
+							<div class="sponsor">主辦單位：
+								<a href="" data-toggle="modal" data-target="#sponsorInfo<%= i %>">
+									<%if (_event[i].holder.name){%>
+									<%=_event[i].holder.name%>
+									<%}else{%>
+										承辦單位
+									<%}%>										
+								</a>
+							</div>
+							<table>
+								<tbody>
+									<tr>
+										<th>活動名稱/ID<br>(將滑鼠移至活動名稱即可檢視ID)</th>
+										<th>活動地點</th>
+										<th>報名連結</th>
+									</tr>
+									<tr>
+										<td title="<%=_event[i].shortid%>" width="300px" style= "word-break:break-all"><%=_event[i].name%></td>
+										<td width="200px" style= "word-break:break-all"><%=_event[i].location%></td>
+
+										<%if(_event[i].ncculink) {%>
+											<td width="150px" style= "word-break:break-all"><a href="<%=_event[i].ncculink%>" target="_blank" style="font-weight: bold">我要報名</a></td>
+											<%}else{%>
+											<td width="150px" style= "word-break:break-all">無報名連結</td>
+										<%}%>
+									</tr>
+								</tbody>
+							</table>
+
+
+						<!-- Modal -->
+						<div class="modal fade" id="sponsorInfo<%= i %>" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h3 class="modal-title" id="infoLabel">承辦單位聯絡資訊</h3>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">
+										<h3 class="inline">承辦單位名稱：</h3><p class="inline"><%=_event[i].holder.name%></p>
+										<br>
+										<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline">
+										<%if (_event[i].holder.phone){%>
+											<%=_event[i].holder.phone%>
+											<%}else{%>
+												無
+											<%}%>
+										</p>
+										<br>
+										<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><%=_event[i].holder.email%></p>
+										<br>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<%}%>
+					</div>
+					<!-- <header class="align-center">
+						<p>再來舉辦一場活動吧！</p>
+					</header>
+
+					<ul class="actions fit">
+						<li><a href="/sponsor/events/createevent" class="button fit">新增活動</a></li>
+					</ul> -->
+					</div>
+			</section>
+
+            <!-- Footer -->
+            <footer id="footer">
+                    <div class="inner">
+                        <h2>Contact Us</h2>
+                        <ul class="actions">
+                            <!-- <li><span class="icon fa-phone"></span> <a href="#">(000) 000-0000</a></li> -->
+                            <!--<li><span class="icon fa-map-marker"></span> 123 Somewhere Road, Nashville, TN 00000</li>-->
+                            <li><span class="icon fa-envelope"></span> <a href="#">nccupoint@gmail.com</a></li>
+                            <br>
+                            <br>
+                            <li><a href="http://localhost:3000/QApageBLI">Q ＆ A</a></li>
+                        </ul>
+                    </div>
+                </footer>
+    
+            <!-- Scripts -->
+            <script src="/stylesheets/assets/js/jquery.min.js"></script>
+            <script src="/stylesheets/assets/js/jquery.scrolly.min.js"></script>
+            <script src="/stylesheets/assets/js/skel.min.js"></script>
+            <script src="/stylesheets/assets/js/util.js"></script>
+            <script src="/stylesheets/assets/js/main.js"></script>
+            <script src="/javascripts/event.js"></script>
+        </body>
+    </html>

@@ -1,53 +1,18 @@
-<!DOCTYPE HTML>
-<!--
-	Intensify by TEMPLATED
-	templated.co @templatedco
-	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
--->
-<html>
-<head>
-	<title>Ｍy events - NCCU Attendance</title>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link rel="stylesheet" href="../css/bootstrap.min.css">
-	<link rel="stylesheet" href="../assets/css/main.css" />
-	<link rel="stylesheet" href="../assets/css/edit.css">
-	<link rel="Icon" href="../images/logo.ico"/>
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-	<script src="../js/bootstrap.min.js"></script>
-	<script src="../node_modules/chart.min.js"></script>
-	<script src="../node_modules/utils.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-</head>
-<body class="subpage" style="font-family:Microsoft JhengHei;">
+<%-include('../root/header')-%>
+<script>
+		function check_link(jpgid) {
+			var x = document.getElementById(jpgid);
+			if (x.style.display === 'none') {
+				x.style.display = 'block';
+			}else{
+				x.style.display = 'none';
+			}
+		}
 
-<!-- Header -->
-<header id="header">
-	<nav class="left">
-		<a href="#menu"><span>Menu</span></a>
-	</nav>
-	<a href="index_after_login.html" class="logo">
-		<img src="../images/header.png" class="logo_img" height="50" width="323"/>
-	</a>
-	<nav class="right">
-		<a href="../index.html" class="button alt">Log out</a>
-	</nav>
-</header>
-
-<!-- Menu -->
-<nav id="menu">
-	<p>您好,Ｕsername</p>
-	<ul class="links">
-		<li><a href="index_after_login.html">首頁</a></li>
-		<li><a href="member_info.html">個人資料</a></li>
-		<li><a href="eventslist_after_login.html">活動列表</a></li>
-		<li><a href="myrecords.html">我參加的活動</a></li>
-		<li><a href="myevents_for_phone.html">我辦的活動</a></li>
-		<li><a href="qrcodelist.html">QRCode<img src="../images/fire.png" height="25" width="25"/></a></li>
-		<li><a href="QApage_after_login.html">Ｑ＆Ａ</a></li>
-	</ul>
-</nav>
-
+		function update_alert(){
+			alert("在您修改活動資訊前，請注意： \n\n1.當活動的「開始時間」在現在時間的一小時內，活動狀態會成為「正在進行」，屆時將無法再對活動進行修改及刪除，敬請留意！\n\n2.修改活動資訊中的「開始時間」與「結束時間」預設為2020-12-31 12:00，而非活動原本的開始時間及結束時間，煩請您將「開始時間」與「結束時間」調回原本活動的時間，感謝！")
+		}
+	</script>
 <!-- Main -->
 			<section id="main" class="wrapper">
 				<div class="inner">
@@ -56,36 +21,66 @@
 					</header>
 					<div class="table-wrapper">
 
-						<div class="event_time">活動開始時間：2019/11/18 10:09:21</div>
+						<% for(let i = 0;i < list_event.length;i++){ %>
+
+						<div class="event_time">活動開始時間：<%= Time[i]%></div>
 						<div class="sponsor">
-							<a href="" data-toggle="modal" data-target="#event-edit1">修改</a>/<a href="" data-toggle="modal" data-target="#event-delete1">刪除</a>
+
+						<!-- 測試用，先開放超過時間能夠修改和刪除，之後上線直接解除此處的註解並在ejs前面補齊即可  -->
+						<!-- if(list_event[i].status == 'willhold'){%> -->
+							<a href="" data-toggle="modal" data-target="#event-edit<%= i %>" onclick="update_alert()">修改</a>/
+							<a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a>
+						<!-- <else{%>
+							<td>已超過更改時間</td>
+						}%> -->
 						</div>
-						<table style="font-size: 12px">
+
+						<table>
 							<tbody>
 							<tr>
 								<th></th>
 								<th>活動名稱</th>
 								<th>活動細節</th>
-								<th width="160px" style= "word-break:break-all">活動結束 <br>(發放點數)</th>
+								<th width="160px" style= "word-break:break-all">活動狀態</th>
 							</tr>
 							<tr>
-								<td width="10px" style= "word-break:break-all">
-									<a href="" data-toggle="modal" data-target="#event1-qrModal">
-									<img src="../images/code(available).png" height="25" width="25"/>
-									</a>
-								</td>
-								<td width="200px" style= "word-break:break-all">活動1</td>
-								<td width="160px" style= "word-break:break-all"><a href="myeventinfo_for_phone.html">詳細資訊</a></td>
-								<td>
+								<%if(list_event[i].status == 'holding'){%>
+
+									<td width="10px" style= "word-break:break-all">
+										<a href="" data-toggle="modal" data-target="#event<%=i%>-qrModal">
+										<img src="../images/code(available).png" height="25" width="25"/>
+										</a>
+									</td>
+
+								<%}else{%>
+									<td width="10px" style= "word-break:break-all">
+										<img src="../images/code(unavailable).png" height="25" width="25"/>
+									</td>
+								<%}%>	
+
+								<td width="200px" style= "word-break:break-all"><%= list_event[i].name%></td>
+								<td width="160px" style= "word-break:break-all"><a href="/sponsor/events/<%=list_event[i]._id%>">詳細資訊</a></td>
+								<!-- <td>
 									<img src="../images/stop.png" height="15" width="15"/>
-									<a href="" class="important" data-toggle="modal" data-target="#end">活動結束</a>
+									<a href="" class="important" data-toggle="modal" data-target="#end<%= i %>">活動結束</a>
+								</td> -->
+								<%if(list_event[i].status == 'willhold'){%>
+									<td>尚未開始</td>
+								<%}else if( list_event[i].status == 'holding'){%>
+									<td>正在進行 <br>
+									<img src="../images/stop.png" height="15" width="15"/>
+									<a href="" class="important" data-toggle="modal" data-target="#end<%= i %>">活動結束 （發放點數）</a>
 								</td>
+
+								<%}else if( list_event[i].status == 'finish'){%>
+									<td>活動已結束</td>
+								<%}%>
 							</tr>
 							</tbody>
 						</table>
 
 								<!-- Modal -->
-								<div class="modal fade" id="event1-qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
+								<div class="modal fade" id="event<%=i%>-qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
 									<div class="modal-dialog" role="document">
 										<div class="modal-content">
 											<div class="modal-header">
@@ -94,107 +89,145 @@
 													<span aria-hidden="true">&times;</span>
 												</button>
 											</div>
-											<div class="modal-body">
-												<script>
-                                                    function check_in_link1() {
-                                                        var x = document.getElementById('check_in_code1');
-                                                        if (x.style.display === 'none') {
-                                                            x.style.display = 'block';
-                                                        }else{
-                                                            x.style.display = 'none';
-                                                        }
-                                                    }
-												</script>
-												<a href="#" onclick="check_in_link1()"><h3>簽到條碼</h3></a>
-												<div id="check_in_code1" style="display:none;">
-													<span class="image fit"><img src="../images/code.jpeg"/></span>
+											<%if (list_event[i].signCondition == 'onlyIn'){%>
+												<div class="modal-body">														
+													<a href="#" onclick="check_link('check_in_code<%=i%>')"><h3>簽到條碼</h3></a>
+													<div id="check_in_code<%=i%>" style="display:none;">
+														<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_in.jpg" /></span>
+													</div>	
+												</div>	
+											<%}else if (list_event[i].signCondition == 'onlyOut'){%>
+												<div class="modal-body">
+													<a href="#" onclick="check_link('check_out_code<%=i%>')"><h3>刷退條碼</h3></a>
+													<div id="check_out_code<%=i%>" style="display:none;">
+														<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
+													</div>
 												</div>
+											<%}else{%>
+												<div class="modal-body">
+												
+													<a href="#" onclick="check_link('check_in_code<%=i%>')"><h3>簽到條碼</h3></a>
+													<div id="check_in_code<%=i%>" style="display:none;">
+														<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_in.jpg" /></span>
+													</div>	
 
-												<script>
-                                                    function check_out_link1() {
-                                                        var x = document.getElementById('check_out_code1');
-                                                        if (x.style.display === 'none') {
-                                                            x.style.display = 'block';
-                                                        }else{
-                                                            x.style.display = 'none';
-                                                        }
-                                                    }
-												</script>
-												<a href="#" onclick="check_out_link1()"><h3>刷退條碼</h3></a>
-												<div id="check_out_code1" style="display:none;">
-													<span class="image fit"><img src="../images/code.jpeg"/></span>
+													<a href="#" onclick="check_link('check_out_code<%=i%>')"><h3>刷退條碼</h3></a>
+													<div id="check_out_code<%=i%>" style="display:none;">
+														<span class="image fit"><img src="/images/QRcode/qrcode_<%= list_event[i]._id %>_out.jpg"/></span>
+													</div>
 												</div>
-											</div>
+											<%}%>
 
 											<div class="modal-footer">
 												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 											</div>
 										</div>
+										
 									</div>
 								</div>
 
 								<!-- Modal -->
-								<div class="modal fade" id="event-edit1" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
-									<div class="modal-dialog" role="document">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h3 class="modal-title" id="event-editLabel">修改活動資訊</h3>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body" style="text-align: left">
-
-												<h3 class="inline">活動名稱：</h3><p class="inline">活動1</p>
-												<div class="6u 12u$(xsmall) inline">
-													<input type="text" name="name" id="event-editName" value="" placeholder="修改活動名稱" />
+								<form method="post" action="/sponsor/events/<%= list_event[i]._id %>/update">
+									<div class="modal fade" id="event-edit<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
+										<div class="modal-dialog" role="document">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h3 class="modal-title" id="event-editLabel">修改活動資訊</h3>
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
 												</div>
-												<br>
-												<h3 class="inline">活動日期：</h3><p class="inline">時間1</p>
-												<br>
-												<input type="datetime-local" id="event-editDateTime1" value="2018-06-12T19:30">
-												<br>
-												<br>
-												<h3 class="inline">活動地點：</h3><p class="inline">地點1</p>
-												<div class="6u 12u$(xsmall) inline">
-													<input type="text" name="name" id="event-editLocation" value="" placeholder="修改活動地點" />
-												</div>
-												<br>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-												<input type="submit" class="btn btn-primary" value="Save"/>
+												<div class="modal-body" style="text-align: left">
 
+													<h3 class="inline">活動名稱：</h3>
+													<div class="6u 12u$(xsmall) inline">
+														<input type="text" name="name" id="event-editName" value="<%= list_event[i].name %>" placeholder="修改活動名稱" />
+													</div>
+													<br>
+
+													<h3 class="inline">活動地點：</h3>
+													<br>
+													<div class="6u 12u$(xsmall) inline">
+														<input type="text" name="location" id="event-editLocation" value="<%= list_event[i].location %>" placeholder="">
+													</div>
+													<br>
+													
+													<h3 class="inline">活動連結：</h3>
+													<br>
+													<div class="6u 12u$(xsmall) inline">
+														<input type="text" name="link" id="event-editLink" value="<%= list_event[i].ncculink %>" placeholder="修改活動連結">
+													</div>
+													<br>
+
+													<h3 class="inline">開始時間：</h3>
+													<br>
+													
+													<input type="datetime-local" name="time" id="event-editDateTime" value="2020-12-31T00:00" placeholder="2014-09-18">
+													<br>
+
+													<h3 class="inline">結束時間：</h3>
+													<br>
+													<input type="datetime-local" name="endtime" id="event-editEndTime" value="2020-12-31T00:00" placeholder="2014-09-18">
+													<br>
+
+													<h3 class="inline">發點數條件：</h3>
+													<br>
+													<select name="signCondition">
+														<% if (list_event[i].signCondition == 'onlyIn'){%>
+														<option value="bothSign">必須 簽到與刷退</option>
+														<option value="onlyIn" selected="true">*只要 簽到</option>
+														<option value="onlyOut">只要 刷退</option>
+														<%} else if (list_event[i].signCondition == 'onlyOut'){%>
+														<option value="bothSign">必須 簽到與刷退</option>
+														<option value="onlyIn" >只要 簽到</option>
+														<option value="onlyOut" selected="true">*只要 刷退</option>
+														<%}else{%>
+														<option value="bothSign" selected="true">*必須 簽到與刷退</option>
+														<option value="onlyIn" >只要 簽到</option>
+														<option value="onlyOut">只要 刷退</option>	
+														<%}%>	
+													</select>
+													<br>
+														
+
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+													<input type="submit" class="btn btn-primary" value="Save"/>
+
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
+								</form>
 
 								<!-- Modal -->
-								<div class="modal fade" id="event-delete1" tabindex="-1" role="dialog" aria-labelledby="event-deleteLabel" aria-hidden="true">
-									<div class="modal-dialog" role="document">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h3 class="modal-title" id="event-deleteLabel">刪除活動</h3>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body">
-												<p>請注意！當你按下Delete，該活動將被刪除。</p>
-												<p>若有需要復原，請洽詢系統服務人員。</p>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-												<button type="button" class="btn btn-primary">Delete</button>
+								<form method="post" action="/sponsor/events/<%= list_event[i]._id %>/delete">
+									<div class="modal fade" id="event-delete<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-deleteLabel" aria-hidden="true">
+										<div class="modal-dialog" role="document">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h3 class="modal-title" id="event-deleteLabel">刪除活動</h3>
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
+												</div>
+												<div class="modal-body">
+													<p>請注意！當你按下Delete，該活動將被刪除。</p>
+													<p>若有需要復原，請洽詢系統服務人員。</p>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary">Delete</button>
 
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-
+								</form>
+						
 								<!-- Modal -->
-								<div class="modal fade" id="end" tabindex="-1" role="dialog" aria-labelledby="end_event" aria-hidden="true">
+								<div class="modal fade" id="end<%= i %>" tabindex="-1" role="dialog" aria-labelledby="end_event" aria-hidden="true">
 									<div class="modal-dialog" role="document">
 										<div class="modal-content">
 											<div class="modal-header">
@@ -209,261 +242,20 @@
 											</div>
 											<div class="modal-footer">
 												<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-												<button type="button" class="btn btn-primary">活動結束</button>
+												<button type="button" onclick="location.href='/sponsor/events/<%= list_event[i]._id %>/SendMultiPoint'" class="btn btn-primary">活動結束</button>
 
 											</div>
 										</div>
 									</div>
 								</div>
-							</tr>
-							</tbody>
-						</table>
-
-						<div class="event_time">活動開始時間：2019/11/18 10:09:21</div>
-						<div class="sponsor">
-							<a href="" data-toggle="modal" data-target="#event-edit1">修改</a>/<a href="" data-toggle="modal" data-target="#event-delete1">刪除</a>
-						</div>
-						<table style="font-size: 12px">
-							<tbody>
-							<tr>
-								<th></th>
-								<th>活動名稱</th>
-								<th>活動細節</th>
-								<th width="160px" style= "word-break:break-all">活動結束 <br>(發放點數)</th>
-							</tr>
-							<tr>
-								<td width="10px" style= "word-break:break-all">
-									<a href="" data-toggle="modal" data-target="#event1-qrModal">
-										<img src="../images/code(unavailable).png" height="25" width="25"/>
-									</a>
-								</td>
-								<td width="200px" style= "word-break:break-all">活動1</td>
-								<td width="160px" style= "word-break:break-all"><a href="myeventinfo_for_phone.html">詳細資訊</a></td>
-								<td>
-									<img src="../images/stop.png" height="15" width="15"/>
-									<a href="" class="important" data-toggle="modal" data-target="#end">活動結束</a>
-								</td>
-							</tr>
-							</tbody>
-						</table>
-
-						<!-- Modal -->
-						<div class="modal fade" id="event1-qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h3 class="modal-title" id="qrModalLabel">QR Code</h3>
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									<div class="modal-body">
-										<script>
-											function check_in_link1() {
-												var x = document.getElementById('check_in_code1');
-												if (x.style.display === 'none') {
-													x.style.display = 'block';
-												}else{
-													x.style.display = 'none';
-												}
-											}
-										</script>
-										<a href="#" onclick="check_in_link1()"><h3>簽到條碼</h3></a>
-										<div id="check_in_code1" style="display:none;">
-											<span class="image fit"><img src="../images/code.jpeg"/></span>
-										</div>
-
-										<script>
-											function check_out_link1() {
-												var x = document.getElementById('check_out_code1');
-												if (x.style.display === 'none') {
-													x.style.display = 'block';
-												}else{
-													x.style.display = 'none';
-												}
-											}
-										</script>
-										<a href="#" onclick="check_out_link1()"><h3>刷退條碼</h3></a>
-										<div id="check_out_code1" style="display:none;">
-											<span class="image fit"><img src="../images/code.jpeg"/></span>
-										</div>
-									</div>
-
-									<div class="modal-footer">
-										<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<!-- Modal -->
-						<div class="modal fade" id="event-edit1" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h3 class="modal-title" id="event-editLabel">修改活動資訊</h3>
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									<div class="modal-body" style="text-align: left">
-
-										<h3 class="inline">活動名稱：</h3><p class="inline">活動1</p>
-										<div class="6u 12u$(xsmall) inline">
-											<input type="text" name="name" id="event-editName" value="" placeholder="修改活動名稱" />
-										</div>
-										<br>
-										<h3 class="inline">活動日期：</h3><p class="inline">時間1</p>
-										<br>
-										<input type="datetime-local" id="event-editDateTime1" value="2018-06-12T19:30">
-										<br>
-										<br>
-										<h3 class="inline">活動地點：</h3><p class="inline">地點1</p>
-										<div class="6u 12u$(xsmall) inline">
-											<input type="text" name="name" id="event-editLocation" value="" placeholder="修改活動地點" />
-										</div>
-										<br>
-									</div>
-									<div class="modal-footer">
-										<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-										<input type="submit" class="btn btn-primary" value="Save"/>
-
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<!-- Modal -->
-						<div class="modal fade" id="event-delete1" tabindex="-1" role="dialog" aria-labelledby="event-deleteLabel" aria-hidden="true">
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h3 class="modal-title" id="event-deleteLabel">刪除活動</h3>
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									<div class="modal-body">
-										<p>請注意！當你按下Delete，該活動將被刪除。</p>
-										<p>若有需要復原，請洽詢系統服務人員。</p>
-									</div>
-									<div class="modal-footer">
-										<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-										<button type="button" class="btn btn-primary">Delete</button>
-
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<!-- Modal -->
-						<div class="modal fade" id="end" tabindex="-1" role="dialog" aria-labelledby="end_event" aria-hidden="true">
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h3 class="modal-title" id="event-deleteLabel">活動結束</h3>
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									<div class="modal-body">
-										<p>請注意！當你按下活動結束，該活動將開始發放點數。</p>
-										<p>一旦開始發放點數，活動細則及出席表將再也無法更動。</p>
-									</div>
-									<div class="modal-footer">
-										<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-										<button type="button" class="btn btn-primary">活動結束</button>
-
-									</div>
-								</div>
-							</div>
-						</div>
-						</tr>
-
+							<%}%>
 					</div>
 
 					<!--button-->
 					<ul class="actions fit">
 						<!--<li><a href="#" class="button special fit">錢包查詢餘額</a></li>-->
-						<li><a href="addevent.html" class="button fit">新增活動</a></li>
-
-
-						<!--<li><a href="#" class="button alt fit" data-toggle="modal" data-target="#bar_line_chart">投資報酬率</a></li>-->
-
-						<!-- Modal -->
-						<!--投資報酬率圖表
-						<div class="modal fade" id="bar_line_chart" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h3 class="modal-title" id="return_on_investment">投資報酬率</h3>
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-
-
-									<div class="modal-body" style="text-align: center">
-										<canvas id="myChart" width="400" height="400"></canvas>
-
-										<script>
-                                            var ctx = document.getElementById('mychart').getContext('2d');
-                                            var Chart = new Chart(ctx, {
-                                                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                                                dataset: [{
-                                                    type: 'line',
-                                                    label: '出席人數',
-                                                    borderColor: '#25a2c3',
-                                                    borderWidth: 2,
-                                                    fill: false,
-                                                    data: [
-                                                        40,50,80,60
-                                                    ]
-                                                }, {
-                                                    type: 'bar',
-                                                    label: '投入資金',
-                                                    backgroundColor: '#f6755e',
-                                                    data: [
-                                                        2000,3000,3000,1500
-                                                    ],
-                                                    borderColor: 'white',
-                                                    borderWidth: 2
-                                                }]
-                                            });
-
-										</script>
-
-									</div>
-								</div>
-							</div>
-						</div>
-						-->
-
+						<li><a href="/sponsor/events/createevent" class="button fit">新增活動</a></li>
 					</ul>
 					</div>
 			</section>
-
-<!-- Footer -->
-<footer id="footer">
-	<div class="inner">
-		<h2>Contact Us</h2>
-		<ul class="actions">
-			<!-- <li><span class="icon fa-phone"></span> <a href="#">(000) 000-0000</a></li> -->
-			<!--<li><span class="icon fa-map-marker"></span> 123 Somewhere Road, Nashville, TN 00000</li>-->
-			<li><span class="icon fa-envelope"></span> <a href="#">nccupoints@gmail.com</a></li>
-			<br>
-			<br>
-			<li><a href="QApage_after_login.html">常見問題</a></li>
-		</ul>
-	</div>
-</footer>
-
-<!-- Scripts -->
-<script src="../assets/js/jquery.min.js"></script>
-<script src="../assets/js/jquery.scrolly.min.js"></script>
-<script src="../assets/js/skel.min.js"></script>
-<script src="../assets/js/util.js"></script>
-<script src="../assets/js/main.js"></script>
-
-</body>
-</html>
+<%-include('../root/footer')-%>

@@ -283,6 +283,8 @@ exports.edit_info_get = (req,res,next)=>{
 };
 
 exports.edit_info_post = [
+    // body('phone','Phone is required').isInt({allow_leading_zeroes: true}),
+    // sanitizeBody('phone').escape(),
 
     (req,res,next)=>{
         req.session.reload();
@@ -420,7 +422,7 @@ exports.event_list = (req,res)=>{
                     endtimeArray.push(moment(_event[i].endtime).format('LLL'));
                 }
 
-                res.render('root/eventlist', {
+                res.render('root/_eventlist', {
                     username : req.session.user_info.user_info.name,
                     title: 'Event List | NCCU Attendance', 
                     _event:  _event,
@@ -445,7 +447,7 @@ exports.event_list = (req,res)=>{
             }
             // console.log( req.session.user_info.user_info.username);
     
-            res.render('root/eventlist', {
+            res.render('root/_eventlist', {
                 username : req.session.user_info.user_info.name,
                 title: 'Event List | NCCU Attendance', 
                 _event:  _event,
@@ -474,7 +476,7 @@ exports.event_list_bli = (req, res) => {
                 endtimeArray.push(moment(_event[i].endtime).format('LLL'));
             }
 
-            res.render('root/eventlistBLI', {
+            res.render('root/_eventlistBLI', {
                 title: 'Event List | NCCU Attendance', 
                 _event:  _event,
                 Time :timeArray,
@@ -494,7 +496,7 @@ exports.event_list_bli = (req, res) => {
                 endtimeArray.push(moment(_event[i].endtime).format('LLL'));
             }
 
-            res.render('root/eventlistBLI', {
+            res.render('root/_eventlistBLI', {
                 title: 'Event List | NCCU Attendance', 
                 _event:  _event,
                 Time :timeArray,

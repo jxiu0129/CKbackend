@@ -1,5 +1,6 @@
 <%-include('../root/header')-%>
-<script>
+	<script language="javascript" type="text/javascript">
+
 		function check_link(jpgid) {
 			var x = document.getElementById(jpgid);
 			if (x.style.display === 'none') {
@@ -12,7 +13,47 @@
 		function update_alert(){
 			alert("在您修改活動資訊前，請注意： \n\n1.當活動的「開始時間」在現在時間的一小時內，活動狀態會成為「正在進行」，屆時將無法再對活動進行修改及刪除，敬請留意！\n\n2.修改活動資訊中的「開始時間」與「結束時間」預設為2020-12-31 12:00，而非活動原本的開始時間及結束時間，煩請您將「開始時間」與「結束時間」調回原本活動的時間，感謝！")
 		}
+		
+		function CheckFunc()
+		{
+			let time = new Date(document.forms[0].time.value);
+			let endtime = new Date(document.forms[0].endtime.value);
+			msg = "";
+
+			if(document.forms[0].name.value == "")
+			{
+				msg = "請輸入活動名稱";
+			}
+			else if(document.forms[0].time.value == "")
+			{
+				msg = "請輸入開始時間";
+			}
+			else if(time.getTime() < Date.now())
+			{
+				msg = "開始時間不可為過去時間"
+			}
+			else if(document.forms[0].endtime.value == "")
+			{
+				msg = "請輸入結束時間";
+			}
+			else if(endtime.getTime() < Date.now())
+			{
+				msg = "結束時間不可為過去時間"
+			}
+			else if(endtime.getTime() < time.getTime())
+			{
+				msg = "結束時間不可比開始時間早"
+			}
+			else
+			{
+				return true;
+			}
+
+			alert(msg);
+			return false;
+		}
 	</script>
+
 <!-- Main -->
 			<section id="main" class="wrapper">
 				<div class="inner">
@@ -193,7 +234,7 @@
 												</div>
 												<div class="modal-footer">
 													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-													<input type="submit" class="btn btn-primary" value="Save"/>
+													<input type="submit" class="btn btn-primary" onclick="return CheckFunc();" value="Save"/>
 
 												</div>
 											</div>

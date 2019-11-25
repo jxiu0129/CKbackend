@@ -30,22 +30,22 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
             async.parallel({
                 user:function(callback){
                     User.findOne({email : req.session.user_info.user_info.email})
-                    .exec(callback)
+                    .exec(callback);
                 },
                 event: function(callback){
                     Event.findById(req.params.eventid)
-                    .exec(callback)
+                    .exec(callback);
                 },
 
                 attendance: function(callback){
                     Attendance.findOne({event_id:req.params.eventid})
-                    .exec(callback)
+                    .exec(callback);
 
                 },
 
                 list : function(callback){
                     Attendance.findOne({event_id:req.params.eventid},'list')
-                    .exec(callback)
+                    .exec(callback);
 
                 }
             },
@@ -62,20 +62,121 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
 
 
                 if(err){return next(err);}
+                
                 else if (String(results.event.holder) == String(_user._id)) {
                     res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'',msg:'贊助商不可參加自己舉辦的活動', url:req.session.API_LoginCode});
                 }
+
+                // 舊版簽到
+                // else if (_atnd == null){
+                    
+                //     let _newSignIn;
+                //     if(results.event.signCondition == 'onlyIn'){
+                //         _newSignIn = new Attendance({
+                //             event_id : req.params.eventid,
+                //             list : [{
+                //                 email : _stdId,
+                //                 time_in : _timein,
+                //                 reward:true,
+                //             }]
+                //         });
+                //     }else{
+                //         _newSignIn = new Attendance({
+                //             event_id : req.params.eventid,
+                //             list : [{
+                //                 email : _stdId,
+                //                 time_in : _timein
+                //             }]
+                //         });
+                //     }
+
+                //     _SignIn = _newSignIn;
+
+                //     _newSignIn.save(function(err){
+
+                //         if(err) {return next(err);}
+                //         console.log("Successfully Create SignIn");
+
+                //     });
+                    
+                //     let thisevent;
+                //     if(results.event.signCondition == 'onlyIn'){
+                //         thisevent = new Event({
+                //             name : results.event.name,
+                //             time : results.event.time,
+                //             expense : results.event.expense,
+                //             location : results.event.location,
+                //             AttendanceList : _newSignIn,
+                //             amount : results.event.amount + 1,
+                //             _id : results.event._id,
+                //             status : results.event.status,
+                //             ncculink : results.event.ncculink,
+                //             signCondition : results.event.signCondition
+                //         });    
+                //     }else{
+                //         thisevent = new Event({
+                //             name : results.event.name,
+                //             time : results.event.time,
+                //             expense : results.event.expense,
+                //             location : results.event.location,
+                //             AttendanceList : _newSignIn,
+                //             amount : results.event.amount,
+                //             _id : results.event._id,
+                //             status : results.event.status,
+                //             ncculink : results.event.ncculink,
+                //             signCondition : results.event.signCondition
+                //         });
+                //     }
+
+                //     Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
+                //         if(err) { return next(err);}
+                //     });
+
+                //     let user_atnd = {
+                //         event_id : req.params.eventid,
+                //         signin : _timein
+                //     };
+
+                //     _user.attend.push(user_atnd);
+
+                //     User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                //         if(err) { return next(err);}
+                //         else if (_user.inited == false){
+                //             res.render('qrcode/checkin(first)',{username:req.session.user_info.user_info.name,user : _user});
+                //         }else{
+                //             res.render('qrcode/checkin(second)',{username:req.session.user_info.user_info.name, user : _user});
+                //         }
+                //     });
+                    
+                // }
+
+                //新版簽到
                 else if (_atnd == null){
+
                     let _newSignIn;
                     if(results.event.signCondition == 'onlyIn'){
-                        _newSignIn = new Attendance({
-                            event_id : req.params.eventid,
-                            list : [{
-                                email : _stdId,
-                                time_in : _timein,
-                                reward:true
-                            }]
+    
+                      _newSignIn = new Attendance({
+                          event_id : req.params.eventid,
+                          list : [{
+                              email : _stdId,
+                              time_in : _timein,
+                              reward:true
+                          }]
                         });
+      
+                      _newSignIn.save(function(err){
+                        if(err) {return next(err);}
+                        console.log("1.Successfully Create SignIn");
+                      });
+                      
+                      let NewSignIn = _newSignIn;   
+      
+                      Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount + 1 , AttendanceList: NewSignIn },{},function(err,theevent){
+                        if(err) { return next(err);}
+                        console.log("2.Succesfully update event.attendancelist");
+                      });
+                    
                     }else{
                         _newSignIn = new Attendance({
                             event_id : req.params.eventid,
@@ -84,57 +185,27 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                                 time_in : _timein
                             }]
                         });
+      
+                        _newSignIn.save(function(err){
+                          if(err) {return next(err);}
+                          console.log("1.Successfully Create SignIn");
+                      });
+      
+                      let NewSignIn = _newSignIn;
+                      
+                      Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount ,AttendanceList : NewSignIn},{},function(err,theevent){
+                          if(err) { return next(err);}
+                          console.log("2.Succesfully update event.attendancelist");
+                      });
                     }
-
-                    _SignIn = _newSignIn;
-
-                    _newSignIn.save(function(err){
-
-                        if(err) {return next(err);}
-                        console.log("Successfully Create SignIn");
-
-                    });
-                    
-                    let thisevent;
-                    if(results.event.signCondition == 'onlyIn'){
-                        thisevent = new Event({
-                            name : results.event.name,
-                            time : results.event.time,
-                            expense : results.event.expense,
-                            location : results.event.location,
-                            AttendanceList : _newSignIn,
-                            amount : results.event.amount + 1,
-                            _id : results.event._id,
-                            status : results.event.status,
-                            ncculink : results.event.ncculink,
-                            signCondition : results.event.signCondition
-                        });    
-                    }else{
-                        thisevent = new Event({
-                            name : results.event.name,
-                            time : results.event.time,
-                            expense : results.event.expense,
-                            location : results.event.location,
-                            AttendanceList : _newSignIn,
-                            amount : results.event.amount,
-                            _id : results.event._id,
-                            status : results.event.status,
-                            ncculink : results.event.ncculink,
-                            signCondition : results.event.signCondition
-                        });
-                    }
-
-                    Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
-                        if(err) { return next(err);}
-                    });
-
+                                 
                     let user_atnd = {
                         event_id : req.params.eventid,
                         signin : _timein
                     };
-
+      
                     _user.attend.push(user_atnd);
-
+      
                     User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
                         if(err) { return next(err);}
                         else if (_user.inited == false){
@@ -143,11 +214,12 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                             res.render('qrcode/checkin(second)',{username:req.session.user_info.user_info.name, user : _user});
                         }
                     });
-                    
+      
                 }
-            
+    
                 else{
                     let _atndList = results.list.list;
+                    
                     if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
                         if (results.event.signCondition == 'onlyIn'){
                             _atndList.push({                   
@@ -161,13 +233,14 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                                 time_in : _timein
                             });    
                         }
+
                         _SignIn = {
                             event_id : req.params.eventid,
                             list : _atndList,
                         };
 
                         Attendance.findByIdAndUpdate(_atnd._id,_SignIn,{},function(err){
-                            console.log("Successfully Create SignIn 671");
+                            console.log("Successfully Create SignIn 123");
                         });
                         
                         let user_atnd = {
@@ -191,9 +264,6 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                     else{
 
                         for(let i = 0; i < _atndList.length; i++){
-                            console.log("i:  "+i);
-                            console.log(_atndList[i].email);
-
 
                             if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                                 if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
@@ -269,30 +339,14 @@ router.get('/testSignIn/:eventid',async (req,res,next)=>{
                         
                         const theAtd = await Attendance.findOne({event_id:req.params.eventid});
 
-                        console.log("theAtd"+theAtd);
                         let _rwd = 0;
                         for ( let j = 0; j < theAtd.list.length ; j++){
                             if(theAtd.list[j].reward == true){
                                     _rwd ++;
                             }
                         }
-
-                        console.log("the_rwd"+_rwd);
-
-                        let theevent = {
-                            name : results.event.name,
-                            time : results.event.time,
-                            expense : results.event.expense,
-                            location : results.event.location,
-                            AttendanceList : _atnd._id,
-                            _id : results.event._id,
-                            amount : _rwd,
-                            status : results.event.status,
-                            ncculink : results.event.ncculink , 
-                            signCondition : results.event.signCondition 
-                        };
                         
-                        Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
+                        Event.findByIdAndUpdate(req.params.eventid,{AttendanceList : _atnd._id ,amount : _rwd,},{},function(err,theevent){
                             if(err) { return next(err);}
                             console.log("reward successfully update");
                             if (_user.inited == false){
@@ -352,17 +406,117 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
             else if (String(results.event.holder) == String(_user._id)) {
                 res.render('qrcode/alertmessage',{username : req.session.user_info.user_info.name,title:'',msg:'贊助商不可參加自己舉辦的活動', url:req.session.API_LoginCode});
             }
+            // else if (_atnd == null){
+            //     let _newSignOut;
+            //     if(results.event.signCondition == 'onlyOut'){
+            //         _newSignOut = new Attendance({
+            //             event_id : req.params.eventid,
+            //             list : [{
+            //                 email : _stdId,
+            //                 time_out : _timeout,
+            //                 reward : true
+            //             }]
+            //         });    
+            //     }else{
+            //         _newSignOut = new Attendance({
+            //             event_id : req.params.eventid,
+            //             list : [{
+            //                 email : _stdId,
+            //                 time_out : _timeout
+            //             }]
+            //         });    
+            //     }
+
+            //     _SignOut = _newSignOut;
+
+            //     _newSignOut.save(function(err){
+
+            //         if(err) {return next(err);}
+            //         console.log("Successfully Create SignOut");
+
+            //     });
+                
+            //     let thisevent;
+            //     if(results.event.signCondition == 'onlyOut'){
+            //         thisevent = new Event({
+            //             name : results.event.name,
+            //             time : results.event.time,
+            //             expense : results.event.expense,
+            //             location : results.event.location,
+            //             AttendanceList : _newSignOut,
+            //             amount : results.event.amount + 1,
+            //             _id : results.event._id,
+            //             status : results.event.status,
+            //             ncculink : results.event.ncculink,
+            //             signCondition : results.event.signCondition
+            //         });    
+            //     }else{
+            //         thisevent = new Event({
+            //             name : results.event.name,
+            //             time : results.event.time,
+            //             expense : results.event.expense,
+            //             location : results.event.location,
+            //             AttendanceList : _newSignOut,
+            //             amount : results.event.amount,
+            //             _id : results.event._id,
+            //             status : results.event.status,
+            //             ncculink : results.event.ncculink,
+            //             signCondition : results.event.signCondition
+            //         });    
+            //     }
+
+
+            //     Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
+            //         if(err) { return next(err);}
+            //     });
+
+            //     let user_atnd = {
+            //         event_id : req.params.eventid,
+            //         signout : _timeout
+            //     };
+
+            //     _user.attend.push(user_atnd);
+
+            //     User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
+                    // if(err) { return next(err);}
+                    // res.render('qrcode/checkout',
+                    // {title: 'Successfully Sign Out | NCCU Attendance',
+                    // username:req.session.user_info.user_info.name,
+                    // user : _user
+                    // });
+
+            //     });
+            //     console.log("here!!!"+theuser);
+                
+            // }
+        
+            //新版刷退
             else if (_atnd == null){
+
                 let _newSignOut;
                 if(results.event.signCondition == 'onlyOut'){
+
                     _newSignOut = new Attendance({
                         event_id : req.params.eventid,
                         list : [{
                             email : _stdId,
                             time_out : _timeout,
-                            reward : true
+                            reward:true
                         }]
-                    });    
+                    });
+    
+                    _newSignOut.save(function(err){
+                    if(err) {return next(err);}
+                    console.log("1.Successfully Create SignOut");
+                    });
+                    
+                    let NewSignOut = _newSignOut;   
+    
+                    Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount + 1 , AttendanceList: NewSignOut },{},function(err,theevent){
+                        if(err) { return next(err);}
+                        console.log("2.Succesfully update event.attendancelist");
+                    });
+                
                 }else{
                     _newSignOut = new Attendance({
                         event_id : req.params.eventid,
@@ -370,59 +524,28 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                             email : _stdId,
                             time_out : _timeout
                         }]
-                    });    
+                    });
+    
+                    _newSignOut.save(function(err){
+                        if(err) {return next(err);}
+                        console.log("1.Successfully Create SignOut");
+                    });
+    
+                    let NewSignOut = _newSignOut;
+                    
+                    Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount ,AttendanceList : NewSignOut},{},function(err,theevent){
+                        if(err) { return next(err);}
+                        console.log("2.Succesfully update event.attendancelist");
+                    });
                 }
-
-                _SignOut = _newSignOut;
-
-                _newSignOut.save(function(err){
-
-                    if(err) {return next(err);}
-                    console.log("Successfully Create SignOut");
-
-                });
-                
-                let thisevent;
-                if(results.event.signCondition == 'onlyOut'){
-                    thisevent = new Event({
-                        name : results.event.name,
-                        time : results.event.time,
-                        expense : results.event.expense,
-                        location : results.event.location,
-                        AttendanceList : _newSignOut,
-                        amount : results.event.amount + 1,
-                        _id : results.event._id,
-                        status : results.event.status,
-                        ncculink : results.event.ncculink,
-                        signCondition : results.event.signCondition
-                    });    
-                }else{
-                    thisevent = new Event({
-                        name : results.event.name,
-                        time : results.event.time,
-                        expense : results.event.expense,
-                        location : results.event.location,
-                        AttendanceList : _newSignOut,
-                        amount : results.event.amount,
-                        _id : results.event._id,
-                        status : results.event.status,
-                        ncculink : results.event.ncculink,
-                        signCondition : results.event.signCondition
-                    });    
-                }
-
-
-                Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
-                    if(err) { return next(err);}
-                });
-
+                                
                 let user_atnd = {
                     event_id : req.params.eventid,
                     signout : _timeout
                 };
-
+    
                 _user.attend.push(user_atnd);
-
+    
                 User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
                     if(err) { return next(err);}
                     res.render('qrcode/checkout',
@@ -430,12 +553,10 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                     username:req.session.user_info.user_info.name,
                     user : _user
                     });
-
                 });
-                console.log("here!!!"+theuser);
-                
+    
             }
-        
+
             else{
                 let _atndList = results.list.list;
                 if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
@@ -540,6 +661,7 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                                 console.log("This User Has Already Signed Out");
                                 res.render('qrcode/alertmessage',
                                 {title: 'Already Signed Out | NCCU Attendance',
+                                username : req.session.user_info.user_info.name,
                                 msg:_user.name + ' ,您已經刷退過囉！'});
                                 return;
                             }
@@ -568,29 +690,14 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
                             _rwd ++;
                         }
                     }
-
-                    console.log(_rwd);
-
-                    let theevent = {
-                        name : results.event.name,
-                        time : results.event.time,
-                        expense : results.event.expense,
-                        location : results.event.location,
-                        AttendanceList : _atnd._id,
-                        _id : results.event._id,
-                        amount : _rwd,
-                        status : results.event.status,
-                        ncculink : results.event.ncculink,
-                        signCondition : results.event.signCondition       
-                    };
                     
-                    Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
+                    Event.findByIdAndUpdate(req.params.eventid,{AttendanceList : _atnd._id ,amount : _rwd},{},function(err,theevent){
                         if(err) { return next(err);}
                         res.render('qrcode/checkout',
-                        {title: 'Successfully Sign Out | NCCU Attendance',
-                        username:req.session.user_info.user_info.name,
-                        user : _user
-                        });
+                            {title: 'Successfully Sign Out | NCCU Attendance',
+                            username:req.session.user_info.user_info.name,
+                            user : _user
+                            });
                         console.log("reward successfully update");
                     });
                 }
@@ -598,6 +705,7 @@ router.get('/testSignOut/:eventid',async (req,res,next)=>{
         });
     }
 });
+
 
 //登入的跳轉
 //登入簽到

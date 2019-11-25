@@ -9,84 +9,55 @@
 			<table>
 				<thead>
 				<tr>
-					<th>活動名稱</th>
-					<th>活動日期</th>
-					<th>活動地點</th>
-					<th>主辦單位投資點數</th>
+					<th>活動名稱/ID</th>
 					<th>獲得點數</th>
-					<th>報到紀錄</th>
-					<th>刷退紀錄</th>
+					<th>出席狀況</th>
+					<th>更多</th>
 				</tr>
 				</thead>
 				<tbody>
 				<% for(let i = 0; i < event_info.length; i++) {%>
 				<tr>
-					<td title="活動ID: <%= event_info[i].event_id.shortid%>"><%= event_info[i].event_id.name%></td>
-					<td><%= event_info[i].event_id.time.toLocaleDateString()%></td>
-					<td><%= event_info[i].event_id.location%></td>
-					<td><%= event_info[i].event_id.expense%></td>
+					<!-- 活動名稱 -->
+					<td title="活動ID: <%= event_info[i].event_id.shortid%>" width="250px" style= "word-break:break-all"><%= event_info[i].event_id.name%></td>
 
+					<!-- 獲得點數 -->
 					<%if(event_info[i].event_id.SendPoint != undefined && event_info[i].event_id.SendPoint != null){%>
-						<td><img src="../images/piggy-bank.png" height="20" width="20"/>
+						<td width="140px" style= "word-break:break-all"><img src="../images/piggy-bank.png" height="20" width="20"/>
 							<%=event_info[i].event_id.SendPoint%></td>
 					<%}else{%>
-							<td title="活動結束才會發放點數">活動尚未結束</td>
+							<td width="140px" style= "word-break:break-all" title="活動結束才會發放點數">活動尚未結束</td>
 					<%}%>
 
-
+					<!-- 出席狀況 -->
 					<%if(event_info[i].signin != undefined && event_info[i].signin != null){%>
-						<%//console.log('刷進!進else')%>
-						<td><%=event_info[i].signin.toLocaleString({second:'numeric', hour12: false})%></td>
+						<%if(event_info[i].signout != undefined && event_info[i].signout != null){%>
+						<td width="180px" style= "word-break:break-all">
+							<%=event_info[i].signin.toLocaleString({second:'numeric', hour12: false})%>
+							<br>
+							<%=event_info[i].signout.toLocaleString({second:'numeric', hour12: false})%>
+						</td>
+						<%}else{%>
+						<td width="180px" style= "word-break:break-all">
+							<%=event_info[i].signin.toLocaleString({second:'numeric', hour12: false})%> 
+							<br>
+							<%='尚未刷退'%>
+						</td>
+						<%}%>
 					<%}else{%>
-						<%//console.log('刷進進else')%>
-							<td class="inline">尚未刷到</td>
+						<%if(event_info[i].signout != undefined && event_info[i].signout != null){%>
+						<td width="180px" style= "word-break:break-all">
+							<%='尚未簽到'%> 
+							<br>
+							<%=event_info[i].signout.toLocaleString({second:'numeric', hour12: false})%>
+						</td>
+						<%}%>
 					<%}%>
 
-
-					<%if(event_info[i].signout != undefined && event_info[i].signout != null){%>
-						<%//console.log('刷退!進else')%>
-						<td><%=event_info[i].signout.toLocaleString({hour12: false})%></td>
-					<%}else{%>
-						<%//console.log('刷退進else')%>
-							<td>尚未刷退</td>
-					<%}%>
-
-					<!--Modal 這裡不需要了QQ-->
-					<div class="modal fade" id="record1" tabindex="-1" role="dialog" aria-labelledby="recordLabel" aria-hidden="true">
-						<div class="modal-dialog" role="document">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h3 class="modal-title" id="recordLabel">報到與刷退紀錄</h3>
-									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-										<span aria-hidden="true">&times;</span>
-									</button>
-								</div>
-
-								<div class="modal-body">
-									<%if(event_info[i].signin != undefined){%>
-										<h3 class="inline">報到時間：</h3><p class="inline"><%=event_info[i].signin.toLocaleString()%></p>
-									<%}else{%>
-											<h3 class="inline">報到時間：</h3><p class="inline">尚未刷到</p>
-									<%}%>
-
-									<br>
-
-									<%if(event_info[i].signout != undefined){%>
-										<h3 class="inline">刷退時間：</h3><p class="inline"><%=event_info[i].signout.toLocaleString()%></p>
-									<%}else{%>
-										<h3 class="inline">刷退時間：</h3><p class="inline">尚未刷退</p>
-									<%}%>
-
-									<br>
-
-								</div>
-
-								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-								</div>
-							</div>
-						</div>
-					</div>
+					<!-- 更多 -->
+					<%var id = event_info[i].event_id._id; id=='undefined' ? 'undefined':event_info[i].event_id._id + "'"%>
+					<%let url = 'http://localhost:3000/user/record/info?eventid='%>
+					<td width="160px" style= "word-break:break-all"><a href=<%=url + id%>>  查看詳情 </a> </td>
 				</tr>
 				<%};%>
 				</tbody>

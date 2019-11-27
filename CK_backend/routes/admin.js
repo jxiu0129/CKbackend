@@ -5,6 +5,17 @@ const admin_controller = require('../controllers/adminController');
 
 // Admin_Routes: This is for admin to manage and monitor the entire system.
 // GET admin page
+router.use((req, res, next) => {
+    if (typeof req.session.admin == 'undefined' || !req.session.admin) {
+        next();
+    } else {
+        res.render('admin/index', { title: 'Express' });    }
+});
+
+router.get('/admin/login',admin_controller.admin_login_get);
+
+router.post('/admin/login',admin_controller.admin_login_post);
+
 router.get('/admin', admin_controller.admin);
 
 router.get('/admin/events', admin_controller.event_list);

@@ -356,6 +356,8 @@ exports.Send_Multi_Point = async function(req, res){
             .exec((err, data) => {
                 if (err){
                     console.log(err);
+                }else if (!data){
+                    console.log('0人出席');
                 }else{
                     for(let i = 0; i < data.list.length;i++)
                     {
@@ -377,8 +379,25 @@ exports.Send_Multi_Point = async function(req, res){
                 rp(sendpoint)
                 .then((message) =>{
                     console.log(message);
-                    if(message.status == false){
-                        res.render('qrcode/alertmessage',{username: req.session.user_info.user_info.name,title:'活動無法結束',msg:'發生錯誤，請洽詢政大活動點工作人員'});
+                    if(message.status == false){            //當status為false時，處理錯誤
+                        if(message.msg == 'Token is not valid'){        //msg顯示Token is not valid，可能的情況為token過期或無人參加活動
+                            if(!data){                                  //無人出席
+                                res.render('qrcode/alertmessage',{
+                                    username: req.session.user_info.user_info.name,
+                                    title:'活動無法結束',
+                                    msg:'出席人數為0，無法結束活動（請洽詢政大活動點工作人員）'});        
+                            }else{
+                                res.render('qrcode/alertmessage',{      //token過期
+                                    username: req.session.user_info.user_info.name,
+                                    title:'活動無法結束',
+                                    msg:'發生錯誤，請洽詢政大活動點工作人員'+'\n'+'msg:Token is not valid'});        
+                            }
+                        }else{                  //其他錯誤
+                            res.render('qrcode/alertmessage',{
+                                username: req.session.user_info.user_info.name,
+                                title:'活動無法結束',
+                                msg:'發生錯誤，請洽詢政大活動點工作人員'});    
+                        }     
                     }else{
                         // 按下活動結束後會更改活動的status為finsih
                         Event.findByIdAndUpdate(req.params.eventid , {status : 'finish',SendPoint : point})

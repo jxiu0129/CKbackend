@@ -15,7 +15,6 @@ const QRCode = require('qrcode');
 const schedule = require('node-schedule');
 const moment = require('moment');
 
-
 const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 
@@ -125,6 +124,22 @@ moment.locale('zh-tw', {
     }
   });
 
+exports.admin_login_get = (req,res)=>{
+    res.render('admin/login');
+};
+
+exports.admin_login_post = (req,res)=>{
+    if (req.body.account == 'admin' && req.body.password == 'workhard') {
+        req.session.admin = true;
+        res.json({
+            status: true
+        });
+    } else {
+        res.json({
+            status: false
+        });
+    }
+};
 
 exports.admin = function(req,res){
     res.render('admin/index');

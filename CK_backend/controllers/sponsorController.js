@@ -149,13 +149,16 @@ exports.sponsor_events= async(req,res,next) =>{
     let NewToken;
 
     setInterval(async () => {
-        if (TokenRefreshClock <= Date.now() + 5 * 60 * 1000){
+        if (TokenRefreshClock + 5 * 60 * 1000 <= Date.now() ){
             NewToken = await indexController.grant_new_token(RefreshToken);
             req.session.API_Access = NewToken;
+            req.session.API_RefreshClock = Date.now();
+            TokenRefreshClock = Date.now();
             req.session.save();
             console.log(req.session.API_Access);
-        }
-    }, 30 * 1000);
+        };
+        console.log("Hi I'm here.");
+    },10 *1000);
 
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{
@@ -174,7 +177,7 @@ exports.sponsor_events= async(req,res,next) =>{
                     timeArray.push(moment(list_event[i].time).format('LLL'));
                     endtimeArray.push(moment(list_event[i].endtime).format('LLL'));
                 }
-                res.render('sponsor/myevents', { 
+                res.render('sponsor/_myevents', { 
                     username: req.session.user_info.user_info.name,
                     title: 'My Events | NCCU Attendance',
                     list_event:  list_event,
@@ -202,7 +205,8 @@ exports.sponsor_create_get= async function(req, res,){
     });
     User.findOne({email:req.session.user_info.user_info.email})
     .exec(async (err,_user)=>{
-        res.render('sponsor/addevents' , { username: req.session.user_info.user_info.name , 
+        res.render('sponsor/addevents' , { 
+            username: req.session.user_info.user_info.name , 
             url:req.session.API_LoginCode,
             title : "Add Events | NCCU Attendance",
             balance : point.user_info.sponsor_point,
@@ -217,34 +221,42 @@ exports.sponsor_create_post = [
     //Validate
     // req.session.reload();
     body('name', 'Name is required').isLength({ min: 1 }).trim(),
-    body('time',  'Invalid date').isISO8601().custom((value) => {
-        if (value < Date.now()){
+    body('time',  'time is required').isISO8601().custom((value) => {
+        var date = new Date(value);
+        if (date.getTime() < Date.now()){
             throw new Error('Cannot hold event in past!');
         }
         return true;
     }),
-    body('endtime',  'Invalid date').isISO8601().custom((value) => {
-        if (value < Date.now()){
+    body('endtime',  'Invalid date').isISO8601().custom((value,{req}) => {
+        
+        var startDate = new Date(req.body.time);
+        var date = new Date(value);
+
+        if (date.getTime() < Date.now()){
             throw new Error('Cannot hold event in past!');
+        }else if ( startDate > date){
+            throw new Error('EndTime cannot before StartTime!');            
         }
         return true;
     }),
-    body('location', 'Name is required').isLength({ min: 1 }).trim(),
-    body('expense','Expense is required').isInt().custom((value, {req}) => {
-        if(value < 0){
-            console.log("Problem3");
-            throw new Error('Expense must be Positive');
-        }else if(value > req.session.user_info.user_info.sponsor_point){
-            console.log("Problem4");
-            throw new Error("You don't have enough money");
-        }
-        return true;
+    body('expense','Expense is required').isInt().custom(async(value, {req}) => {
+        let user = await User.findOne({email:req.session.user_info.user_info.email});
+            if(value < 0){
+                console.log("Problem3");
+                throw new Error('Expense must be Positive');
+            }else if(value > req.session.user_info.user_info.sponsor_point - user.spendedAmount){
+                console.log("Problem4");
+                throw new Error("You don't have enough money");
+            }
+            return true;    
     }),    
+
     // Sanitize (trim) the name field.
     sanitizeBody('name').escape(),
     sanitizeBody('time').escape().toDate(),
     sanitizeBody('endtime').escape().toDate(),
-    sanitizeBody('location').escape(),
+    // sanitizeBody('location').escape(),
     sanitizeBody('expense').escape(),
     
     // Process request after validation and sanitization.
@@ -276,9 +288,17 @@ exports.sponsor_create_post = [
 
         if (!errors.isEmpty()) {
             // There are errors. Render the form again with sanitized values/error messages.
-            res.render('sponsor/addevents', { username: req.session.user_info.user_info.name,title: 'Add Events | NCCU Attendance', balance : 'defined your mother' , errors: errors.array(), url:req.session.API_LoginCode});
+            res.redirect("/sponsor/events/createevent");
+            // res.render('sponsor/addevents', { 
+            //     errors: errors.array(), 
+            //     username: req.session.user_info.user_info.name , 
+            //     url:req.session.API_LoginCode,
+            //     title : "Add Events | NCCU Attendance",
+            //     balance : point.user_info.sponsor_point,
+            //     realBalance : req.session.user_info.user_info.sponsor_point - _user.spendedAmount,});
             // Test
-            console.log("Error : "+errors);
+            console.log("errors: ");
+            console.log(errors);
         return;
         }
         else {
@@ -414,23 +434,43 @@ exports.sponsor_update_post= [
 
     //Validate
     body('name', 'Name is required').isLength({ min: 1 }).trim(),
-    body('time',  'Invalid date').optional({ checkFalsy: true}).isISO8601(),
-    body('endtime',  'Invalid date').optional({ checkFalsy: true}).isISO8601(),
-    body('location', 'Name is required').isLength({ min: 1 }).trim(),
-    body('expense','Expense is required').isInt({ min : 0 ,allow_leading_zeroes: false}),
+    body('time',  'time is required').isISO8601().custom((value) => {
+        var date = new Date(value);
+        if (date.getTime() < Date.now()){
+            throw new Error('Cannot hold event in past!');
+        }
+        return true;
+    }),
+    body('endtime',  'Invalid date').isISO8601().custom((value,{req}) => {
+        var startDate = new Date(req.body.time);
+        var date = new Date(value);
+
+        if (date.getTime() < Date.now()){
+            throw new Error('Cannot hold event in past!');
+        }else if ( startDate > date){
+            throw new Error('EndTime cannot before StartTime!');            
+        }
+        return true;
+    }),
 
     // Sanitize (trim) the name field.
     sanitizeBody('name').escape(),
     sanitizeBody('time').escape().toDate(),
     sanitizeBody('endtime').escape().toDate(),
-    sanitizeBody('location').escape(),
-    sanitizeBody('Expense').escape(),
 
     // Process request after validation and sanitization.
     async(req, res, next) => {
 
         // Extract the validation errors from a request.
         const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // There are errors. Render the form again with sanitized values/error messages.
+            res.redirect("/sponsor/events");
+            console.log("errors: ");
+            console.log(errors);
+        return;
+        }
+
         let attd = await Attendance.findOne({event_id:req.params.eventid},(err)=>{
             if (err) { return next(err); }
         });
@@ -525,6 +565,23 @@ exports.sponsor_update_post= [
         }
     }
 ];
+
+exports.eventinfo_sponsor = (req,res)=>{
+    req.session.reload();
+    Event.findById(req.params.eventid,(err,event)=>{
+
+            let Time = moment(event.time).format('LLL');
+            let EndTime = moment(event.endtime).format('LLL');
+
+        res.render('sponsor/eventinfo_sponsor',{
+            url:req.session.API_LoginCode,
+            username:req.session.user_info.user_info.name,
+            event : event,
+            Time : Time,
+            EndTime : EndTime,
+        });
+    });
+};
 
 exports.events_attendancelist = function(req,res,next){
 
@@ -652,10 +709,10 @@ exports.SignIn_create_post= [
 
     // Process request after validation and sanitization.
     (req,res,next) =>{
-        console.log("????"),   
         req.session.reload();
         body('time',  'Invalid date').isISO8601().custom((value) => {
             if (value < Date.now()){
+                req.body.time;
                 throw new Error('Cannot hold event in past!');
             }
             return true;
@@ -709,8 +766,10 @@ exports.SignIn_create_post= [
             if(err){return next(err);}
 
             else if (_atnd == null){
+
                 let _newSignIn;
                 if(results.event.signCondition == 'onlyIn'){
+
                   _newSignIn = new Attendance({
                       event_id : req.params.eventid,
                       list : [{
@@ -725,12 +784,13 @@ exports.SignIn_create_post= [
                     console.log("1.Successfully Create SignIn");
                   });
                   
-                  let _newSigin = _newSignIn;   //in In
+                  let NewSignIn = _newSignIn;   
   
-                  Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount + 1,AttendanceList:_newSigin},{},function(err,theevent){
+                  Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount + 1 , AttendanceList: NewSignIn },{},function(err,theevent){
                     if(err) { return next(err);}
                     console.log("2.Succesfully update event.attendancelist");
                   });
+                
                 }else{
                     _newSignIn = new Attendance({
                         event_id : req.params.eventid,
@@ -745,9 +805,9 @@ exports.SignIn_create_post= [
                       console.log("1.Successfully Create SignIn");
                   });
   
-                  let _newSignin = _newSignIn;
+                  let NewSignIn = _newSignIn;
                   
-                  Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount ,AttendanceList:_newSignin},{},function(err,theevent){
+                  Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount ,AttendanceList : NewSignIn},{},function(err,theevent){
                       if(err) { return next(err);}
                       console.log("2.Succesfully update event.attendancelist");
                   });
@@ -767,10 +827,10 @@ exports.SignIn_create_post= [
                 });
   
             }
-        
-        
+
             else{
                 let _atndList = results.list.list;
+
                 if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄 =>把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
                     if (results.event.signCondition == 'onlyIn'){
                         _atndList.push({                   
@@ -791,7 +851,7 @@ exports.SignIn_create_post= [
                     };
 
                     Attendance.findByIdAndUpdate(_atnd._id,_SignIn,{},function(err){
-                        console.log("Successfully Create SignIn 671");
+                        console.log("Successfully Create SignIn 123");
                     });
                     
                 let user_atnd = {
@@ -805,17 +865,12 @@ exports.SignIn_create_post= [
                     if(err) { return next(err);}
                     res.redirect("./attendancelist");
                 });
-                console.log("here!!!"+theuser);
-
             }
 
 
                 else{
 
                     for(let i = 0; i < _atndList.length; i++){
-                        console.log("i:  "+i);
-                        console.log(_atndList[i].email);
-
 
                         if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
@@ -871,13 +926,11 @@ exports.SignIn_create_post= [
                                 return;
                             }
                         }else{
-                            console.log("?");
+                            console.log("Something Wrong Here 11251");
                             break;
                         }
                     }
                     
-                    console.log(_SignIn);
-
                     await Attendance.findByIdAndUpdate(results.attendance._id,_SignIn,{},function(err,theAtd){
                         if(err){return next(err);}
                         console.log("Successfully Create SignIn");
@@ -898,10 +951,9 @@ exports.SignIn_create_post= [
                         }
                     }
 
-                    console.log(_rwd);
-
-                    Event.findByIdAndUpdate(req.params.eventid,{AttendanceList:_atnd._id ,amount : _rwd,},{},function(err,theevent){
+                    Event.findByIdAndUpdate(req.params.eventid,{AttendanceList:_atnd._id ,amount : _rwd},{},function(err,theevent){
                         if(err) { return next(err);}
+                        console.log("reward successfully update");
                         res.redirect("./attendancelist");
                      });
 
@@ -972,16 +1024,31 @@ exports.SignOut_create_post= [
             if(err){return next(err);}
 
             else if (_atnd == null){
+
                 let _newSignOut;
                 if(results.event.signCondition == 'onlyOut'){
-                    _newSignOut = new Attendance({
-                        event_id : req.params.eventid,
-                        list : [{
-                            email : _stdId,
-                            time_out : _timeout,
-                            reward : true
-                        }]
-                    });    
+
+                 _newSignOut = new Attendance({
+                      event_id : req.params.eventid,
+                      list : [{
+                          email : _stdId,
+                          time_out : _timeout,
+                          reward:true
+                      }]
+                    });
+  
+                  _newSignOut.save(function(err){
+                    if(err) {return next(err);}
+                    console.log("1.Successfully Create SignOut");
+                  });
+                  
+                  let NewSignOut = _newSignOut;
+  
+                  Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount + 1 , AttendanceList: NewSignOut },{},function(err,theevent){
+                    if(err) { return next(err);}
+                    console.log("2.Succesfully update event.attendancelist");
+                  });
+                
                 }else{
                     _newSignOut = new Attendance({
                         event_id : req.params.eventid,
@@ -989,68 +1056,37 @@ exports.SignOut_create_post= [
                             email : _stdId,
                             time_out : _timeout
                         }]
-                    });    
+                    });
+  
+                    _newSignOut.save(function(err){
+                      if(err) {return next(err);}
+                      console.log("1.Successfully Create SignOut");
+                  });
+  
+                  let NewSignOut = _newSignOut;
+                  
+                  Event.findByIdAndUpdate(req.params.eventid,{amount :results.event.amount ,AttendanceList : NewSignOut},{},function(err,theevent){
+                      if(err) { return next(err);}
+                      console.log("2.Succesfully update event.attendancelist");
+                  });
                 }
-
-                _SignOut = _newSignOut;
-
-                _newSignOut.save(function(err){
-
-                    if(err) {return next(err);}
-                    console.log("Successfully Create SignOut");
-
-                });
-                let thisevent;
-                if(results.event.signCondition == 'onlyOut'){
-                    thisevent = new Event({
-                        name : results.event.name,
-                        time : results.event.time,
-                        expense : results.event.expense,
-                        location : results.event.location,
-                        AttendanceList : _newSignOut,
-                        amount : results.event.amount + 1,
-                        _id : results.event._id,
-                        status : results.event.status,
-                        ncculink : results.event.ncculink,
-                        signCondition : results.event.signCondition
-                    });    
-                }else{
-                    thisevent = new Event({
-                        name : results.event.name,
-                        time : results.event.time,
-                        expense : results.event.expense,
-                        location : results.event.location,
-                        AttendanceList : _newSignOut,
-                        amount : results.event.amount,
-                        _id : results.event._id,
-                        status : results.event.status,
-                        ncculink : results.event.ncculink,
-                        signCondition : results.event.signCondition
-                    });    
-                }
-
-                Event.findByIdAndUpdate(req.params.eventid,thisevent,{},function(err,theevent){
-                    if(err) { return next(err);}
-                });
-                
-                
+                             
                 let user_atnd = {
                     event_id : req.params.eventid,
                     signout : _timeout
                 };
-
+  
                 _user.attend.push(user_atnd);
-
+  
                 User.findByIdAndUpdate(_user._id,{attend : _user.attend},{},function(err,theuser){
                     if(err) { return next(err);}
                     res.redirect("./attendancelist");
                 });
-                console.log("here!!!"+theuser);
-
             }
-        
+
             else{
                 let _atndList = results.list.list;
+
                 if(_atndList.length == 0){             //有建立attendance但裡面沒有任何紀錄
                     if (results.event.signCondition == 'onlyOut'){
                         _atndList.push({                   //把這筆紀錄塞進去然後update，這樣這筆attendance就有紀錄了
@@ -1071,7 +1107,7 @@ exports.SignOut_create_post= [
                     };
 
                     Attendance.findByIdAndUpdate(_atnd._id,_SignOut,{},function(err){
-                        console.log("Successfully Create SignOut");
+                        console.log("Successfully Create SignOut 123");
                     });
                         
                 let user_atnd = {
@@ -1085,8 +1121,6 @@ exports.SignOut_create_post= [
                     if(err) { return next(err);}
                     res.redirect("./attendancelist");
                 });
-                console.log("here!!!"+theuser);
-
                 }
 
 
@@ -1150,12 +1184,10 @@ exports.SignOut_create_post= [
                                 return;
                             }
                         }else{
-                            console.log("?");
+                            console.log("Something Wrong Here 11252");
                             break;
                         }
                     }
-                    
-                    console.log(_SignOut);
                     
                     await Attendance.findByIdAndUpdate(results.attendance._id,_SignOut,{},function(err,theAtd){
                         if(err){return next(err);}
@@ -1174,24 +1206,9 @@ exports.SignOut_create_post= [
                         if(theAtd.list[j].reward == true){
                             _rwd ++;
                         }
-                    };
+                    }
                     
-                    console.log(_rwd);
-
-                    let theevent = {
-                        name : results.event.name,
-                        time : results.event.time,
-                        expense : results.event.expense,
-                        location : results.event.location,
-                        AttendanceList : _atnd._id,
-                        _id : results.event._id,
-                        amount : _rwd,
-                        status : results.event.status,
-                        ncculink : results.event.ncculink,
-                        signCondition : results.event.signCondition   
-                    };
-                    
-                    Event.findByIdAndUpdate(req.params.eventid,theevent,{},function(err,theevent){
+                    Event.findByIdAndUpdate(req.params.eventid,{AttendanceList:_atnd._id ,amount : _rwd},{},function(err,theevent){
                         if(err) { return next(err);}
                         res.redirect("./attendancelist");    
                     });                
@@ -1215,7 +1232,6 @@ exports.SignBoth_create_post= [
 
     // Process request after validation and sanitization.
     (req,res,next) =>{
-        console.log("????"),
         req.session.reload();
 
 
@@ -1296,8 +1312,6 @@ exports.SignBoth_create_post= [
                     if(err) { return next(err);}
                     res.redirect("./attendancelist");
                 });
-                console.log("here!!!"+theuser);
-                
             }
         
             else{
@@ -1330,8 +1344,6 @@ exports.SignBoth_create_post= [
                         if(err) { return next(err);}
                     });
 
-                    console.log("here!!!"+theuser);
-
                     Event.findByIdAndUpdate(req.params.eventid,{amount:1,AttendanceList:_atnd._id},{},function(err,theevent){
                         if(err) { return next(err);}
                         res.redirect("./attendancelist");
@@ -1343,9 +1355,6 @@ exports.SignBoth_create_post= [
                 else{
 
                     for(let i = 0; i < _atndList.length; i++){
-                        console.log("i:  "+i);
-                        console.log(_atndList[i].email);
-
 
                         if(_stdId != _atndList[i].email){              //輸入的userid不等於目前檢查的studentId
                             if(i != _atndList.length-1){continue;}          //如果現在檢查的不是最後一個，那就繼續檢查，因為不在這筆代表可能在下面的別筆
@@ -1390,11 +1399,10 @@ exports.SignBoth_create_post= [
                                 return;
                             }
                         }else{
-                            console.log("?");
+                            console.log("Something Wrong Here 11253");
                             break;
                         }
                     }
-                    console.log(_Sign);
 
                     await Attendance.findByIdAndUpdate(results.attendance._id,_Sign,{},function(err,theAtd){
                         if(err){return next(err);}
@@ -1415,8 +1423,6 @@ exports.SignBoth_create_post= [
                             _rwd ++;
                         }
                     }
-
-                    console.log(_rwd);
                     
                     Event.findByIdAndUpdate(req.params.eventid,{amount: _rwd,AttendanceList:_atnd._id},{},function(err,theevent){
                         if(err) { return next(err);}

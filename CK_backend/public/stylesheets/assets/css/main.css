@@ -1621,6 +1621,10 @@
 		line-height: 1.65;
 	}
 
+	table{
+        font-size: 14px;
+    }
+
 		@media screen and (max-width: 1680px) {
 
 			body, input, select, textarea {
@@ -1659,6 +1663,9 @@
 				font-size: 12pt;
 			}
 
+			table{
+                font-size: 12px;
+            }
 		}
 
 	a {
@@ -2345,9 +2352,9 @@
 
 		table th {
 			color: #727a82;
-			font-size: 0.9em;
+			font-size: 1em;
 			font-weight: 700;
-			padding: 0 0.75em 0.75em 0.75em;
+			padding: 0.75em 0.75em 0.75em 0.75em;
 			text-align: left;
 		}
 
@@ -2558,7 +2565,7 @@
 			input[type="button"],
 			button,
 			.button {
-				padding: 0;
+				padding: 0 0.75em 0.75em 0.75em;
 			}
 
 		}

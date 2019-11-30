@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>管理員登入</title>
+  </head>
+  <body>
+    <div class="container mainContainer indexContainer">
+      <div class="loginContainer inLogin">
+      <div class="panelDeco">
+          <div class="panelDecoTitle">
+              <h4>政治大學</h4>
+              <h5><span>體重管理系統</span></h5>
+          </div>
+        </div><div class="loginPanel">
+          <h5 class="bold" style="margin-top: 15px;margin-left: 15px;">管理者登入</h5>
+          <div class="inputForm loginInputForm">
+              <div class="inputUnit">
+                <h5>帳號</h5>
+                <input name="loginAccount" type="text" placeholder="請輸入帳號/Email" />
+              </div> 
+              <div class="inputUnit">
+                <h5>密碼</h5>
+                <input name="loginPass" type="password" placeholder="請輸入密碼" />
+              </div> 
+              <div class="btnGroup two">
+                <button class="submitLogin">登入</button>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    $('document').ready(function(){
+      $('body').on('click', '.submitLogin', function(){
+        async.waterfall([
+          function(next){
+            next(null, {
+              account: $('input[name=loginAccount]').val(),
+              password: $('input[name=loginPass]').val(),
+            });
+          },
+        ], function(err, rst){
+            if ( err ) throw err;  // 匯集 err1 err2 err3
+            else {
+              $('.webLoader').fadeIn(500).css('display','flex');
+              $.post('/admin/login', rst, function(rtn){
+                $('.webLoader').fadeOut(500);
+                if ( rtn.status ){
+                  window.location = '/admin/selectUser';
+                } else {
+                  toast('帳號密碼錯誤', 'danger');
+                }
+              });
+            }
+        });
+      });
+    });
+  </script>
+</html>

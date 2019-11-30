@@ -19,6 +19,9 @@ router.post('/sponsor/events/:eventid/delete', sponsor_controller.sponsor_delete
 // POST request to update events.
 router.post('/sponsor/events/:eventid/update', sponsor_controller.sponsor_update_post);
 
+// GET request for event detail
+router.get('/sponsor/events/:eventid',sponsor_controller.eventinfo_sponsor);
+
 // GET request for attendance list
 router.get('/sponsor/events/:eventid/attendancelist', sponsor_controller.events_attendancelist);
 router.get('/sponsor/events/:eventid/attendancelist_test', sponsor_controller.events_attendancelist_record);

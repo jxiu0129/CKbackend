@@ -5,23 +5,7 @@
 					<header class="align-center">
 						<h1> <u><%=event.name%></u> 的活動出席表 </h1>
 					</header>
-					<!-- <div>
-						<ul class="list=group list-group-flush">
-							<li class="list-group-item list-group-item-action align-items-center">活動名稱：<%=event.name%></li>
-							<li class="list-group-item list-group-item-action align-items-center">主辦人：<%=event.holder.name%></li>
-							<li class="list-group-item list-group-item-action align-items-center">活動地點：<%=event.location%></li> -->
-							<!-- <li class="list-group-item list-group-item-action align-items-center">簽到人數：0</li> -->
-							<!-- <li class="list-group-item list-group-item-action align-items-center">簽退人數：0</li> -->
-							<!-- <%if(event.status == 'willhold'){%>
-								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：尚未開始</li>
-							<%}else if( event.status == 'holding'){%>
-								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：正在進行</li>
-							<%}else if( event.status == 'finish'){%>
-								<li class="list-group-item list-group-item-action align-items-center">舉辦狀況：活動已結束</li>
-							<%}%>
-						</ul>
-					</div> -->
-					<!-- <hr> -->
+
 					<form method="post" action="#">
 						<div class="row uniform">
 							<div class="9u 12u$(small)">
@@ -74,10 +58,6 @@
                         <li><a href="./SignbothCreate" class="button alt fit">新增報到與刷退紀錄</a></li>					
 					</ul>
 
-					<!-- 活動結束跟匯出名單應該是一起? -->
-					<ul class="actions fit">
-						<li><a href="./SendMultiPoint" class="button alt fit">活動結束！</a></li>
-					</ul>
 					<!--button-->
 					<ul class="actions fit">
 						<li><a href="＃" class="button fit">匯出出席名單</a></li>

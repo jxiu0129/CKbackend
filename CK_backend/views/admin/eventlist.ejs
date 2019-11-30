@@ -26,10 +26,8 @@
                                 <th>活動ID</th>
 								<th>活動名稱</th>
 								<th>活動日期</th>
-								<th>活動地點</th>
-								<th>承辦單位</th>
-                                <th>修改/刪除</th>
-                                <th>活動狀態</th>
+								<th>活動狀態</th>
+								<th>詳細資訊</th>
 							</tr>
 							</thead>
 							<tbody>
@@ -37,45 +35,10 @@
 
 							<tr>
                                 <td width="150px" style= "word-break:break-all"><%=_event[i].shortid%></td>
-								<td width="250px" style= "word-break:break-all"><%=_event[i].name%></td>
-								<td width="250px" style= "word-break:break-all"><%=Time[i]%> 開始
+								<td width="350px" style= "word-break:break-all"><%=_event[i].name%></td>
+								<td width="300px" style= "word-break:break-all"><%=Time[i]%> 開始
 									<br><%= endTime[i] %> 結束</td>
 
-								<td width="150px" style= "word-break:break-all"><%=_event[i].location%></td>
-
-								<%if (_event[i].holder != undefined){%>
-									<td width="150px" style= "word-break:break-all"><a href="" data-toggle="modal" data-target="#sponsorInfo<%= i %>"><%=_event[i].holder.name%></a></td>
-									<!-- Modal -->
-									<div class="modal fade" id="sponsorInfo<%= i %>" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
-										<div class="modal-dialog" role="document">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h3 class="modal-title" id="infoLabel">承辦單位聯絡資訊</h3>
-													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-														<span aria-hidden="true">&times;</span>
-													</button>
-												</div>
-												<div class="modal-body">
-														<h3 class="inline">承辦單位名稱：</h3><p class="inline"><%=_event[i].holder.name%></p>
-														<br>
-														<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline"><%=_event[i].holder.phone%></p>
-														<br>
-														<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><a href="<%=_event[i].holder.email%>"><%=_event[i].holder.email%></a></p>
-														<br>
-												</div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-												</div>
-											</div>
-										</div>
-									</div>
-								<%}else{%>
-									<td></td>
-								<%}%>
-								
-                                <td><a href="" data-toggle="modal" data-target="#event-edit<%= i %>">修改</a>/
-                                    <a href="" data-toggle="modal" data-target="#event-delete<%= i %>">刪除</a></td>
-                               
                                 <%if(_event[i].status == 'willhold'){%>
                                     <td>尚未開始</td>
                                 <%}else if(_event[i].status == 'holding'){%>
@@ -84,107 +47,7 @@
                                 <%}else if(_event[i].status == 'finish'){%>
                                     <td>活動已結束</td>
 								<%}%>
-								
-								<!-- Modal -->
-								<form method="post" action="/admin/events/delete?eventid=<%=_event[i]._id%>&userid=<%=_event[i].holder._id%>">
-									<div class="modal fade" id="event-delete<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-deleteLabel" aria-hidden="true">
-										<div class="modal-dialog" role="document">
-											<div class="modal-content">
-												<div class="modal-header">
-													<p> <%= _event[i]._id %> </p>
-													<h3 class="modal-title" id="event-deleteLabel">刪除活動</h3>
-													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-														<span aria-hidden="true">&times;</span>
-													</button>
-												</div>
-												<div class="modal-body">
-													<p>請注意！當你按下Delete，該活動將被刪除。</p>
-													<p>是否真的要刪除此活動？</p>
-												</div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-													<button type="submit" class="btn btn-primary">Delete</button>
-
-												</div>
-											</div>
-										</div>
-									</div>
-								</form>
-
-								<!-- Modal -->
-								<form method="post" action="/admin/events/update?eventid=<%=_event[i]._id%>">
-									<div class="modal fade" id="event-edit<%= i %>" tabindex="-1" role="dialog" aria-labelledby="event-editLabel" aria-hidden="true">
-										<div class="modal-dialog" role="document">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h3 class="modal-title" id="event-editLabel">修改活動資訊</h3>
-													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-														<span aria-hidden="true">&times;</span>
-													</button>
-												</div>
-												<div class="modal-body" style="text-align: left">
-
-													<h3 class="inline">活動名稱：</h3>
-													<div class="6u 12u$(xsmall) inline">
-														<input type="text" name="name" id="event-editName" value="<%= _event[i].name %>" placeholder="修改活動名稱" />
-													</div>
-													<br>
-
-													<h3 class="inline">活動地點：</h3>
-													<br>
-													<div class="6u 12u$(xsmall) inline">
-														<input type="text" name="location" id="event-editLocation" value="<%= _event[i].location %>" placeholder="">
-													</div>
-													<br>
-													
-													<h3 class="inline">活動連結：</h3>
-													<br>
-													<div class="6u 12u$(xsmall) inline">
-														<input type="text" name="link" id="event-editLink" value="<%= _event[i].ncculink %>" placeholder="修改活動連結">
-													</div>
-													<br>
-
-													<h3 class="inline">開始時間：</h3>
-													<br>
-													
-													<input type="datetime-local" name="time" id="event-editDateTime" value="2019-01-01T00:00" placeholder="2014-09-18">
-													<br>
-
-													<h3 class="inline">結束時間：</h3>
-													<br>
-													<input type="datetime-local" name="endtime" id="event-editEndTime" value="2019-01-01T00:00" placeholder="2014-09-18">
-													<br>
-
-													<h3 class="inline">發點數條件：</h3>
-													<br>
-													<select name="signCondition">
-														<% if (_event[i].signCondition == 'onlyIn'){%>
-														<option value="bothSign">必須 簽到與刷退</option>
-														<option value="onlyIn" selected="true">*只要 簽到</option>
-														<option value="onlyOut">只要 刷退</option>
-														<%} else if (_event[i].signCondition == 'onlyOut'){%>
-														<option value="bothSign">必須 簽到與刷退</option>
-														<option value="onlyIn" >只要 簽到</option>
-														<option value="onlyOut" selected="true">*只要 刷退</option>
-														<%}else{%>
-														<option value="bothSign" selected="true">*必須 簽到與刷退</option>
-														<option value="onlyIn" >只要 簽到</option>
-														<option value="onlyOut">只要 刷退</option>	
-														<%}%>	
-													</select>
-													<br>
-														
-
-												</div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-													<input type="submit" class="btn btn-primary" value="Save"/>
-
-												</div>
-											</div>
-										</div>
-									</div>
-								</form>
+                                <td width="160px" style= "word-break:break-all"><a href="/admin/events/eventinfo/<%=_event[i]._id%>">詳細資訊</a></td>
                                 </tr>
 							<%}%>
 							</tbody>

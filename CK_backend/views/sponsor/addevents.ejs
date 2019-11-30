@@ -58,46 +58,67 @@
                                     <option value="onlyIn">只要 簽到</option>
                                     <option value="onlyOut">只要 刷退</option>
                                 </select>
-                            </div>
+                            </div>  
 
 							<br>
-                            <p>請注意！當你新增此活動後，該活動的投資金額不可再做更動。
+                            <p>請注意！當你新增此活動後，<b><u>該活動的投資金額不可再做修改。</u></b>
                                 <br>
                                 若有需要更動，請刪除整筆活動再行新增。</p>
 							<div class="12u$">
 								<ul class="actions">
 									<li><input type="submit" onclick="return CheckFunc();" value="新增活動" /></li>
-									<li><input type="reset" value="重填資料" class="alt" /></li>
+                                    <li><input type="reset" value="重填資料" class="alt" /></li>
+                                    <!-- <li><input type="button" onclick="location.href='/sponsor/events'" value="回上一頁"></li> -->
 								</ul>
-							</div>
-							<script language="javascript" type="text/javascript">
+                            </div>                            
+                            
+                            <!-- 在此設定可用餘額並把值傳到script中，才能用function檢查可用餘額是否足夠 -->
+                            <input id='realbalance' type='number' value=<%=realBalance%> style="display:none"/>
+                            
+                            <script language="javascript" type="text/javascript">
+                            
+                                let Rbalance = document.getElementById('realbalance').value;
+                                console.log(Rbalance);
+                                
                                 function CheckFunc()
                                 {
+                                    let time = new Date(document.forms[0].time.value);
+                                    let endtime = new Date(document.forms[0].endtime.value);
                                     msg = "";
+
                                     if(document.forms[0].name.value == "")
                                     {
                                         msg = "請輸入活動名稱";
-                                    }
-                                    else if(document.forms[0].location.value == "")
-                                    {
-                                        msg = "請輸入活動地點";
-                                    }
-                                    else if(document.forms[0].event_link.value == "")
-                                    {
-                                        msg = "請輸入活動連結";
                                     }
                                     else if(document.forms[0].time.value == "")
                                     {
                                         msg = "請輸入開始時間";
                                     }
+                                    else if(time.getTime() < Date.now())
+                                    {
+                                        msg = "開始時間不可為過去時間"
+                                    }
                                     else if(document.forms[0].endtime.value == "")
                                     {
                                         msg = "請輸入結束時間";
+                                    }
+                                    else if(endtime.getTime() < Date.now())
+                                    {
+                                        msg = "結束時間不可為過去時間"
+                                    }
+                                    else if(endtime.getTime() < time.getTime())
+                                    {
+                                        msg = "結束時間不可比開始時間早"
                                     }
                                     else if(document.forms[0].expense.value == "")
                                     {
                                         msg = "請輸入投入資金";
                                     }
+                                    // WTF???
+                                    // else if(document.forms[0].expense.value > Rbalance)
+                                    // {
+                                    //     msg = "可用餘額不足（投入資金不可大於可用餘額）";
+                                    // }
                                     else
                                     {
                                         return true;

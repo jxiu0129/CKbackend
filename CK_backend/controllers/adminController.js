@@ -15,7 +15,6 @@ const QRCode = require('qrcode');
 const schedule = require('node-schedule');
 const moment = require('moment');
 
-
 const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 
@@ -125,6 +124,22 @@ moment.locale('zh-tw', {
     }
   });
 
+exports.admin_login_get = (req,res)=>{
+    res.render('admin/login');
+};
+
+exports.admin_login_post = (req,res)=>{
+    if (req.body.account == 'admin' && req.body.password == 'workhard') {
+        req.session.admin = true;
+        res.json({
+            status: true
+        });
+    } else {
+        res.json({
+            status: false
+        });
+    }
+};
 
 exports.admin = function(req,res){
     res.render('admin/index');
@@ -152,6 +167,23 @@ exports.event_list = function(req,res){
     });
 };
 
+
+exports.event_info = (req,res)=>{
+    Event.findById(req.params.eventid)
+    .populate('holder')
+    .exec((err,event)=>{
+            let Time = moment(event.time).format('LLL');
+            let EndTime = moment(event.endtime).format('LLL');
+
+        res.render('admin/eventinfo',{
+            event : event,
+            Time : Time,
+            EndTime : EndTime,
+        });
+    });
+};
+
+
 exports.create_event_first_get = function(req,res){
     res.render('admin/addevent_first');
 };
@@ -164,7 +196,7 @@ exports.create_event_first_post =[
             if (err) { return next(err); }
             if(theuser == undefined | theuser == null){
               console.log("err: "+theuser);
-              res.redirect('http://attend.nccu.edu.tw/admin/events/createevent_first');
+              res.redirect('https://attend.nccu.edu.tw/admin/events/createevent_first');
             }else{
               res.redirect('/admin/events/createevent_second/'+theuser._id);
             }
@@ -418,7 +450,7 @@ exports.event_update_post= [
               // Successful - redirect to genre detail page.
               console.log('Successfully Update');
               // ?????
-              res.redirect("http://attend.nccu.edu.tw/admin/events");
+              res.redirect("https://attend.nccu.edu.tw/admin/events");
           });
       
   }
@@ -434,14 +466,14 @@ exports.event_attendancelist = function(req,res,next){
       .exec(function (err, thisattnd){
           if (err) { return next(err); }
 
-          res.render('admin/attendancelist', { username: req.session.user_info.user_info.name,title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt , url:req.session.API_LoginCode} );
+          res.render('admin/attendancelist', {title: 'Attendance List | NCCU Attendance', thisattnd : thisattnd, event :theevt} );
       });
   });
   
 };
 
 exports.Signin_create_get= function(req,res){
-  res.render('admin/add_checkin' , { username: req.session.user_info.user_info.name,title : "Create Sign In | NCCU Attendance", url:req.session.API_LoginCode});
+  res.render('admin/add_checkin' , { username: req.session.user_info.user_info.name,title : "Create Sign In | NCCU Attendance"});
 };
 
 exports.Signin_create_post= [
@@ -1239,6 +1271,76 @@ exports.user_create_post = async (req,res)=>{
         res.render('admin/add_user');
     }
 };
+
+
+//////////////////////////////  User Part   /////////////////////////////////////////////////////////////
+
+
+exports.user_list = (req,res)=>{
+    User.find({})
+    // .populate('hold')
+    // .populate('attend')
+    .sort([['email','descending']])
+    .exec((err,user)=>{
+        res.render('admin/userlist',{user : user});
+    });
+};
+
+exports.user_info = (req,res)=>{
+    User.findById(req.params.userid)
+    .exec((err,user)=>{
+        res.render('admin/userinfo',{user:user});
+    });
+};
+
+exports.user_record = (req, res, next) => {
+    User
+    .findById(req.params.userid, 'attend email')
+    .populate('attend.event_id')
+    .exec((err, data) => {
+        if(err){ console.log(err); }
+
+        if(data.attend == null){
+            let err = new Error('你還沒有參加任何活動喔');
+            err.status = 404;
+            return next(err);
+        }
+
+
+        res.render('admin/userrecord', {
+            event_info: data.attend, 
+            user:data
+        });
+    });
+    
+};
+
+exports.user_holded = (req,res) =>{
+    User.findById(req.params.userid)
+    .exec((err,_user)=>{
+        if (err) { return next(err); }
+        
+        Event.find({_id:_user.hold.holded_events})
+        .sort([['time','descending']])
+        .exec((err,list_event) => {
+            if (err) { return next(err); }
+            let timeArray = [];
+            let endtimeArray = [];
+            for(let i =0 ; i< list_event.length;i++){
+                timeArray.push(moment(list_event[i].time).format('LLL'));
+                endtimeArray.push(moment(list_event[i].endtime).format('LLL'));
+            }
+
+            res.render('admin/userevents', {
+                _user : _user,
+                list_event:  list_event,
+                Time : timeArray,
+                endTime : endtimeArray, 
+            });
+        });      
+    });
+};
+
 
 exports.user_events = function(req,res){
     res.render('index' , { title : "使用者資料"});

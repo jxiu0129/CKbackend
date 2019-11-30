@@ -9,6 +9,8 @@ router.get('/admin', admin_controller.admin);
 
 router.get('/admin/events', admin_controller.event_list);
 
+router.get('/admin/events/eventinfo/:eventid', admin_controller.event_info);
+
 router.get('/admin/events/createevent_first',admin_controller.create_event_first_get);
 
 router.post('/admin/events/createevent_first',admin_controller.create_event_first_post);
@@ -36,7 +38,18 @@ router.post('/admin/events/:eventid/SignbothCreate', admin_controller.Signboth_c
 // router.get('/admin/checks/delete', admin_controller.check_delete_get);
 
 // // POST request to delete checks.
-router.get('/admin/:eventid', admin_controller.check_delete_post);
+// router.get('/admin/:eventid', admin_controller.check_delete_post);
+
+
+// GET user list
+router.get('/admin/user/userlist',admin_controller.user_list);
+
+// GET user list
+router.get('/admin/user/:userid',admin_controller.user_info);
+
+router.get('/admin/user/:userid/events',admin_controller.user_holded);
+
+router.get('/admin/user/:userid/record',admin_controller.user_record);
 
 // // GET user create
 router.get('/admin/user/createUser',admin_controller.user_create_get);

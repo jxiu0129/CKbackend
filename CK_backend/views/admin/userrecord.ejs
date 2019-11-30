@@ -1,9 +1,9 @@
-<%- include('../root/header')-%>
+<%- include('header')-%>
 <!-- Main -->
 <section id="main" class="wrapper">
 	<div class="inner">
 		<header class="align-center">
-			<h1>我參加的活動</h1>
+			<h1><u><%=user.name%></u>參加的活動</h1>
 		</header>
 		<div class="table-wrapper">
 			<table>
@@ -54,10 +54,8 @@
 						<%}%>
 					<%}%>
 
-					<!-- 更多 -->
-					<%var id = event_info[i].event_id._id; id=='undefined' ? 'undefined':event_info[i].event_id._id + "'"%>
-					<%let url = 'https://attend.nccu.edu.tw/user/record/info?eventid='%>
-					<td width="160px" style= "word-break:break-all"><a href=<%=url + id%>>  查看詳情 </a> </td>
+                    <!-- 更多 -->
+					<td width="160px" style= "word-break:break-all"><a href='/admin/events/eventinfo/<%=event_info[i].event_id._id%>'>查看詳情</a> </td>
 				</tr>
 				<%};%>
 				</tbody>
@@ -70,4 +68,5 @@
 		</ul>
 		</div>
 </section>
+
 <%- include('../root/footer')-%>

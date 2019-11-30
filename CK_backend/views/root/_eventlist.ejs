@@ -1,0 +1,99 @@
+<%-include('../root/header')-%>
+
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<header class="align-center">
+						<h1>活動列表</h1>
+					</header>
+
+					<form method="post" action="#">
+						<div class="row uniform">
+							<div class="9u 12u$(small)">
+								<input type="text" name="query" id="query" value="" style="height: 3em" placeholder="輸入活動名稱" />
+							</div>
+							<div class="3u$ 12u$(small)">
+								<input type="submit" value="搜尋" class="fit" style="height: 3em; line-height: 3em"/>
+							</div>
+						</div>
+					</form>
+
+					<div class="table-wrapper" >
+							<% for(let i = 0 ; i < _event.length; i++){ %>
+
+							<div class="event_time">活動開始日期：<%=Time[i]%></div>
+							<div class="sponsor">主辦單位：
+								<a href="" data-toggle="modal" data-target="#sponsorInfo<%= i %>">
+									<%if (_event[i].holder.name){%>
+									<%=_event[i].holder.name%>
+									<%}else{%>
+										承辦單位
+									<%}%>										
+								</a>
+							</div>
+							<table>
+								<tbody>
+									<tr>
+										<th>活動名稱/ID<br>(將滑鼠移至活動名稱即可檢視ID)</th>
+										<th>活動地點</th>
+										<th>報名連結</th>
+									</tr>
+									<tr>
+										<td title="<%=_event[i].shortid%>" width="300px" style= "word-break:break-all"><%=_event[i].name%></td>
+										<td width="200px" style= "word-break:break-all"><%=_event[i].location%></td>
+
+										<%if(_event[i].ncculink) {%>
+											<td width="150px" style= "word-break:break-all"><a href="<%=_event[i].ncculink%>" target="_blank" style="font-weight: bold">我要報名</a></td>
+											<%}else{%>
+											<td width="150px" style= "word-break:break-all">無報名連結</td>
+										<%}%>
+									</tr>
+								</tbody>
+							</table>
+
+
+						<!-- Modal -->
+						<div class="modal fade" id="sponsorInfo<%= i %>" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h3 class="modal-title" id="infoLabel">承辦單位聯絡資訊</h3>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">
+										<h3 class="inline">承辦單位名稱：</h3><p class="inline"><%=_event[i].holder.name%></p>
+										<br>
+										<h3 class="inline">承辦單位聯絡電話：</h3><p class="inline">
+										<%if (_event[i].holder.phone){%>
+											<%=_event[i].holder.phone%>
+											<%}else{%>
+												無
+											<%}%>
+										</p>
+										<br>
+										<h3 class="inline">承辦單位e-mail：</h3><p class="inline"><%=_event[i].holder.email%></p>
+										<br>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<%}%>
+					</div>
+					<header class="align-center">
+						<p>再來舉辦一場活動吧！</p>
+					</header>
+
+					<!--button-->
+					<ul class="actions fit">
+						<li><a href="/sponsor/events/createevent" class="button fit">新增活動</a></li>
+					</ul>
+					</div>
+			</section>
+
+<%-include('../root/footer')-%>

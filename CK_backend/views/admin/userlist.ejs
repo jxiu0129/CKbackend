@@ -1,0 +1,46 @@
+<%-include('header')-%>
+
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<header class="align-center">
+						<h1>使用者列表</h1>
+					</header>
+
+					<form method="post" action="#">
+						<div class="row uniform">
+							<div class="9u 12u$(small)">
+								<input type="text" name="query" id="query" value="" style="height: 3em" placeholder="輸入活動id" />
+							</div>
+							<div class="3u$ 12u$(small)">
+								<input type="submit" value="搜尋" class="fit" style="height: 3em; line-height: 3em" />
+							</div>
+						</div>
+					</form>
+
+					
+					<div class="table-wrapper">
+						<table>
+							<thead>
+							<tr>
+                                <th>姓名</th>
+								<th>Email</th>
+								<th>詳細資訊</th>
+							</tr>
+							</thead>
+							<tbody>
+							<% for(let i = 0 ; i < user.length; i++){ %>
+
+                            <tr>
+                                <td width="150px" style= "word-break:break-all"><%=user[i].name%></td>
+                                <td width="250px" style= "word-break:break-all"><%=user[i].email%></td>
+                                <td width="160px" style= "word-break:break-all"><a href="/admin/user/<%=user[i]._id%>">詳細資訊</a></td>
+                            </tr>
+							<%}%>
+							</tbody>
+
+						</table>
+					</div>
+                </div>
+        </section>
+<%-include('../root/footer')-%>

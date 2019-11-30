@@ -1,0 +1,71 @@
+<%-include('header')-%>
+
+<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<header class="align-center">
+						<h1><u><%=_user.name%></u>辦的活動</h1>
+					</header>
+					<div class="table-wrapper">
+
+						<% for(let i = 0;i < list_event.length;i++){ %>
+
+						<div class="event_time">活動開始時間：<%= Time[i]%></div>
+						<div class="sponsor">
+
+						</div>
+
+						<table>
+							<tbody>
+							<tr>
+								<th>活動名稱</th>
+								<th>活動細節</th>
+								<th width="160px" style= "word-break:break-all">活動狀態</th>
+							</tr>
+							<tr>
+								<td width="200px" style= "word-break:break-all"><%= list_event[i].name%></td>
+								<td width="160px" style= "word-break:break-all"><a href="/admin/events/eventinfo/<%=list_event[i]._id%>">詳細資訊</a></td>
+
+                                <%if(list_event[i].status == 'willhold'){%>
+									<td>尚未開始</td>
+								<%}else if( list_event[i].status == 'holding'){%>
+									<td>正在進行 <br>
+									<img src="../images/stop.png" height="15" width="15"/>
+									<a href="" class="important" data-toggle="modal" data-target="#end<%= i %>">活動結束 （發放點數）</a>
+								</td>
+
+								<%}else if( list_event[i].status == 'finish'){%>
+									<td>活動已結束</td>
+								<%}%>
+							</tr>
+							</tbody>
+						</table>
+						
+								<!-- Modal -->
+								<div class="modal fade" id="end<%= i %>" tabindex="-1" role="dialog" aria-labelledby="end_event" aria-hidden="true">
+									<div class="modal-dialog" role="document">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h3 class="modal-title" id="event-deleteLabel">活動結束</h3>
+												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+													<span aria-hidden="true">&times;</span>
+												</button>
+											</div>
+											<div class="modal-body">
+												<p>請注意！當你按下活動結束，該活動將開始發放點數。</p>
+												<p>一旦開始發放點數，活動細則及出席表將再也無法更動。</p>
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+												<button type="button" onclick="location.href='/sponsor/events/<%= list_event[i]._id %>/SendMultiPoint'" class="btn btn-primary">活動結束</button>
+
+											</div>
+										</div>
+									</div>
+								</div>
+							<%}%>
+					</div>
+
+					</div>
+			</section>
+<%-include('../root/footer')-%>

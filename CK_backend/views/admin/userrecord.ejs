@@ -1,0 +1,72 @@
+<%- include('header')-%>
+<!-- Main -->
+<section id="main" class="wrapper">
+	<div class="inner">
+		<header class="align-center">
+			<h1><u><%=user.name%></u>參加的活動</h1>
+		</header>
+		<div class="table-wrapper">
+			<table>
+				<thead>
+				<tr>
+					<th>活動名稱/ID</th>
+					<th>獲得點數</th>
+					<th>出席狀況</th>
+					<th>更多</th>
+				</tr>
+				</thead>
+				<tbody>
+				<% for(let i = 0; i < event_info.length; i++) {%>
+				<tr>
+					<!-- 活動名稱 -->
+					<td title="活動ID: <%= event_info[i].event_id.shortid%>" width="250px" style= "word-break:break-all"><%= event_info[i].event_id.name%></td>
+
+					<!-- 獲得點數 -->
+					<%if(event_info[i].event_id.SendPoint != undefined && event_info[i].event_id.SendPoint != null){%>
+						<td width="140px" style= "word-break:break-all"><img src="../images/piggy-bank.png" height="20" width="20"/>
+							<%=event_info[i].event_id.SendPoint%></td>
+					<%}else{%>
+							<td width="140px" style= "word-break:break-all" title="活動結束才會發放點數">活動尚未結束</td>
+					<%}%>
+
+					<!-- 出席狀況 -->
+					<%if(event_info[i].signin != undefined && event_info[i].signin != null){%>
+						<%if(event_info[i].signout != undefined && event_info[i].signout != null){%>
+						<td width="180px" style= "word-break:break-all">
+							<%=event_info[i].signin.toLocaleString({second:'numeric', hour12: false})%>
+							<br>
+							<%=event_info[i].signout.toLocaleString({second:'numeric', hour12: false})%>
+						</td>
+						<%}else{%>
+						<td width="180px" style= "word-break:break-all">
+							<%=event_info[i].signin.toLocaleString({second:'numeric', hour12: false})%> 
+							<br>
+							<%='尚未刷退'%>
+						</td>
+						<%}%>
+					<%}else{%>
+						<%if(event_info[i].signout != undefined && event_info[i].signout != null){%>
+						<td width="180px" style= "word-break:break-all">
+							<%='尚未簽到'%> 
+							<br>
+							<%=event_info[i].signout.toLocaleString({second:'numeric', hour12: false})%>
+						</td>
+						<%}%>
+					<%}%>
+
+                    <!-- 更多 -->
+					<td width="160px" style= "word-break:break-all"><a href='/admin/events/eventinfo/<%=event_info[i].event_id._id%>'>查看詳情</a> </td>
+				</tr>
+				<%};%>
+				</tbody>
+			</table>
+		</div>
+
+		<!--button-->
+		<ul class="actions fit">
+			<li><a href="#" class="button fit">錢包查看餘額</a></li>
+		</ul>
+		</div>
+</section>
+
+<%- include('../root/footer')-%>

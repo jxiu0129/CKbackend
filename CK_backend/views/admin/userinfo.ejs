@@ -1,0 +1,55 @@
+<%-include('header')-%>
+		<!-- Main -->
+		<section id="main" class="wrapper">
+			<div class="inner">
+				<header class="align-center">
+					<h1><u><%=user.name%></u>的資料</h1>
+				</header>
+
+				<!-- Table -->
+				<div class="table-wrapper">
+					<table>
+						<tbody>
+						<tr>
+							<td width="400px" style= "word-break:break-all">姓名</td>
+							<td width="600px" style= "word-break:break-all"><%=user.name%></td>
+						</tr>
+						<tr>
+							<td>會員電話</td>
+							<td><%=user.phone%></td>
+						</tr>
+						<tr>
+							<td>會員email</td>
+							<td><%=user.email%></td>
+                        </tr>
+						<tr>
+							<td>已使用活動點</td>
+							<td><%=user.spendedAmount%></td>
+						</tr>
+						<tr>
+							<td>參加過的活動</td>
+                            <td><a href="/admin/user/<%=user._id%>/record">前往參加過的活動</a></td>
+                        </tr>
+						<tr>
+							<td>辦過的活動</td>
+                            <td><a href="/admin/user/<%=user._id%>/events">前往辦過的活動</a></td>
+                        </tr>
+                        <tr>
+                            <td>是否編輯過個人資料</td>
+                            <td><%=user.inited%></td>
+                        </tr>
+
+                    </tbody>
+					</table>
+				</div>
+
+						<!--button-->
+						<ul class="actions fit">
+							<li><a href="/user_profile/edit_info" class="button fit">編輯個人資料</a></li>
+						</ul>
+
+					</div>
+				</form>
+			</div>
+		</section> 
+<%-include('../root/footer')-%>
